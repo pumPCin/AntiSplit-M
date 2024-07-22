@@ -15,6 +15,7 @@
   */
 package com.reandroid.apk;
 
+import com.reandroid.apkeditor.merge.LogUtil;
 import com.reandroid.archive.ArchiveFile;
 import com.reandroid.archive.BlockInputSource;
 import com.reandroid.archive.FileInputSource;
@@ -767,9 +768,7 @@ public class ApkModule implements ApkFile, Closeable {
         this.apkLogger = logger;
     }
     void logMessage(String msg) {
-        if(apkLogger!=null){
-            apkLogger.logMessage(msg);
-        }
+        LogUtil.logMessage(msg);
     }
     public void setCloseable(Closeable closeable){
         this.mCloseable = closeable;

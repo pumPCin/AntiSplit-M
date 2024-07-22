@@ -10,4 +10,9 @@
     <string name="no_filepath">Could not find the filepath of the selected file</string>
     <string name="output">Output directory:</string>
     <string name="show_dialog">Show dialog allowing selection of which splits to include</string>
+    <string name="nothing">Nothing selected</string>
+    <string name="change_text_color">Change Text Color</string>
+    <string name="change_background_color">Change background color</string>
+    <string name="all">Select All</string>
+    <string name="for_device">Select for your device</string>
 </resources>

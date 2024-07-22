@@ -37,12 +37,25 @@
                     android:layout_weight="1"
                     android:text="@string/merge" />
 
+                <Button
+                    android:id="@+id/changeTextColor"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/change_text_color" />
+
+                <Button
+                    android:id="@+id/changeBgColor"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/change_background_color" />
+
                 <TextView
                     android:id="@+id/oldAndroidInfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textColor="#673AB7"
                     android:text="@string/oldAndroidInfo"
                     android:visibility="gone"/>
 
@@ -53,24 +66,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:text="@string/enable_logs"
-                android:textColor="#673AB7" />
+                android:text="@string/enable_logs" />
 
             <Switch
                 android:id="@+id/ask"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:text="@string/ask"
-                android:textColor="#673AB7" />
+                android:text="@string/ask" />
 
             <Switch
                 android:id="@+id/showDialog"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:text="@string/show_dialog"
-                android:textColor="#673AB7" />
+                android:text="@string/show_dialog" />
 
             <EditText
                 android:id="@+id/workingFileField"
@@ -78,8 +88,6 @@
                 android:layout_height="48dp"
                 android:ems="10"
                 android:inputType="textNoSuggestions"
-                android:textColor="#673AB7"
-                android:textColorHint="#673AB7"
                 android:hint="@string/working_file"
                 android:importantForAutofill="no"/>
 
@@ -88,7 +96,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:textColor="#673AB7"
                 android:textIsSelectable="true"
                 android:visibility="gone"/>
 
@@ -97,7 +104,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:textColor="#673AB7"
                 android:textIsSelectable="true"/>
 
         </LinearLayout>
