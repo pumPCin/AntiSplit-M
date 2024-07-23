@@ -6,6 +6,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -213,7 +214,9 @@ public class MainActivity extends Activity implements Merger.LogListener {
         if (supportsFilePicker) startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
                 .addCategory(Intent.CATEGORY_OPENABLE)
                 .setType("*/*")
-                .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/zip", "application/octet-stream"}), REQUEST_CODE_OPEN_SPLIT_APK_TO_ANTISPLIT); // XAPK is octet-stream
+                .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/zip", "application/vnd.android.package-archive", "application/octet-stream"})
+                , REQUEST_CODE_OPEN_SPLIT_APK_TO_ANTISPLIT); // XAPK is octet-stream
         else {
             final String workingFilePath = ((TextView) findViewById(R.id.workingFileField)).getText().toString();
             splitAPKUri = Uri.fromFile(new File(workingFilePath));
@@ -232,7 +235,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
         Uri xapkUri;
         try {
-            xapkUri = Objects.requireNonNull(splitAPKUri.getPath()).endsWith("xapk") ? splitAPKUri : null;
+            xapkUri = !urisAreSplitApks || !Objects.requireNonNull(splitAPKUri.getPath()).endsWith("xapk") ? null : splitAPKUri;
         } catch (NullPointerException ignored) {
             xapkUri = null;
         }
@@ -305,25 +308,44 @@ public class MainActivity extends Activity implements Merger.LogListener {
         }
     }
 
+    private void processOneSplitApkUri(Uri uri) {
+        splitAPKUri = uri;
+        if (showDialog) showApkSelectionDialog();
+        else selectDirToSaveAPKOrSaveNow();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && data != null) {
-            Uri uri = data.getData();
-            if (uri != null) {
-                switch(requestCode) {
-                    case 0:
-                        checkStoragePerm();
-                    break;
-                    case REQUEST_CODE_OPEN_SPLIT_APK_TO_ANTISPLIT:
-                        splitAPKUri = uri;
-                        if(showDialog) showApkSelectionDialog();
-                        else selectDirToSaveAPKOrSaveNow();
-                    break;
-                    case REQUEST_CODE_SAVE_APK:
-                        new ProcessTask(this).execute(uri);
-                    break;
-                }
+            switch(requestCode) {
+                case 0:
+                    checkStoragePerm();
+                break;
+                case REQUEST_CODE_OPEN_SPLIT_APK_TO_ANTISPLIT:
+                    ClipData clipData = data.getClipData();
+                    if (clipData == null) processOneSplitApkUri(data.getData());
+                    else {
+                        //multiple files selected
+                        Uri first = clipData.getItemAt(0).getUri();
+                        try {
+                            if(Objects.requireNonNull(first.getPath()).endsWith(".apk")) {
+                                urisAreSplitApks = false;
+                                uris = new ArrayList<>();
+                                uris.add(first);
+                            } else processOneSplitApkUri(first);
+                        } catch (NullPointerException ignored) {}
+                        for (int i = 1; i < clipData.getItemCount(); i++) {
+                            Uri uri = clipData.getItemAt(i).getUri();
+                            if(urisAreSplitApks) processOneSplitApkUri(uri);
+                            else uris.add(uri);
+                        }
+                        if(!urisAreSplitApks) selectDirToSaveAPKOrSaveNow();
+                    }
+                break;
+                case REQUEST_CODE_SAVE_APK:
+                    new ProcessTask(this).execute(data.getData());
+                break;
             }
         }
     }
