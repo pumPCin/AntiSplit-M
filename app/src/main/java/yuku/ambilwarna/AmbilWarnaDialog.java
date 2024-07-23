@@ -1,16 +1,21 @@
 package yuku.ambilwarna;
 
+import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.bgColor;
+
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
@@ -22,7 +27,7 @@ public class AmbilWarnaDialog {
 		void onOk(AmbilWarnaDialog dialog, int color);
 	}
 
-	final AlertDialog dialog;
+	final Dialog dialog;
 	private final boolean supportsAlpha;
 	final OnAmbilWarnaListener listener;
 	final View viewHue;
@@ -82,9 +87,9 @@ public class AmbilWarnaDialog {
 		viewAlphaCheckered = view.findViewById(R.id.ambilwarna_alphaCheckered);
 
 		{ // hide/show alpha
-			viewAlphaOverlay.setVisibility(supportsAlpha? View.VISIBLE: View.GONE);
-			viewAlphaCursor.setVisibility(supportsAlpha? View.VISIBLE: View.GONE);
-			viewAlphaCheckered.setVisibility(supportsAlpha? View.VISIBLE: View.GONE);
+			viewAlphaOverlay.setVisibility(supportsAlpha ? View.VISIBLE : View.GONE);
+			viewAlphaCursor.setVisibility(supportsAlpha ? View.VISIBLE : View.GONE);
+			viewAlphaCheckered.setVisibility(supportsAlpha ? View.VISIBLE : View.GONE);
 		}
 
 		viewSatVal.setHue(getHue());
@@ -93,8 +98,8 @@ public class AmbilWarnaDialog {
 
 		viewHue.setOnTouchListener((v, event) -> {
 			if (event.getAction() == MotionEvent.ACTION_MOVE
-			|| event.getAction() == MotionEvent.ACTION_DOWN
-			|| event.getAction() == MotionEvent.ACTION_UP) {
+					|| event.getAction() == MotionEvent.ACTION_DOWN
+					|| event.getAction() == MotionEvent.ACTION_UP) {
 
 				float y = event.getY();
 				if (y < 0.f) y = 0.f;
@@ -117,8 +122,8 @@ public class AmbilWarnaDialog {
 
 		if (supportsAlpha) viewAlphaCheckered.setOnTouchListener((v, event) -> {
 			if ((event.getAction() == MotionEvent.ACTION_MOVE)
-			|| (event.getAction() == MotionEvent.ACTION_DOWN)
-			|| (event.getAction() == MotionEvent.ACTION_UP)) {
+					|| (event.getAction() == MotionEvent.ACTION_DOWN)
+					|| (event.getAction() == MotionEvent.ACTION_UP)) {
 
 				float y = event.getY();
 				if (y < 0.f) {
@@ -141,8 +146,8 @@ public class AmbilWarnaDialog {
 		});
 		viewSatVal.setOnTouchListener((v, event) -> {
 			if (event.getAction() == MotionEvent.ACTION_MOVE
-			|| event.getAction() == MotionEvent.ACTION_DOWN
-			|| event.getAction() == MotionEvent.ACTION_UP) {
+					|| event.getAction() == MotionEvent.ACTION_DOWN
+					|| event.getAction() == MotionEvent.ACTION_UP) {
 
 				float x = event.getX(); // touch event are in dp units.
 				float y = event.getY();
@@ -164,27 +169,71 @@ public class AmbilWarnaDialog {
 			return false;
 		});
 
-		// if back button is used, call back our listener.
-		dialog = new AlertDialog.Builder(context, AlertDialog.THEME_DEVICE_DEFAULT_DARK)
-		.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+		dialog = new Dialog(context, android.R.style.Theme_Dialog);
+		dialog.setContentView(view);
+		view.setBackgroundColor(bgColor);
+
+		Button buttonOk = new Button(context);
+		buttonOk.setText(android.R.string.ok);
+		buttonOk.setLayoutParams(new LinearLayout.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				1.0f
+		));
+		buttonOk.setOnClickListener(v -> {
 			if (AmbilWarnaDialog.this.listener != null) {
 				AmbilWarnaDialog.this.listener.onOk(AmbilWarnaDialog.this, getColor());
 			}
-		})
-		.setNegativeButton(android.R.string.cancel, (dialog, which) -> {
-			if (AmbilWarnaDialog.this.listener != null) {
-				AmbilWarnaDialog.this.listener.onCancel(AmbilWarnaDialog.this);
-			}
-		})
-		.setOnCancelListener(paramDialogInterface -> {
-			if (AmbilWarnaDialog.this.listener != null) {
-				AmbilWarnaDialog.this.listener.onCancel(AmbilWarnaDialog.this);
-			}
+			dialog.dismiss();
+		});
 
-		})
-		.create();
-		// kill all padding from the dialog window
-		dialog.setView(view, 0, 0, 0, 0);
+		Button buttonCancel = new Button(context);
+		buttonCancel.setText(android.R.string.cancel);
+		buttonCancel.setLayoutParams(new LinearLayout.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				1.0f
+		));
+		buttonCancel.setOnClickListener(v -> {
+			if (AmbilWarnaDialog.this.listener != null) {
+				AmbilWarnaDialog.this.listener.onCancel(AmbilWarnaDialog.this);
+			}
+			dialog.dismiss();
+		});
+
+		LinearLayout buttonLayout = new LinearLayout(context);
+		buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+		buttonLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+		buttonLayout.setLayoutParams(new LinearLayout.LayoutParams(
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT
+		));
+		buttonLayout.setBackgroundColor(bgColor);
+
+		buttonLayout.addView(buttonOk);
+		buttonLayout.addView(buttonCancel);
+
+		((ViewGroup) view).addView(buttonLayout);
+
+		buttonOk.setOnClickListener(v -> {
+			if (AmbilWarnaDialog.this.listener != null) {
+				AmbilWarnaDialog.this.listener.onOk(AmbilWarnaDialog.this, getColor());
+			}
+			dialog.dismiss();
+		});
+
+		buttonCancel.setOnClickListener(v -> {
+			if (AmbilWarnaDialog.this.listener != null) {
+				AmbilWarnaDialog.this.listener.onCancel(AmbilWarnaDialog.this);
+			}
+			dialog.dismiss();
+		});
+
+		dialog.setOnCancelListener(dialogInterface -> {
+			if (AmbilWarnaDialog.this.listener != null) {
+				AmbilWarnaDialog.this.listener.onCancel(AmbilWarnaDialog.this);
+			}
+		});
 
 		// move cursor & target on first draw
 		ViewTreeObserver vto = view.getViewTreeObserver();
@@ -195,7 +244,7 @@ public class AmbilWarnaDialog {
 				if (AmbilWarnaDialog.this.supportsAlpha) moveAlphaCursor();
 				moveTarget();
 				if (AmbilWarnaDialog.this.supportsAlpha) updateAlphaView();
-				view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 			}
 		});
 	}
@@ -270,8 +319,8 @@ public class AmbilWarnaDialog {
 	}
 
 	private void updateAlphaView() {
-		final GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[] {
-		Color.HSVToColor(currentColorHsv), 0x0
+		final GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{
+				Color.HSVToColor(currentColorHsv), 0x0
 		});
 		viewAlphaOverlay.setBackgroundDrawable(gd);
 	}
