@@ -1,7 +1,7 @@
 # AntiSplit M
 Android app to merge/"AntiSplit" split APKs (APKS/XAPK/APKM) to a regular .APK file
 
-**Note: If you are using this app to get an APK to patch in ReVanced Manager, you should enable the option "Show dialog allowing selection of which splits to include" and in the dialog select "Select for your device specifications" (see screenshots below)**
+**Note: If you are using this app to get an APK to patch in ReVanced Manager, you should enable the option "Automatically select splits for your device specifications" (see screenshots below)**
 
 This project is a simple GUI implementation of Merge utilities from [REAndroid APKEditor](https://github.com/REAndroid/APKEditor).
 
@@ -23,7 +23,7 @@ Note: if you are planning to further modify the APK, you only need to sign it af
 Note: Some apps verify the signature of the APK or take other measures to check if the app was modified, which may cause it to crash on startup.
 
 # Screenshots
-<img src="/images/1.6 mainscreen.png" height="540" width="243" /> <img src="/images/1.6 dialog.png" height="540" width="243" /> <img src="/images/1.6 result.png" height="540" width="243" />
+<img src="/images/1.6.1 mainscreen.jpg" height="540" width="243" /> <img src="/images/1.6 dialog.png" height="540" width="243" /> <img src="/images/1.6 result.png" height="540" width="243" />
 
 # Todo
 * support picking from installed apps
