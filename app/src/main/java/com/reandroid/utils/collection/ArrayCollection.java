@@ -17,7 +17,15 @@ package com.reandroid.utils.collection;
 
 import com.reandroid.common.ArraySupplier;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Objects;
+import java.util.Set;
+import java.util.Spliterator;
 import java.util.function.Predicate;
 
 public class ArrayCollection<T> implements ArraySupplier<T>, List<T>, Set<T> {
@@ -356,9 +364,7 @@ public class ArrayCollection<T> implements ArraySupplier<T>, List<T>, Set<T> {
         }
         Object[] result = getNewArray(length);
         Object[] elements = this.mElements;
-        for(int i = start; i < end; i ++){
-            result[i] = elements[i];
-        }
+        if (end - start >= 0) System.arraycopy(elements, start, result, start, end - start);
         return new ArrayCollection<>(result);
     }
 
@@ -807,9 +813,7 @@ public class ArrayCollection<T> implements ArraySupplier<T>, List<T>, Set<T> {
         return update;
     }
     private void arrayCopy(Object[] source, Object[] destination, int length){
-        for(int i = 0; i < length; i++){
-            destination[i] = source[i];
-        }
+        if (length >= 0) System.arraycopy(source, 0, destination, 0, length);
     }
     private Object[] getNewArray(Object[] source, int length){
         Object[] result = getNewArray(length);

@@ -1534,7 +1534,7 @@ public class ResXmlElement extends ResXmlNode implements
             builder.append(getEndLineNumber());
             builder.append(") ");
             builder.append("<");
-            builder.append(start.toString());
+            builder.append(start);
             if(hasText() && !hasElement()){
                 builder.append(">");
                 for(ResXmlTextNode textNode : listXmlTextNodes()){

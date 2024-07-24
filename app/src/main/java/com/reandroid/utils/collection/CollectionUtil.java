@@ -37,9 +37,7 @@ public class CollectionUtil {
         }
         int length = elements.length;
         HashSet<T> results = new HashSet<>(length);
-        for (int i = 0; i < length; i ++){
-            results.add(elements[i]);
-        }
+        results.addAll(Arrays.asList(elements).subList(0, length));
         return results;
     }
     public static<T> HashSet<T> toHashSet(Iterator<? extends T> iterator) {

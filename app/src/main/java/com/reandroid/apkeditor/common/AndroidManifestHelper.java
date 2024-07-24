@@ -70,7 +70,7 @@ public class AndroidManifestHelper {
     }
 
     public static void removeAttributeFromManifestAndApplication(AndroidManifestBlock androidManifestBlock,
-                                                                 int resourceId, String nameForLogging){
+                                                                 int resourceId){
         if(resourceId == 0){
             return;
         }

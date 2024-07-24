@@ -1336,7 +1336,7 @@ public class ResConfig extends ResConfigBase implements JSONConvert<JSONObject>,
             if(flag== null){
                 return;
             }
-            mBuilder.append('-').append(flag.toString());
+            mBuilder.append('-').append(flag);
         }
         private void appendDp(String prefix, int number){
             if(number == 0){
@@ -1618,11 +1618,8 @@ public class ResConfig extends ResConfigBase implements JSONConvert<JSONObject>,
                 return false;
             }
             Matcher matcher = PATTERN_LOCALE_NUMBERING_SYSTEM.matcher(qualifier);
-            if(!matcher.find()){
-                return false;
-            }
+            return matcher.find();
             //TODO: where to set ?
-            return true;
         }
         private void parseLocaleScriptVariant(){
             if(this.mLanguageRegionParsed || isEmpty()){

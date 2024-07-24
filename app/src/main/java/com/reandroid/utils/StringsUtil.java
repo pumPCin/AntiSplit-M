@@ -287,7 +287,7 @@ public class StringsUtil {
             builder.append(' ');
         }
         builder.append('[');
-        builder.append(elements.toString());
+        builder.append(elements);
         if(count < size){
             builder.append(" ... ");
         }

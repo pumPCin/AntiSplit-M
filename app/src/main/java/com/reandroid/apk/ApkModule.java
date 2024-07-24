@@ -54,7 +54,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 
 public class ApkModule implements ApkFile, Closeable {
-    private String moduleName;
+    private final String moduleName;
     private final ZipEntryMap zipEntryMap;
     private boolean loadDefaultFramework = true;
     private boolean mDisableLoadFramework = false;
@@ -217,9 +217,10 @@ public class ApkModule implements ApkFile, Closeable {
         writeApk(file, null);
     }
     public void writeApk(File file, WriteProgress progress) throws IOException {
-        ApkFileWriter writer = createApkFileWriter(file);
-        writer.setWriteProgress(progress);
-        writer.write();
+        try (ApkFileWriter writer = createApkFileWriter(file)) {
+            writer.setWriteProgress(progress);
+            writer.write();
+        }
     }
     public void writeApk(OutputStream outputStream) throws IOException {
         createApkStreamWriter(outputStream).write();

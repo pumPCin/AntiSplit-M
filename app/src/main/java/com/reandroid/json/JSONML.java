@@ -136,7 +136,7 @@ public class JSONML {
                             if (!(token instanceof String)) {
                                 throw x.syntaxError("Missing value");
                             }
-                            newjo.accumulate(attribute, keepStrings ? ((String)token) :XML.stringToValue((String)token));
+                            newjo.accumulate(attribute, keepStrings ? token :XML.stringToValue((String)token));
                             token = null;
                         } else {
                             newjo.accumulate(attribute, "");
@@ -338,7 +338,7 @@ public class JSONML {
                     } else if (object instanceof JSONArray) {
                         sb.append(toString((JSONArray)object));
                     } else {
-                        sb.append(object.toString());
+                        sb.append(object);
                     }
                 }
             } while (i < length);
@@ -407,7 +407,7 @@ public class JSONML {
                     } else if (object instanceof JSONArray) {
                         sb.append(toString((JSONArray)object));
                     } else {
-                        sb.append(object.toString());
+                        sb.append(object);
                     }
                 }
             }

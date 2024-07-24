@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -57,6 +58,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     private static boolean logEnabled;
     private static boolean ask;
     private static boolean showDialog;
+    private static boolean signApk;
     private Uri splitAPKUri;
     private ArrayList<Uri> uris;
     private boolean urisAreSplitApks = true;
@@ -74,6 +76,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         ((TextView) findViewById(R.id.logSwitch)).setTextColor(color);
         ((TextView) findViewById(R.id.ask)).setTextColor(color);
         ((TextView) findViewById(R.id.showDialog)).setTextColor(color);
+        ((TextView) findViewById(R.id.signToggle)).setTextColor(color);
     }
 
     private void setBgColor(int color) {
@@ -100,14 +103,15 @@ public class MainActivity extends Activity implements Merger.LogListener {
             // Android versions below 4.4 are too old to use the file picker for ACTION_OPEN_DOCUMENT/ACTION_CREATE_DOCUMENT. The location of the file must be manually input. The files will be saved to "AntiSplit-M" folder in the internal storage.
         }
 
+        // Fetch settings from SharedPreferences
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
         setTextColor(settings.getInt("textColor", 0xffffffff));
         setBgColor(settings.getInt("backgroundColor", 0xff000000));
 
-        // Fetch settings from SharedPreferences
         logEnabled = settings.getBoolean("logEnabled", true);
         LogUtil.setLogListener(this);
         LogUtil.setLogEnabled(logEnabled);
+
 
         Switch logSwitch = findViewById(R.id.logSwitch);
         logSwitch.setChecked(logEnabled);
@@ -115,6 +119,11 @@ public class MainActivity extends Activity implements Merger.LogListener {
             logEnabled = isChecked;
             LogUtil.setLogEnabled(logEnabled);
         });
+
+        signApk = settings.getBoolean("signApk", true);
+        Switch signToggle = findViewById(R.id.signToggle);
+        signToggle.setChecked(signApk);
+        signToggle.setOnCheckedChangeListener((buttonView, isChecked) -> signApk = isChecked);
 
         Switch askSwitch = findViewById(R.id.ask);
         if (Build.VERSION.SDK_INT > 22) {
@@ -167,7 +176,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         } else if (Intent.ACTION_SEND_MULTIPLE.equals(fromShareOrViewAction)) {
             if (fromShareOrView.hasExtra(Intent.EXTRA_STREAM)) {
                 uris = fromShareOrView.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
-                final Uri uri = uris.get(0);
+                final Uri uri = (Uri) uris.get(0);
                 urisAreSplitApks = !uri.getPath().endsWith(".apk");
                 if(urisAreSplitApks) splitAPKUri = uri;
                 else selectDirToSaveAPKOrSaveNow();
@@ -197,15 +206,14 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
     @Override
     protected void onPause() {
-        getSharedPreferences("set", Context.MODE_PRIVATE).edit().putBoolean("logEnabled", logEnabled).putBoolean("ask", ask).putBoolean("showDialog", showDialog).apply();
+        getSharedPreferences("set", Context.MODE_PRIVATE).edit().putBoolean("logEnabled", logEnabled).putBoolean("ask", ask).putBoolean("showDialog", showDialog).putBoolean("signApk", signApk).apply();
         super.onPause();
     }
 
     @Override
     public void onLog(String log) {
         runOnUiThread(() -> {
-            TextView logTextView = findViewById(R.id.logField);
-            logTextView.append(log + "\n");
+            ((TextView)findViewById(R.id.logField)).append(log + "\n");
             ScrollView scrollView = findViewById(R.id.scrollView);
             scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
         });
@@ -225,27 +233,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
         }
     }
     private Handler handler;
-
-    private void process(Uri outputUri) {
-        runOnUiThread(() -> ((TextView)findViewById(R.id.logField)).setText(""));
-        final File cacheDir = getExternalCacheDir();
-        if (cacheDir != null && urisAreSplitApks) {
-            deleteDir(cacheDir);
-        }
-
-        Uri xapkUri;
-        try {
-            xapkUri = !urisAreSplitApks || !Objects.requireNonNull(splitAPKUri.getPath()).endsWith("xapk") ? null : splitAPKUri;
-        } catch (NullPointerException ignored) {
-            xapkUri = null;
-        }
-
-        try {
-            Merger.run(urisAreSplitApks ? getContentResolver().openInputStream(splitAPKUri) : null, cacheDir, getContentResolver().openOutputStream(outputUri), xapkUri, this, splitsToUse);
-        } catch (IOException e) {
-            showError(e);
-        }
-    }
 
     /** @noinspection ResultOfMethodCallIgnored*/
     public static void deleteDir(File dir){
@@ -274,6 +261,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         protected String doInBackground(Uri... uris) {
             MainActivity activity = activityReference.get();
             if(!activity.urisAreSplitApks) {
+                // Just copy non split apks to cache folder then merger will load it
                 for(Uri u : activity.uris) {
                     try(InputStream is = activity.getContentResolver().openInputStream(u);
                         FileOutputStream fos = new FileOutputStream(activity.getExternalCacheDir() + File.separator + getOriginalFileName(activity, u))) {
@@ -287,7 +275,31 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     }
                 }
             }
-            activity.process(uris[0]);
+            activity.runOnUiThread(() -> ((TextView) activity.findViewById(R.id.logField)).setText(""));
+            final File cacheDir = activity.getExternalCacheDir();
+            if (cacheDir != null && activity.urisAreSplitApks) {
+                deleteDir(cacheDir);
+            }
+
+            Uri xapkUri;
+            try {
+                xapkUri = !activity.urisAreSplitApks || !Objects.requireNonNull(activity.splitAPKUri.getPath()).endsWith("xapk") ? null : activity.splitAPKUri;
+            } catch (NullPointerException ignored) {
+                xapkUri = null;
+            }
+
+            try (OutputStream os = activity.getContentResolver().openOutputStream(uris[0])) {
+                Merger.run(
+                        activity.urisAreSplitApks ? activity.getContentResolver().openInputStream(activity.splitAPKUri) : null,
+                        cacheDir,
+                        os,
+                        xapkUri,
+                        activity,
+                        activity.splitsToUse,
+                        signApk);
+            } catch (Exception e) {
+                activity.showError(e);
+            }
             return null;
         }
         @Override
@@ -296,7 +308,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             if(activity.urisAreSplitApks) activity.getHandler().post(() -> {
                 try {
                     activity.uris.remove(0);
-                    activity.splitAPKUri = activity.uris.get(0);
+                    activity.splitAPKUri = (Uri) activity.uris.get(0);
                     if(showDialog) activity.showApkSelectionDialog();
                     else activity.selectDirToSaveAPKOrSaveNow();
                 } catch (IndexOutOfBoundsException | NullPointerException ignored) {
@@ -540,7 +552,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
     private void showError(Exception e) {
         final String mainErr = e.toString();
-        StringBuilder stackTrace = new StringBuilder().append(mainErr);
+        StringBuilder stackTrace = new StringBuilder().append(mainErr).append('\n');
         for(StackTraceElement line : e.getStackTrace()) {
             stackTrace.append(line).append('\n');
         }

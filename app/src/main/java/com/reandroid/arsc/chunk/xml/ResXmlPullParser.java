@@ -694,8 +694,8 @@ public class ResXmlPullParser implements XmlResourceParser {
         reportNamespaceAttrs = true;
     }
 
-    public static interface DocumentLoadedListener{
-        public ResXmlDocument onDocumentLoaded(ResXmlDocument resXmlDocument);
+    public interface DocumentLoadedListener{
+        ResXmlDocument onDocumentLoaded(ResXmlDocument resXmlDocument);
     }
 
 }

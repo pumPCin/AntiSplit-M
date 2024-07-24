@@ -37,6 +37,7 @@ import com.reandroid.arsc.value.ValueType;
 import com.starry.FileUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,7 +54,7 @@ public class Merger {
         void onLog(String log);
     }
 
-    public static void run(InputStream ins, File cacheDir, OutputStream out, Uri xapkUri, Context context, List<String> splits) throws IOException {
+    public static void run(InputStream ins, File cacheDir, OutputStream out, Uri xapkUri, Context context, List<String> splits, boolean signApk) throws Exception {
         LogUtil.logMessage("Searching apk files ...");
 
         if(ins!=null) {
@@ -144,11 +145,11 @@ public class Merger {
             AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
                     AndroidManifest.NAME_splitTypes);
             AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
-                    AndroidManifest.ID_extractNativeLibs,
-                    AndroidManifest.NAME_extractNativeLibs);
+                    AndroidManifest.ID_extractNativeLibs
+            );
             AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
-                    AndroidManifest.ID_isSplitRequired,
-                    AndroidManifest.NAME_isSplitRequired);
+                    AndroidManifest.ID_isSplitRequired
+            );
             ResXmlElement application = manifest.getApplicationElement();
             List<ResXmlElement> splitMetaDataElements =
                     AndroidManifestHelper.listSplitRequired(application);
@@ -206,10 +207,20 @@ public class Merger {
             manifest.refresh();
         }
         LogUtil.logMessage("Saving...");
-
-        mergedModule.writeApk(out);
+        File temp;
+        if(signApk) {
+            temp = new File(cacheDir + File.separator + "temp.apk");
+            mergedModule.writeApk(temp);
+            LogUtil.logMessage("Signing APK...");
+            try {
+                new com.aefyr.pseudoapksigner.PseudoApkSignerWrapper(context).sign(new FileInputStream(temp), out);
+            } catch (Exception e) {
+                LogUtil.logMessage("Failed to sign APK, saving without signing");
+                mergedModule.writeApk(out);
+                throw(e); // for showError
+            }
+        } else mergedModule.writeApk(out);
         mergedModule.close();
-        out.close();
         bundle.close();
     }
 }

@@ -5,14 +5,16 @@
     <string name="merge">Select split APK to Merge/AntiSplit</string>
     <string name="success_saved">File saved successfully</string>
     <string name="enable_logs">Enable logs</string>
-    <string name="ask">Ask where to save the file each time (if disabled, write the AntiSplitted APK to the same directory where the split file was from)</string>
-    <string name="grant_storage">Storage permission is required to save to the same dir as the selected file</string>
-    <string name="no_filepath">Could not find the filepath of the selected file</string>
+    <string name="ask">Ask where to save the file each time (if disabled, write the merged APK to the same directory where the split file was from)</string>
+    <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
+    <string name="no_filepath">Couldn\'t find filepath of the selected file</string>
     <string name="output">Output directory:</string>
     <string name="show_dialog">Show dialog allowing selection of which splits to include</string>
     <string name="nothing">Nothing selected</string>
-    <string name="change_text_color">Change Text Color</string>
+    <string name="change_text_color">Change text color</string>
     <string name="change_background_color">Change background color</string>
     <string name="all">Select All</string>
-    <string name="for_device">Select for your device</string>
+    <string name="for_device">Select for your device specifications</string>
+    <string name="select_splits">Select splits</string>
+    <string name="sign_apk">Sign the APK after merging (enable this if you want to use the merged APK in ReVanced Manager)</string>
 </resources>

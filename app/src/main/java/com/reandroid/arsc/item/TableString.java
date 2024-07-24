@@ -48,14 +48,11 @@ public class TableString extends StringItem {
         return styleItem.build(get());
     }
     public Iterator<Entry> getEntries(boolean complex) {
-        return super.getUsers(Entry.class, new Predicate<Entry>() {
-            @Override
-            public boolean test(Entry item) {
-                if(complex){
-                    return item.isComplex();
-                }
-                return item.isScalar();
+        return super.getUsers(Entry.class, item -> {
+            if(complex){
+                return item.isComplex();
             }
+            return item.isScalar();
         });
     }
     public Iterator<Entry> getEntries(Predicate<Entry> tester) {

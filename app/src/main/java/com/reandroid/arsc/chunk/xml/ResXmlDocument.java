@@ -333,10 +333,7 @@ public class ResXmlDocument extends Chunk<HeaderBlock>
         if(chunkType==ChunkType.XML_CDATA){
             return true;
         }
-        if(chunkType==ChunkType.XML_LAST_CHUNK){
-            return true;
-        }
-        return false;
+        return chunkType == ChunkType.XML_LAST_CHUNK;
     }
     @Override
     public ResXmlStringPool getStringPool(){

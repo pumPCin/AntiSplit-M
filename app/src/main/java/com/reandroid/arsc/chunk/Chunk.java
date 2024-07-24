@@ -72,10 +72,9 @@ public abstract class Chunk<T extends HeaderBlock> extends ExpandableBlockContai
     }
     @Override
     public String toString(){
-        StringBuilder builder=new StringBuilder();
-        builder.append(getClass().getSimpleName());
-        builder.append(": ");
-        builder.append(getHeaderBlock());
-        return builder.toString();
+        String builder = getClass().getSimpleName() +
+                ": " +
+                getHeaderBlock();
+        return builder;
     }
 }

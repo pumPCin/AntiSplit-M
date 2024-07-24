@@ -1892,7 +1892,6 @@ public class KXmlParser implements XmlPullParser, Closeable {
 
             buf.append('>');
         } else if (type == IGNORABLE_WHITESPACE) {
-            ;
         } else if (type != TEXT) {
             buf.append(getText());
         } else if (isWhitespace) {
