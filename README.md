@@ -1,5 +1,7 @@
 # AntiSplit M
-Android app to AntiSplit (merge) split APKs (APKS/XAPK/APKM) to regular .APK file
+Android app to merge/"AntiSplit" split APKs (APKS/XAPK/APKM) to a regular .APK file
+
+**Note: If you are using this app to get an APK to patch in ReVanced Manager, you should enable the option "Show dialog allowing selection of which splits to include" and in the dialog select "Select for your device specifications" (see screenshots below)**
 
 This project is a simple GUI implementation of Merge utilities from [REAndroid APKEditor](https://github.com/REAndroid/APKEditor).
 
@@ -16,13 +18,12 @@ There are 3 ways to open the split APK to be merged:
 * Open the app from launcher and press the button then select the split APK file.
    * This option does not work on Android < 4.4, use one of the 2 other options or type the path to the APK (on your device storage) into the box in the app.
 
-Note: The APK will not be signed, you have to sign it before installing with any tool like [apk-signer](https://play.google.com/store/apps/details?id=com.haibison.apksigner). If you are planning to further modify the APK, you only need to sign it after the modifications.
+Note: if you are planning to further modify the APK, you only need to sign it after the modifications.
 
 Note: Some apps verify the signature of the APK or take other measures to check if the app was modified, which may cause it to crash on startup.
 
 # Screenshots
-<img src="/images/1.4.1 mainscreen.jpg" height="540" width="243" /> <img src="/images/1.4.1 dialog.jpg" height="540" width="243" /> <img src="/images/1.4.1 processed screen.jpg" height="540" width="243" />
+<img src="/images/1.6 mainscreen.png" height="540" width="243" /> <img src="/images/1.6 dialog.png" height="540" width="243" /> <img src="/images/1.6 result.png" height="540" width="243" />
 
 # Todo
-* Implement signing the exported APK
 * support picking from installed apps
