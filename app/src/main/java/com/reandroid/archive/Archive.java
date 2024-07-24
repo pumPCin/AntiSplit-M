@@ -26,6 +26,7 @@ import com.reandroid.utils.collection.CollectionUtil;
 import com.reandroid.utils.collection.ComputeIterator;
 import com.reandroid.utils.io.FileUtil;
 import com.reandroid.utils.io.IOUtil;
+import com.starry.FileUtils;
 
 import java.io.*;
 import java.util.*;
@@ -152,67 +153,34 @@ public abstract class Archive<T extends ZipInput> implements Closeable {
         int result = 0;
         while (iterator.hasNext()){
             ArchiveEntry archiveEntry = iterator.next();
-            extract(toFile(dir, archiveEntry), archiveEntry, logger);
+            String name = archiveEntry.getName().replace('/', File.separatorChar);
+            File file = new File(dir, name);
+            FileUtil.ensureParentDirectory(file);
+            if(logger != null){
+                long size = archiveEntry.getDataSize();
+                if(size > LOG_LARGE_FILE_SIZE){
+                    logger.logVerbose("Extracting ["
+                            + FileUtil.toReadableFileSize(size) + "] "+ archiveEntry.getName());
+                }
+            }
+            if(archiveEntry.getMethod() != Archive.STORED){
+                OutputStream outputStream = FileUtils.getFileOutputStream(file);
+                IOUtil.writeAll(openInputStream(archiveEntry), outputStream);
+            }else {
+                extractStored(file, archiveEntry);
+            }
             result ++;
         }
         return result;
     }
-    public void extract(File file, ArchiveEntry archiveEntry) throws IOException{
-        extract(file, archiveEntry, null);
-    }
-    public void extract(File file, ArchiveEntry archiveEntry, APKLogger logger) throws IOException{
-        FileUtil.ensureParentDirectory(file);
-        if(logger != null){
-            long size = archiveEntry.getDataSize();
-            if(size > LOG_LARGE_FILE_SIZE){
-                logger.logVerbose("Extracting ["
-                        + FileUtil.toReadableFileSize(size) + "] "+ archiveEntry.getName());
-            }
-        }
-        if(archiveEntry.getMethod() != Archive.STORED){
-            extractCompressed(file, archiveEntry);
-        }else {
-            extractStored(file, archiveEntry);
-        }
-    }
+
     abstract void extractStored(File file, ArchiveEntry archiveEntry) throws IOException;
-    private void extractCompressed(File file, ArchiveEntry archiveEntry) throws IOException {
-        FileOutputStream outputStream = new FileOutputStream(file);
-        IOUtil.writeAll(openInputStream(archiveEntry), outputStream);
-    }
-    private File toFile(File dir, ArchiveEntry archiveEntry){
-        String name = archiveEntry.getName().replace('/', File.separatorChar);
-        return new File(dir, name);
-    }
+
     @Override
     public void close() throws IOException {
         this.zipInput.close();
     }
 
-    public static<T1 extends InputSource> PathTree<T1> buildPathTree(T1[] inputSources){
-        PathTree<T1> root = PathTree.newRoot();
-        int length = inputSources.length;
-        for(int i = 0; i < length; i ++){
-            T1 item = inputSources[i];
-            root.add(item.getAlias(), item);
-        }
-        return root;
-    }
-
-    public static Date dosToJavaDate(long dosTime) {
-        final Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.YEAR, (int) ((dosTime >> 25) & 0x7f) + 1980);
-        cal.set(Calendar.MONTH, (int) ((dosTime >> 21) & 0x0f) - 1);
-        cal.set(Calendar.DATE, (int) (dosTime >> 16) & 0x1f);
-        cal.set(Calendar.HOUR_OF_DAY, (int) (dosTime >> 11) & 0x1f);
-        cal.set(Calendar.MINUTE, (int) (dosTime >> 5) & 0x3f);
-        cal.set(Calendar.SECOND, (int) (dosTime << 1) & 0x3e);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTime();
-    }
-    public static long javaToDosTime(long javaTime) {
-        return javaToDosTime(new Date(javaTime));
-    }
     public static long javaToDosTime(Date date) {
         if(date == null || date.getTime() == 0){
             return 0;

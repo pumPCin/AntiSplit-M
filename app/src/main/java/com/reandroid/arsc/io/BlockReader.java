@@ -18,6 +18,7 @@ package com.reandroid.arsc.io;
 import com.reandroid.arsc.header.InfoHeader;
 import com.reandroid.arsc.header.SpecHeader;
 import com.reandroid.arsc.header.TypeHeader;
+import com.starry.FileUtils;
 
 import java.io.*;
 
@@ -290,9 +291,10 @@ public class BlockReader extends InputStream {
 
 
     private static byte[] loadBuffer(File file) throws IOException {
-        FileInputStream in=new FileInputStream(file);
-        byte[] result = loadBuffer(in);
-        in.close();
+        byte[] result;
+        try (InputStream in = FileUtils.getFileInputStream(file)) {
+            result = loadBuffer(in);
+        }
         return result;
     }
     private static byte[] loadBuffer(InputStream in) throws IOException {

@@ -13,9 +13,15 @@ import android.provider.OpenableColumns;
 import android.text.TextUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.UUID;
 
 public class FileUtils {
@@ -49,8 +55,28 @@ public class FileUtils {
     private static String FALLBACK_COPY_FOLDER = "upload_part";
     private Context context;
 
+    public static final Charset UTF_8 = Charset.forName("UTF-8");
+
     public FileUtils(Context context) {
         this.context = context;
+    }
+
+    private static final boolean supportsNewOutputStream = (Build.VERSION.SDK_INT > 25);
+
+    public static OutputStream getFileOutputStream(String filepath) throws IOException {
+        return getFileOutputStream(new File(filepath));
+    }
+
+    public static OutputStream getFileOutputStream(File file) throws IOException {
+        return supportsNewOutputStream ? Files.newOutputStream(file.toPath(), java.nio.file.StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE) : new FileOutputStream(file);
+    }
+
+    public static InputStream getFileInputStream(File file) throws IOException {
+        return supportsNewOutputStream ? Files.newInputStream(file.toPath(), StandardOpenOption.READ) : new FileInputStream(file);
+    }
+
+    public static InputStream getFileInputStream(String filePath) throws IOException {
+        return supportsNewOutputStream ? Files.newInputStream(Paths.get(filePath), StandardOpenOption.READ) : new FileInputStream(filePath);
     }
 
     private static boolean fileExists(String filePath) {
@@ -108,11 +134,6 @@ public class FileUtils {
 
     private static boolean isWhatsAppFile(Uri uri) {
         return "com.whatsapp.provider.media".equals(uri.getAuthority());
-    }
-
-    private static boolean isGoogleDriveUri(Uri uri) {
-        return "com.google.android.apps.docs.storage".equals(uri.getAuthority())
-                || "com.google.android.apps.docs.storage.legacy".equals(uri.getAuthority());
     }
 
     @SuppressLint("NewApi")
@@ -184,10 +205,6 @@ public class FileUtils {
             return getDataColumn(context, contentUri, selection, selectionArgs);
         }
 
-        if (isGoogleDriveUri(uri)) {
-            return getDriveFilePath(uri);
-        }
-
         if (isWhatsAppFile(uri)) {
             return getFilePathForWhatsApp(uri);
         }
@@ -195,10 +212,6 @@ public class FileUtils {
         if ("content".equalsIgnoreCase(uri.getScheme())) {
             if (isGooglePhotosUri(uri)) {
                 return uri.getLastPathSegment();
-            }
-
-            if (isGoogleDriveUri(uri)) {
-                return getDriveFilePath(uri);
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -213,30 +226,6 @@ public class FileUtils {
         }
 
         return copyFileToInternalStorage(uri, FALLBACK_COPY_FOLDER);
-    }
-
-    private String getDriveFilePath(Uri uri) {
-        Cursor returnCursor = context.getContentResolver().query(uri, null, null, null, null);
-        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-        returnCursor.moveToFirst();
-        String name = returnCursor.getString(nameIndex);
-        returnCursor.close();
-
-        File file = new File(context.getCacheDir(), name);
-        try (FileOutputStream outputStream = new FileOutputStream(file)) {
-            try (InputStream cursor = context.getContentResolver().openInputStream(uri)) {
-                int read;
-                int maxBufferSize = 1024 * 1024;
-                int bytesAvailable = cursor.available();
-                int bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                byte[] buffers = new byte[bufferSize];
-                while ((read = cursor.read(buffers)) != -1) {
-                    outputStream.write(buffers, 0, read);
-                }
-            }
-        } catch (IOException e) {
-        }
-        return file.getPath();
     }
 
     private String copyFileToInternalStorage(Uri uri, String newDirName) {
@@ -258,7 +247,7 @@ public class FileUtils {
             output = new File(context.getCacheDir() + File.separator + name);
         }
 
-        try (FileOutputStream outputStream = new FileOutputStream(output)) {
+        try (OutputStream outputStream = FileUtils.getFileOutputStream(output)) {
             try (InputStream cursor = context.getContentResolver().openInputStream(uri)) {
                 int read;
                 int bufferSize = 1024;

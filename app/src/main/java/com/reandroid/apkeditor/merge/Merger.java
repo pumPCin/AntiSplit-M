@@ -20,6 +20,7 @@ import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.getOriginalFile
 import android.content.Context;
 import android.net.Uri;
 
+import com.abdurazaaqmohammed.AntiSplit.R;
 import com.reandroid.apk.ApkBundle;
 import com.reandroid.apk.ApkModule;
 import com.reandroid.apkeditor.common.AndroidManifestHelper;
@@ -37,8 +38,6 @@ import com.reandroid.arsc.value.ValueType;
 import com.starry.FileUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -52,10 +51,12 @@ public class Merger {
 
     public interface LogListener {
         void onLog(String log);
+        void onLog(int resID);
+
     }
 
     public static void run(InputStream ins, File cacheDir, OutputStream out, Uri xapkUri, Context context, List<String> splits, boolean signApk) throws Exception {
-        LogUtil.logMessage("Searching apk files ...");
+        LogUtil.logMessage(R.string.searching);
 
         if(ins!=null) {
             if(xapkUri == null) {
@@ -65,14 +66,14 @@ public class Merger {
                     while (zipEntry != null) {
                         final String name = zipEntry.getName();
                         if (name.endsWith(".apk")) {
-                            if((splits != null && !splits.isEmpty() && splits.contains(name))) LogUtil.logMessage("Skipping " + name + ": Unselected");
+                            if((splits != null && !splits.isEmpty() && splits.contains(name))) LogUtil.logMessage(context.getString(R.string.skipping) + " " + name + context.getString(R.string.unselected));
                             else {
                                 File file = new File(cacheDir, name);
                                 String canonicalizedPath = file.getCanonicalPath();
                                 if (!canonicalizedPath.startsWith(cacheDir.getCanonicalPath() + File.separator)) {
                                     throw new IOException("Zip entry is outside of the target dir: " + name);
                                 }
-                                FileOutputStream fos = new FileOutputStream(file);
+                                OutputStream fos = FileUtils.getFileOutputStream(file);
                                 int len;
                                 while ((len = zis.read(buffer)) > 0) {
                                     fos.write(buffer, 0, len);
@@ -80,24 +81,23 @@ public class Merger {
                                 fos.close();
                                 LogUtil.logMessage("Extracted " + name);
                             }
-                        } else LogUtil.logMessage("Skipping " + name + ": Not an APK file");
+                        } else LogUtil.logMessage(context.getString(R.string.skipping) + " " +  name + " " + context.getString(R.string.not_apk));
                         zipEntry = zis.getNextEntry();
                     }
                     zis.closeEntry();
                 }
             } else {
-                LogUtil.logMessage("XAPK file detected, ensuring it can be extracted properly");
+                LogUtil.logMessage(R.string.detected_xapk);
                 File bruh = new File(new FileUtils(context).getPath(xapkUri));
                 final boolean couldntRead = !bruh.canRead();
                 if(couldntRead) {
                     // copy to cache dir if no permission
-                    bruh = new File(cacheDir + File.separator + getOriginalFileName(context, xapkUri));
-                    try (FileOutputStream fos = new FileOutputStream(bruh)) {
-                        byte[] buffer = new byte[4096];
-                        int length;
-                        while ((length = ins.read(buffer)) > 0) {
-                            fos.write(buffer, 0, length);
-                        }
+                    bruh = new File(cacheDir, getOriginalFileName(context, xapkUri));
+                    OutputStream fos = FileUtils.getFileOutputStream(bruh);
+                    byte[] buffer = new byte[4096];
+                    int length;
+                    while ((length = ins.read(buffer)) > 0) {
+                        fos.write(buffer, 0, length);
                     }
                 }
                 try (ZipFile zipFile = new ZipFile(bruh)) {
@@ -108,7 +108,7 @@ public class Merger {
                         String fileName = entry.getName();
 
                         if (fileName.endsWith(".apk")) {
-                            if((splits != null && !splits.isEmpty() && splits.contains(fileName))) LogUtil.logMessage("Skipping " + fileName + ": Unselected");
+                            if((splits != null && !splits.isEmpty() && splits.contains(fileName))) LogUtil.logMessage(context.getString(R.string.skipping) + " " + fileName + context.getString(R.string.unselected));
                             else {
                                 File outFile = new File(cacheDir, fileName);
                                 File parentDir = outFile.getParentFile();
@@ -117,7 +117,7 @@ public class Merger {
                                 }
 
                                 try (InputStream is = zipFile.getInputStream(entry);
-                                     FileOutputStream fos = new FileOutputStream(outFile)) {
+                                     OutputStream fos = FileUtils.getFileOutputStream(outFile)) {
                                     byte[] buffy = new byte[1024];
                                     int len;
                                     while ((len = is.read(buffy)) > 0) {
@@ -125,7 +125,7 @@ public class Merger {
                                     }
                                 }
                             }
-                        } else LogUtil.logMessage("Skipping " + fileName + ": Not an APK file");
+                        } else LogUtil.logMessage(context.getString(R.string.skipping) + " " +  fileName + " " + context.getString(R.string.not_apk));
                     }
                     if(couldntRead) bruh.delete();
                 }
@@ -139,7 +139,7 @@ public class Merger {
         ApkModule mergedModule = bundle.mergeModules();
         if(mergedModule.hasAndroidManifest()) {
             AndroidManifestBlock manifest = mergedModule.getAndroidManifest();
-            LogUtil.logMessage("Sanitizing manifest ...");
+            LogUtil.logMessage(R.string.sanitizing_manifest);
             AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
                     AndroidManifest.NAME_requiredSplitTypes);
             AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
@@ -182,7 +182,7 @@ public class Merger {
                                                 continue;
                                             }
                                             String path = resValue.getValueAsString();
-                                            LogUtil.logMessage("Removed-table-entry : " + path);
+                                            LogUtil.logMessage(context.getString(R.string.removed_table_entry) + " " + path);
                                             //Remove file entry
                                             zipEntryMap.remove(path);
                                             // It's not safe to destroy entry, resource id might be used in dex code.
@@ -206,16 +206,16 @@ public class Merger {
             }
             manifest.refresh();
         }
-        LogUtil.logMessage("Saving...");
-        File temp;
+        LogUtil.logMessage((R.string.saving));
+
         if(signApk) {
-            temp = new File(cacheDir + File.separator + "temp.apk");
+            final File temp = new File(cacheDir, "temp.apk");
             mergedModule.writeApk(temp);
-            LogUtil.logMessage("Signing APK...");
-            try {
-                new com.aefyr.pseudoapksigner.PseudoApkSignerWrapper(context).sign(new FileInputStream(temp), out);
+            LogUtil.logMessage(R.string.signing);
+            try (InputStream fis = FileUtils.getFileInputStream(temp)) {
+                new com.aefyr.pseudoapksigner.PseudoApkSignerWrapper(context).sign(fis, out);
             } catch (Exception e) {
-                LogUtil.logMessage("Failed to sign APK, saving without signing");
+                LogUtil.logMessage(R.string.sign_failed);
                 mergedModule.writeApk(out);
                 throw(e); // for showError
             }

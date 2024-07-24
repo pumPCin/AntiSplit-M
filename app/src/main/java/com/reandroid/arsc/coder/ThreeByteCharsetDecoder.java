@@ -25,7 +25,7 @@ import java.nio.charset.StandardCharsets;
 public class ThreeByteCharsetDecoder extends CharsetDecoder {
     public static final ThreeByteCharsetDecoder INSTANCE = new ThreeByteCharsetDecoder();
     public ThreeByteCharsetDecoder() {
-        super(StandardCharsets.UTF_8, 1.0F, 1.0F);
+        super(com.starry.FileUtils.UTF_8, 1.0F, 1.0F);
     }
     @Override
     protected CoderResult decodeLoop(ByteBuffer src, CharBuffer dst) {

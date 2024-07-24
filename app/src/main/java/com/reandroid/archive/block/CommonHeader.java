@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 public abstract class CommonHeader extends ZipHeader {
     private final int offsetFileName;
@@ -135,14 +134,18 @@ public abstract class CommonHeader extends ZipHeader {
         }
     }
     public Date getDate(){
-        return Archive.dosToJavaDate(getDosTime());
+        long dosTime = getDosTime();
+        final Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, (int) ((dosTime >> 25) & 0x7f) + 1980);
+        cal.set(Calendar.MONTH, (int) ((dosTime >> 21) & 0x0f) - 1);
+        cal.set(Calendar.DATE, (int) (dosTime >> 16) & 0x1f);
+        cal.set(Calendar.HOUR_OF_DAY, (int) (dosTime >> 11) & 0x1f);
+        cal.set(Calendar.MINUTE, (int) (dosTime >> 5) & 0x3f);
+        cal.set(Calendar.SECOND, (int) (dosTime << 1) & 0x3e);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
     }
-    public void setDate(Date date){
-        setDosTime(Archive.javaToDosTime(date));
-    }
-    public void setDate(long date){
-        setDosTime(Archive.javaToDosTime(date));
-    }
+
     public long getCrc(){
         return getIntegerUnsigned(offsetGeneralPurpose + 8);
     }
@@ -293,7 +296,7 @@ public abstract class CommonHeader extends ZipHeader {
         if(fileName==null){
             fileName="";
         }
-        byte[] nameBytes = fileName.getBytes(StandardCharsets.UTF_8);
+        byte[] nameBytes = fileName.getBytes(com.starry.FileUtils.UTF_8);
         getGeneralPurposeFlag().setUtf8(true, false);
         int length = nameBytes.length;
         setFileNameLength(length);
@@ -322,7 +325,7 @@ public abstract class CommonHeader extends ZipHeader {
         if(length>max){
             length = max;
         }
-        return new String(bytes, offset, length, StandardCharsets.UTF_8);
+        return new String(bytes, offset, length, com.starry.FileUtils.UTF_8);
     }
     public String decodeComment(){
         int length = getExtraLength();
@@ -335,7 +338,7 @@ public abstract class CommonHeader extends ZipHeader {
         if(length>max){
             length = max;
         }
-        return new String(bytes, offset, length, StandardCharsets.UTF_8);
+        return new String(bytes, offset, length, com.starry.FileUtils.UTF_8);
     }
     void onUtf8Changed(boolean oldValue){
         String str = mFileName;

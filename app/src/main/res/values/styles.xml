@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="CustomDialogTheme">
-        <item name="android:color">@android:color/holo_purple</item>
-        <item name="android:textColor">@android:color/holo_purple</item>
-        <item name="android:textColorAlertDialogListItem">@android:color/holo_purple</item>
-        <item name="android:textColorPrimary">@android:color/holo_purple</item>
-        <item name="android:background">@android:color/black</item>
-    </style>
+
 </resources>

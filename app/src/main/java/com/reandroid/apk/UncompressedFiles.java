@@ -21,10 +21,12 @@ import com.reandroid.json.JSONArray;
 import com.reandroid.json.JSONConvert;
 import com.reandroid.json.JSONObject;
 import com.reandroid.utils.CompareUtil;
+import com.starry.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -186,8 +188,10 @@ public class UncompressedFiles implements JSONConvert<JSONObject> {
         if(!jsonFile.isFile()){
             return;
         }
-        JSONObject jsonObject=new JSONObject(new FileInputStream(jsonFile));
-        fromJson(jsonObject);
+        try (InputStream fis = FileUtils.getFileInputStream(jsonFile)) {
+            JSONObject jsonObject=new JSONObject(fis);
+            fromJson(jsonObject);
+        }
     }
     private static String sanitizePath(String path){
         if(path==null || path.length()==0){

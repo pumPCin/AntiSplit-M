@@ -18,6 +18,7 @@ package com.reandroid.archive;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.utils.StringsUtil;
+import com.starry.FileUtils;
 
 import java.io.*;
 import java.util.Comparator;
@@ -73,10 +74,7 @@ public abstract class InputSource {
         }
         return getName();
     }
-    public void setAlias(String alias) {
-        this.alias = alias;
-        this.splitAlias = null;
-    }
+
     private String[] getSplitAlias(){
         if(this.splitAlias == null){
             String alias = StringsUtil.toLowercase(getAlias());
@@ -97,14 +95,12 @@ public abstract class InputSource {
         if(!dir.exists()){
             dir.mkdirs();
         }
-        FileOutputStream outputStream = new FileOutputStream(file);
+        OutputStream outputStream = FileUtils.getFileOutputStream(file);
         write(outputStream);
         outputStream.close();
     }
     public long write(OutputStream outputStream) throws IOException {
-        return write(outputStream, openStream());
-    }
-    private long write(OutputStream outputStream, InputStream inputStream) throws IOException {
+        InputStream inputStream = openStream();
         long result=0;
         byte[] buffer=new byte[1024 * 1000];
         int len;
@@ -115,6 +111,7 @@ public abstract class InputSource {
         close(inputStream);
         return result;
     }
+
     public String getName(){
         return name;
     }

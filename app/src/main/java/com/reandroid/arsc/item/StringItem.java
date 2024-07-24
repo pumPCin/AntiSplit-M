@@ -283,7 +283,7 @@ public class StringItem extends StringBlock implements JSONConvert<JSONObject>, 
             CharBuffer charBuffer = DECODER_3B.decode(byteBuffer);
             return charBuffer.toString();
         } catch (CharacterCodingException e) {
-            return new String(bytes, offset, length, StandardCharsets.UTF_8);
+            return new String(bytes, offset, length, com.starry.FileUtils.UTF_8);
         }
     }
     public boolean hasStyle(){
@@ -429,7 +429,7 @@ public class StringItem extends StringBlock implements JSONConvert<JSONObject>, 
         byte[] bts;
         byte[] lenBytes=new byte[2];
         if(str!=null){
-            bts=str.getBytes(StandardCharsets.UTF_8);
+            bts=str.getBytes(com.starry.FileUtils.UTF_8);
             int strLen=bts.length;
             if((strLen & 0xff80)!=0){
                 lenBytes=new byte[4];

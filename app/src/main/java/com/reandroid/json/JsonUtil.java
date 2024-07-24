@@ -5,8 +5,8 @@
 */
 package com.reandroid.json;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import android.os.Build;
+
 import java.util.Base64;
 
 public class JsonUtil {
@@ -17,37 +17,9 @@ public class JsonUtil {
         }
         text = text.substring(JSONItem.MIME_BIN_BASE64.length());
         try{
-            return Base64.getUrlDecoder().decode(text);
+            return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ? Base64.getUrlDecoder().decode(text) : android.util.Base64.decode(text, android.util.Base64.URL_SAFE);
         }catch (Throwable throwable){
             throw new JSONException(throwable);
         }
     }
-    public static void readJSONObject(File file, JSONConvert<JSONObject> jsonConvert) throws IOException {
-        FileInputStream inputStream=new FileInputStream(file);
-        readJSONObject(inputStream, jsonConvert);
-        inputStream.close();
-    }
-    public static void readJSONObject(InputStream inputStream, JSONConvert<JSONObject> jsonConvert){
-        InputStreamReader reader=new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-        readJSONObject(reader, jsonConvert);
-    }
-    public static void readJSONObject(Reader reader, JSONConvert<JSONObject> jsonConvert){
-        JSONObject jsonObject=new JSONObject(new JSONTokener(reader));
-        jsonConvert.fromJson(jsonObject);
-    }
-
-    public static void readJSONArray(File file, JSONConvert<JSONArray> jsonConvert) throws IOException {
-        FileInputStream inputStream=new FileInputStream(file);
-        readJSONArray(inputStream, jsonConvert);
-        inputStream.close();
-    }
-    public static void readJSONArray(InputStream inputStream, JSONConvert<JSONArray> jsonConvert){
-        InputStreamReader reader=new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-        readJSONArray(reader, jsonConvert);
-    }
-    public static void readJSONArray(Reader reader, JSONConvert<JSONArray> jsonConvert){
-        JSONArray jsonObject=new JSONArray(new JSONTokener(reader));
-        jsonConvert.fromJson(jsonObject);
-    }
-
 }

@@ -37,6 +37,7 @@ import com.reandroid.utils.collection.EmptyIterator;
 import com.reandroid.utils.collection.FilterIterator;
 import com.reandroid.utils.collection.IterableIterator;
 import com.reandroid.utils.collection.SingleIterator;
+import com.starry.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -510,7 +511,7 @@ public class TableBlock extends Chunk<TableHeader>
         if(dir!=null && !dir.exists()){
             dir.mkdirs();
         }
-        OutputStream outputStream=new FileOutputStream(file);
+        OutputStream outputStream = FileUtils.getFileOutputStream(file);
         int length = super.writeBytes(outputStream);
         outputStream.close();
         return length;
@@ -655,7 +656,9 @@ public class TableBlock extends Chunk<TableHeader>
         return load(inputStream);
     }
     public static TableBlock load(File file) throws IOException{
-        return load(new FileInputStream(file));
+        try (InputStream fis =FileUtils.getFileInputStream(file)) {
+            return load(fis);
+        }
     }
     public static TableBlock load(InputStream inputStream) throws IOException{
         TableBlock tableBlock=new TableBlock();

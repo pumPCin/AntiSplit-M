@@ -55,7 +55,14 @@ public class ZipEntryMap implements Comparator<InputSource>, Iterable<InputSourc
         return ArrayIterator.of(toArray());
     }
     public PathTree<InputSource> getPathTree(){
-        return Archive.buildPathTree(toArray());
+        InputSource[] inputSources = toArray();
+        PathTree<InputSource> root = PathTree.newRoot();
+        int length = inputSources.length;
+        for(int i = 0; i < length; i ++){
+            InputSource item = inputSources[i];
+            root.add(item.getAlias(), item);
+        }
+        return root;
     }
     public LinkedHashMap<String, InputSource> toAliasMap(){
         InputSource[] sources = toArray();

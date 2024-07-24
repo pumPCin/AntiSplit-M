@@ -1,5 +1,7 @@
 package com.aefyr.pseudoapksigner;
 
+import com.starry.FileUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,24 +15,6 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 
 public class Utils {
-
-    public static byte[] getFileHash(File file, String hashingAlgorithm) throws Exception {
-        return getFileHash(new FileInputStream(file), hashingAlgorithm);
-    }
-
-    static byte[] getFileHash(InputStream fileInputStream, String hashingAlgorithm) throws Exception {
-        MessageDigest messageDigest = MessageDigest.getInstance(hashingAlgorithm);
-
-        byte[] buffer = new byte[1024 * 1024];
-
-        int read;
-        while ((read = fileInputStream.read(buffer)) > 0)
-            messageDigest.update(buffer, 0, read);
-
-        fileInputStream.close();
-
-        return messageDigest.digest();
-    }
 
     static byte[] hash(byte[] bytes, String hashingAlgorithm) throws Exception {
         MessageDigest messageDigest = MessageDigest.getInstance(hashingAlgorithm);
@@ -65,10 +49,9 @@ public class Utils {
     static byte[] readFile(File file) throws IOException {
         byte[] fileBytes = new byte[(int) file.length()];
 
-        FileInputStream inputStream = new FileInputStream(file);
-        inputStream.read(fileBytes);
-        inputStream.close();
-
+        try(InputStream inputStream = FileUtils.getFileInputStream(file)){
+            inputStream.read(fileBytes);
+        }
         return fileBytes;
     }
 }

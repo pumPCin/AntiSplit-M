@@ -15,6 +15,8 @@
  */
 package com.reandroid.json;
 
+import com.starry.FileUtils;
+
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -35,7 +37,7 @@ public abstract class JSONItem {
         if(dir != null && !dir.exists()){
             dir.mkdirs();
         }
-        FileOutputStream outputStream=new FileOutputStream(file);
+        OutputStream outputStream= FileUtils.getFileOutputStream(file);
         write(outputStream, indentFactor);
         outputStream.close();
     }
@@ -43,7 +45,7 @@ public abstract class JSONItem {
         write(outputStream, INDENT_FACTOR);
     }
     public void write(OutputStream outputStream, int indentFactor) throws IOException {
-        Writer writer=new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+        Writer writer=new OutputStreamWriter(outputStream, com.starry.FileUtils.UTF_8);
         writer= write(writer, indentFactor, 0);
         writer.flush();
         writer.close();

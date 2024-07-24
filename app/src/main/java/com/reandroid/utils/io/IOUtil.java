@@ -21,17 +21,11 @@ import java.nio.charset.StandardCharsets;
 @SuppressWarnings({"ResultOfMethodCallIgnored"})
 public class IOUtil {
 
-    public static String readUtf8(File file) throws IOException {
-        return new String(readFully(file), StandardCharsets.UTF_8);
-    }
-    public static String readUtf8(InputStream inputStream) throws IOException {
-        return new String(readFully(inputStream), StandardCharsets.UTF_8);
-    }
     public static void writeUtf8(String content, File file) throws IOException {
         writeUtf8(content, FileUtil.outputStream(file));
     }
     public static void writeUtf8(String content, OutputStream outputStream) throws IOException {
-        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = content.getBytes(com.starry.FileUtils.UTF_8);
         outputStream.write(bytes, 0, bytes.length);
         outputStream.close();
     }
@@ -69,9 +63,6 @@ public class IOUtil {
             inputStream.close();
             outputStream.close();
         }
-    }
-    public static byte[] readFully(File file) throws IOException{
-        return readFully(FileUtil.inputStream(file));
     }
     public static byte[] readFully(InputStream inputStream) throws IOException{
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

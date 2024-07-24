@@ -19,6 +19,8 @@ import com.reandroid.archive.block.CentralEntryHeader;
 import com.reandroid.archive.block.LocalFileHeader;
 import com.reandroid.utils.HexUtil;
 
+import java.io.UnsupportedEncodingException;
+
 public class ArchiveEntry {
     private final LocalFileHeader localFileHeader;
     public ArchiveEntry(LocalFileHeader lfh){
@@ -82,7 +84,7 @@ public class ArchiveEntry {
     public String getComment(){
         return getCentralEntryHeader().getComment();
     }
-    public void setComment(String comment){
+    public void setComment(String comment) {
         getCentralEntryHeader().setComment(comment);
     }
     public boolean isFile() {

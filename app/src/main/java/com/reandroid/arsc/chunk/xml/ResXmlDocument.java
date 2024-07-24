@@ -35,6 +35,8 @@ import com.reandroid.utils.collection.IterableIterator;
 import com.reandroid.utils.collection.SingleIterator;
 import com.reandroid.xml.XMLDocument;
 import com.reandroid.xml.XMLFactory;
+import com.starry.FileUtils;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
@@ -447,7 +449,7 @@ public class ResXmlDocument extends Chunk<HeaderBlock>
         if(dir!=null && !dir.exists()){
             dir.mkdirs();
         }
-        OutputStream outputStream=new FileOutputStream(file);
+        OutputStream outputStream= FileUtils.getFileOutputStream(file);
         int length = super.writeBytes(outputStream);
         outputStream.close();
         return length;

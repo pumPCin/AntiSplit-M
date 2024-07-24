@@ -18,8 +18,14 @@ package com.reandroid.utils.io;
 import com.reandroid.arsc.ARSCLib;
 import com.reandroid.utils.ObjectsUtil;
 import com.reandroid.utils.StringsUtil;
+import com.starry.FileUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,16 +40,8 @@ public class FileUtil {
         }
         return new File(dir, name);
     }
-    @Deprecated
-    public static void writeUtf8(File file, String content) throws IOException {
-        IOUtil.writeUtf8(content, file);
-    }
-    public static String combineFilePath(String parent, String name){
-        return combinePath(File.separatorChar, parent, name);
-    }
-    public static String combineUnixPath(String parent, String name){
-        return combinePath('/', parent, name);
-    }
+
+
     public static String combinePath(char separator, String parent, String name){
         if(StringsUtil.isEmpty(parent)){
             return name;
@@ -156,15 +154,9 @@ public class FileUtil {
         }
         return result + "." + dec + unit;
     }
-    public static InputStream inputStream(File file) throws IOException{
-        if(!file.isFile()){
-            throw new FileNotFoundException("No such file: " + file);
-        }
-        return new FileInputStream(file);
-    }
     public static OutputStream outputStream(File file) throws IOException{
         ensureParentDirectory(file);
-        return new FileOutputStream(file);
+        return FileUtils.getFileOutputStream(file);
     }
     public static void ensureParentDirectory(File file){
         File dir = file.getParentFile();

@@ -2,6 +2,8 @@ package com.abdurazaaqmohammed.AntiSplit.main;
 
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
 
+import static com.reandroid.apkeditor.merge.LogUtil.logEnabled;
+
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -21,7 +23,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.OpenableColumns;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.Switch;
@@ -34,55 +35,48 @@ import com.reandroid.apkeditor.merge.Merger;
 import com.starry.FileUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 
 /** @noinspection deprecation*/
 public class MainActivity extends Activity implements Merger.LogListener {
-    private final static int REQUEST_CODE_OPEN_SPLIT_APK_TO_ANTISPLIT = 1;
-    private final static int REQUEST_CODE_SAVE_APK = 2;
-    private final static boolean supportsFilePicker = Build.VERSION.SDK_INT>19;
-    private static boolean logEnabled;
     private static boolean ask;
     private static boolean showDialog;
     private static boolean signApk;
+    private static boolean selectSplitsForDevice;
     private Uri splitAPKUri;
     private ArrayList<Uri> uris;
     private boolean urisAreSplitApks = true;
     public static int textColor;
     public static int bgColor;
 
-    private void setTextColor(int color) {
-        textColor = color;
-        ((TextView) findViewById(R.id.oldAndroidInfo)).setTextColor(color);
-        final TextView wf = findViewById(R.id.workingFileField);
-        wf.setTextColor(color);
-        wf.setHintTextColor(color);
-        ((TextView) findViewById(R.id.errorField)).setTextColor(color);
-        ((TextView) findViewById(R.id.logField)).setTextColor(color);
-        ((TextView) findViewById(R.id.logSwitch)).setTextColor(color);
-        ((TextView) findViewById(R.id.ask)).setTextColor(color);
-        ((TextView) findViewById(R.id.showDialog)).setTextColor(color);
-        ((TextView) findViewById(R.id.signToggle)).setTextColor(color);
+    private void setColor(int color, boolean isTextColor) {
+        if(isTextColor) {
+            textColor = color;
+            ((TextView) findViewById(R.id.oldAndroidInfo)).setTextColor(color);
+            final TextView wf = findViewById(R.id.workingFileField);
+            wf.setTextColor(color);
+            wf.setHintTextColor(color);
+            ((TextView) findViewById(R.id.errorField)).setTextColor(color);
+            ((TextView) findViewById(R.id.logField)).setTextColor(color);
+            ((TextView) findViewById(R.id.logToggle)).setTextColor(color);
+            ((TextView) findViewById(R.id.ask)).setTextColor(color);
+            ((TextView) findViewById(R.id.showDialogToggle)).setTextColor(color);
+            ((TextView) findViewById(R.id.signToggle)).setTextColor(color);
+            ((TextView) findViewById(R.id.selectSplitsForDeviceToggle)).setTextColor(color);
+        } else {
+            bgColor = color;
+            findViewById(R.id.main).setBackgroundColor(color);
+        }
     }
 
-    private void setBgColor(int color) {
-        bgColor = color;
-        findViewById(R.id.main).setBackgroundColor(color);
-    }
     public Handler getHandler() {
         return handler;
     }
@@ -98,32 +92,50 @@ public class MainActivity extends Activity implements Merger.LogListener {
         } catch (NullPointerException ignored) {}
         setContentView(R.layout.activity_main);
 
-        if (!supportsFilePicker) {
-            findViewById(R.id.oldAndroidInfo).setVisibility(View.VISIBLE);
-            // Android versions below 4.4 are too old to use the file picker for ACTION_OPEN_DOCUMENT/ACTION_CREATE_DOCUMENT. The location of the file must be manually input. The files will be saved to "AntiSplit-M" folder in the internal storage.
-        }
+        final boolean doesNotSupportInbuiltAndroidFilePicker = Build.VERSION.SDK_INT < 19;
+        // Android versions below 4.4 are too old to use the file picker for ACTION_OPEN_DOCUMENT/ACTION_CREATE_DOCUMENT. The location of the file must be manually input. The files will be saved to "AntiSplit-M" folder in the internal storage.
+        if (doesNotSupportInbuiltAndroidFilePicker) findViewById(R.id.oldAndroidInfo).setVisibility(View.VISIBLE);
 
         // Fetch settings from SharedPreferences
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
-        setTextColor(settings.getInt("textColor", 0xffffffff));
-        setBgColor(settings.getInt("backgroundColor", 0xff000000));
+        setColor(settings.getInt("textColor", 0xffffffff), true);
+        setColor(settings.getInt("backgroundColor", 0xff000000), false);
 
         logEnabled = settings.getBoolean("logEnabled", true);
         LogUtil.setLogListener(this);
-        LogUtil.setLogEnabled(logEnabled);
 
 
-        Switch logSwitch = findViewById(R.id.logSwitch);
+        Switch logSwitch = findViewById(R.id.logToggle);
         logSwitch.setChecked(logEnabled);
-        logSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            logEnabled = isChecked;
-            LogUtil.setLogEnabled(logEnabled);
-        });
+        logSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> logEnabled = isChecked);
 
         signApk = settings.getBoolean("signApk", true);
         Switch signToggle = findViewById(R.id.signToggle);
         signToggle.setChecked(signApk);
         signToggle.setOnCheckedChangeListener((buttonView, isChecked) -> signApk = isChecked);
+
+        Switch selectSplitsAutomaticallySwitch = findViewById(R.id.selectSplitsForDeviceToggle);
+        Switch showDialogSwitch = findViewById(R.id.showDialogToggle);
+
+        showDialog = settings.getBoolean("showDialog", false);
+        showDialogSwitch.setChecked(showDialog);
+        showDialogSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            showDialog = isChecked;
+            if(isChecked) {
+                selectSplitsForDevice = false;
+                selectSplitsAutomaticallySwitch.setChecked(false);
+            }
+        });
+
+        selectSplitsForDevice = settings.getBoolean("selectSplitsForDevice", false);
+        selectSplitsAutomaticallySwitch.setChecked(selectSplitsForDevice);
+        selectSplitsAutomaticallySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            selectSplitsForDevice = isChecked;
+            if(isChecked) {
+                showDialog = false;
+                showDialogSwitch.setChecked(false);
+            }
+        });
 
         Switch askSwitch = findViewById(R.id.ask);
         if (Build.VERSION.SDK_INT > 22) {
@@ -134,37 +146,21 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 if(!isChecked) checkStoragePerm();
             });
         } else askSwitch.setVisibility(View.INVISIBLE);
-
-        showDialog = settings.getBoolean("showDialog", false);
-        Switch showDialogSwitch = findViewById(R.id.showDialog);
-        showDialogSwitch.setChecked(showDialog);
-        showDialogSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> showDialog = isChecked);
-
-        findViewById(R.id.decodeButton).setOnClickListener(v -> openFilePickerOrStartProcessing());
-        findViewById(R.id.changeBgColor).setOnClickListener(v -> new AmbilWarnaDialog(this, settings.getInt("backgroundColor", 0xff000000), new AmbilWarnaDialog.OnAmbilWarnaListener() {
-                    @Override
-                    public void onOk(AmbilWarnaDialog dialog1, int color) {
-                        settings.edit().putInt("backgroundColor", color).apply();
-                        setBgColor(color);
-                    }
-
-                    @Override
-                    public void onCancel(AmbilWarnaDialog dialog1) {
-                        // cancel was selected by the user
-                    }
-                }).show());
-        findViewById(R.id.changeTextColor).setOnClickListener(v -> new AmbilWarnaDialog(this, settings.getInt("textColor", 0xffffffff), new AmbilWarnaDialog.OnAmbilWarnaListener() {
-                    @Override
-                    public void onOk(AmbilWarnaDialog dialog1, int color) {
-                        settings.edit().putInt("textColor", color).apply();
-                        setTextColor(color);
-                    }
-
-                    @Override
-                    public void onCancel(AmbilWarnaDialog dialog1) {
-                        // cancel was selected by the user
-                    }
-                }).show());
+        findViewById(R.id.decodeButton).setOnClickListener(v -> {
+            if (doesNotSupportInbuiltAndroidFilePicker) {
+                final String workingFilePath = ((TextView) findViewById(R.id.workingFileField)).getText().toString();
+                splitAPKUri = Uri.fromFile(new File(workingFilePath));
+                if(showDialog) showApkSelectionDialog();
+                else new ProcessTask(this).execute(Uri.fromFile(new File(getAntisplitMFolder(), workingFilePath.substring(workingFilePath.lastIndexOf("/") + 1).replaceFirst("\\.(?:xapk|aspk|apk[sm])", "_antisplit.apk"))));
+            } else startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
+                            .addCategory(Intent.CATEGORY_OPENABLE)
+                            .setType("*/*")
+                            .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                            .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/zip", "application/vnd.android.package-archive", "application/octet-stream"})
+                    , 1); // XAPK is octet-stream
+        });
+        findViewById(R.id.changeBgColor).setOnClickListener(v -> showColorPickerDialog(false, 0xff000000));
+        findViewById(R.id.changeTextColor).setOnClickListener(v -> showColorPickerDialog(true, 0xffffffff));
 
         // Check if user shared or opened file with the app.
         final Intent fromShareOrView = getIntent();
@@ -188,15 +184,31 @@ public class MainActivity extends Activity implements Merger.LogListener {
         }
     }
 
+    private void showColorPickerDialog(boolean isTextColor, int currentColor) {
+        new AmbilWarnaDialog(this, currentColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
+            @Override
+            public void onOk(AmbilWarnaDialog dialog1, int color) {
+                setColor(color, isTextColor);
+            }
+
+            @Override
+            public void onCancel(AmbilWarnaDialog dialog1) {
+                // cancel was selected by the user
+            }
+        }).show();
+    }
+
     final File getAntisplitMFolder() {
-        final File antisplitMFolder = new File(Environment.getExternalStorageDirectory() + File.separator + "AntiSplit-M");
-        return antisplitMFolder.exists() || antisplitMFolder.mkdir() ? antisplitMFolder : new File(Environment.getExternalStorageDirectory() + File.separator + "Download");
+        final File antisplitMFolder = new File(Environment.getExternalStorageDirectory(), "AntiSplit-M");
+        return antisplitMFolder.exists() || antisplitMFolder.mkdir() ? antisplitMFolder : new File(Environment.getExternalStorageDirectory(), "Download");
     }
 
     @TargetApi(Build.VERSION_CODES.M)
     private void checkStoragePerm() {
         final boolean write = Build.VERSION.SDK_INT < 30;
-        final boolean noPermission = write ? checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED : !Environment.isExternalStorageManager();
+        final boolean noPermission = write ?
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED :
+                !Environment.isExternalStorageManager();
         if (noPermission) {
             Toast.makeText(this, R.string.grant_storage, Toast.LENGTH_LONG).show();
             if(write) requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
@@ -206,7 +218,15 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
     @Override
     protected void onPause() {
-        getSharedPreferences("set", Context.MODE_PRIVATE).edit().putBoolean("logEnabled", logEnabled).putBoolean("ask", ask).putBoolean("showDialog", showDialog).putBoolean("signApk", signApk).apply();
+        getSharedPreferences("set", Context.MODE_PRIVATE).edit()
+                .putBoolean("logEnabled", logEnabled)
+                .putBoolean("ask", ask)
+                .putBoolean("showDialog", showDialog)
+                .putBoolean("signApk", signApk)
+                .putBoolean("selectSplitsForDevice", selectSplitsForDevice)
+                .putInt("textColor", textColor)
+                .putInt("backgroundColor", bgColor)
+                .apply();
         super.onPause();
     }
 
@@ -218,20 +238,12 @@ public class MainActivity extends Activity implements Merger.LogListener {
             scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
         });
     }
-    private void openFilePickerOrStartProcessing() {
-        if (supportsFilePicker) startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
-                .addCategory(Intent.CATEGORY_OPENABLE)
-                .setType("*/*")
-                .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/zip", "application/vnd.android.package-archive", "application/octet-stream"})
-                , REQUEST_CODE_OPEN_SPLIT_APK_TO_ANTISPLIT); // XAPK is octet-stream
-        else {
-            final String workingFilePath = ((TextView) findViewById(R.id.workingFileField)).getText().toString();
-            splitAPKUri = Uri.fromFile(new File(workingFilePath));
-            if(showDialog) showApkSelectionDialog();
-            else new ProcessTask(this).execute(Uri.fromFile(new File(getAntisplitMFolder() + File.separator + workingFilePath.substring(workingFilePath.lastIndexOf("/") + 1).replaceFirst("\\.(?:xapk|aspk|apk[sm])", "_antisplit.apk"))));
-        }
+
+    @Override
+    public void onLog(int resID) {
+        onLog(getString(resID));
     }
+
     private Handler handler;
 
     /** @noinspection ResultOfMethodCallIgnored*/
@@ -249,7 +261,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
     private List<String> splitsToUse = null;
 
-    private static class ProcessTask extends AsyncTask<Uri, Void, String> {
+    private static class ProcessTask extends AsyncTask<Uri, Void, Void> {
         private final WeakReference<MainActivity> activityReference;
 
         // only retain a weak reference to the activity
@@ -258,13 +270,26 @@ public class MainActivity extends Activity implements Merger.LogListener {
         }
 
         @Override
-        protected String doInBackground(Uri... uris) {
+        protected Void doInBackground(Uri... uris) {
             MainActivity activity = activityReference.get();
-            if(!activity.urisAreSplitApks) {
-                // Just copy non split apks to cache folder then merger will load it
-                for(Uri u : activity.uris) {
-                    try(InputStream is = activity.getContentResolver().openInputStream(u);
-                        FileOutputStream fos = new FileOutputStream(activity.getExternalCacheDir() + File.separator + getOriginalFileName(activity, u))) {
+            List<String> splits = activity.splitsToUse;
+            if(activity.urisAreSplitApks) {
+                if(selectSplitsForDevice) {
+                    try {
+                        splits = DeviceSpecsUtil.getListOfSplits(activity.splitAPKUri, activity);
+                        for (int i = 0; i < splits.size(); i++) {
+                            final String thisSplit = splits.get(i);
+                            if (DeviceSpecsUtil.shouldIncludeSplit(thisSplit, activity)) splits.remove(thisSplit);
+                        }
+                    } catch (IOException ignored) {
+                        // just do all splits
+                    }
+                }
+            } else {
+                // These are the splits from inside the APK, just copy the splits to cache folder then merger will load it
+                for(Uri uri : activity.uris) {
+                    try(InputStream is = activity.getContentResolver().openInputStream(uri);
+                        OutputStream fos = FileUtils.getFileOutputStream(activity.getExternalCacheDir() + File.separator + getOriginalFileName(activity, uri))) {
                         byte[] buffer = new byte[4096];
                         int length;
                         while ((length = is.read(buffer)) > 0) {
@@ -295,15 +320,16 @@ public class MainActivity extends Activity implements Merger.LogListener {
                         os,
                         xapkUri,
                         activity,
-                        activity.splitsToUse,
+                        splits,
                         signApk);
             } catch (Exception e) {
                 activity.showError(e);
             }
             return null;
         }
+
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(Void result) {
             MainActivity activity = activityReference.get();
             if(activity.urisAreSplitApks) activity.getHandler().post(() -> {
                 try {
@@ -329,219 +355,120 @@ public class MainActivity extends Activity implements Merger.LogListener {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && data != null) {
-            switch(requestCode) {
-                case 0:
-                    checkStoragePerm();
+        if (resultCode == RESULT_OK && data != null) switch (requestCode) {
+            case 0:
+                checkStoragePerm();
                 break;
-                case REQUEST_CODE_OPEN_SPLIT_APK_TO_ANTISPLIT:
-                    ClipData clipData = data.getClipData();
-                    if (clipData == null) processOneSplitApkUri(data.getData());
-                    else {
-                        //multiple files selected
-                        Uri first = clipData.getItemAt(0).getUri();
-                        try {
-                            if(Objects.requireNonNull(first.getPath()).endsWith(".apk")) {
-                                urisAreSplitApks = false;
-                                uris = new ArrayList<>();
-                                uris.add(first);
-                            } else processOneSplitApkUri(first);
-                        } catch (NullPointerException ignored) {}
-                        for (int i = 1; i < clipData.getItemCount(); i++) {
-                            Uri uri = clipData.getItemAt(i).getUri();
-                            if(urisAreSplitApks) processOneSplitApkUri(uri);
-                            else uris.add(uri);
-                        }
-                        if(!urisAreSplitApks) selectDirToSaveAPKOrSaveNow();
+            case 1:
+                // opened through button in the app
+                ClipData clipData = data.getClipData();
+                if (clipData == null) processOneSplitApkUri(data.getData());
+                else {
+                    //multiple files selected
+                    Uri first = clipData.getItemAt(0).getUri();
+                    try {
+                        if (Objects.requireNonNull(first.getPath()).endsWith(".apk")) {
+                            urisAreSplitApks = false;
+                            uris = new ArrayList<>();
+                            uris.add(first);
+                        } else processOneSplitApkUri(first);
+                    } catch (NullPointerException ignored) {
                     }
+                    for (int i = 1; i < clipData.getItemCount(); i++) {
+                        Uri uri = clipData.getItemAt(i).getUri();
+                        if (urisAreSplitApks) processOneSplitApkUri(uri);
+                        else uris.add(uri);
+                    }
+                    if (!urisAreSplitApks) selectDirToSaveAPKOrSaveNow();
+                }
                 break;
-                case REQUEST_CODE_SAVE_APK:
-                    new ProcessTask(this).execute(data.getData());
+            case 2:
+                // going to process and save a file now
+                new ProcessTask(this).execute(data.getData());
                 break;
-            }
         }
     }
 
     public void showApkSelectionDialog() {
-        List<String> splits = new ArrayList<>();
+        try {
+            List<String> splits = DeviceSpecsUtil.getListOfSplits(splitAPKUri, this);
+            final int initialSize = splits.size();
+            String[] apkNames = new String[initialSize + 2];
+            boolean[] checkedItems = new boolean[initialSize + 2];
 
-        if (splitAPKUri.getPath().endsWith("xapk")) {
-            File bruh = new File(new FileUtils(this).getPath(splitAPKUri));
-            final boolean couldntRead = !bruh.canRead();
-            if (couldntRead) {
-                // copy to cache dir if no permission
-                bruh = new File(getExternalCacheDir() + File.separator + getOriginalFileName(this, splitAPKUri));
-                try (FileOutputStream fos = new FileOutputStream(bruh);
-                     InputStream ins = getContentResolver().openInputStream(splitAPKUri)) {
-                    byte[] buffer = new byte[4096];
-                    int length;
-                    while ((length = ins.read(buffer)) > 0) {
-                        fos.write(buffer, 0, length);
-                    }
-                } catch (IOException e) {
-                    showError(e);
-                }
+            apkNames[0] = getString(R.string.all);
+            apkNames[1] = getString(R.string.for_device);
+            for (int i = 2; i < initialSize + 2; i++) {
+                apkNames[i] = splits.get(i - 2);
+                checkedItems[i] = false;
             }
-            try (ZipFile zipFile = new ZipFile(bruh)) {
-                Enumeration<? extends ZipEntry> entries = zipFile.entries();
-                while (entries.hasMoreElements()) {
-                    String fileName = entries.nextElement().getName();
-                    if (fileName.endsWith(".apk")) splits.add(fileName);
-                }
-                if (couldntRead) bruh.delete();
-            } catch (IOException e) {
-                showError(e);
-            }
-        } else {
-            try (ZipInputStream zis = new ZipInputStream(getContentResolver().openInputStream(splitAPKUri))) {
-                ZipEntry zipEntry = zis.getNextEntry();
-                while (zipEntry != null) {
-                    final String name = zipEntry.getName();
-                    if (name.endsWith(".apk")) splits.add(name);
-                    zipEntry = zis.getNextEntry();
-                }
-                zis.closeEntry();
-            } catch (IOException e) {
-                showError(e);
-            }
-        }
-        final int initialSize = splits.size();
-        String[] apkNames = new String[initialSize + 2];
-        boolean[] checkedItems = new boolean[initialSize + 2];
 
-        apkNames[0] = getString(R.string.all);
-        apkNames[1] = getString(R.string.for_device);
-        for (int i = 2; i < initialSize + 2; i++) {
-            apkNames[i] = splits.get(i - 2);
-            checkedItems[i] = false;
-        }
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            TextView title = new TextView(this);
+            title.setTextColor(textColor);
+            title.setTextSize(20);
+            title.setText(R.string.select_splits);
+            builder.setCustomTitle(title);
 
-        TextView title = new TextView(this);
-        title.setTextColor(textColor);
-        title.setTextSize(20);
-        title.setText(R.string.select_splits);
-        builder.setCustomTitle(title);
-
-        builder.setMultiChoiceItems(apkNames, checkedItems, (dialog, which, isChecked) -> {
-            switch (which) {
-                case 0:
-                    // "Select All" option
-                    for (int i = 2; i < checkedItems.length; i++) {
-                        checkedItems[i] = isChecked;
-                        ((AlertDialog) dialog).getListView().setItemChecked(i, isChecked);
-                    }
-                    break;
-                case 1:
-                    // device specs option
-                    String densityType;
-                    switch (getResources().getDisplayMetrics().densityDpi) {
-                        case DisplayMetrics.DENSITY_LOW:
-                            densityType = "ldpi";
-                            break;
-                        case DisplayMetrics.DENSITY_MEDIUM:
-                        case DisplayMetrics.DENSITY_140:
-                            densityType = "mdpi";
-                            break;
-                        case DisplayMetrics.DENSITY_HIGH:
-                        case DisplayMetrics.DENSITY_220:
-                        case DisplayMetrics.DENSITY_200:
-                        case DisplayMetrics.DENSITY_180:
-                            densityType = "hdpi";
-                            break;
-                        case DisplayMetrics.DENSITY_XHIGH:
-                        case DisplayMetrics.DENSITY_280:
-                        case DisplayMetrics.DENSITY_260:
-                        case DisplayMetrics.DENSITY_300:
-                            densityType = "xhdpi";
-                            break;
-                        case DisplayMetrics.DENSITY_340:
-                        case DisplayMetrics.DENSITY_360:
-                        case DisplayMetrics.DENSITY_390:
-                        case DisplayMetrics.DENSITY_400:
-                        case DisplayMetrics.DENSITY_420:
-                        case DisplayMetrics.DENSITY_440:
-                        case DisplayMetrics.DENSITY_450:
-                        case DisplayMetrics.DENSITY_XXHIGH:
-                            densityType = "xxhdpi";
-                            break;
-                        case DisplayMetrics.DENSITY_520:
-                        case DisplayMetrics.DENSITY_560:
-                        case DisplayMetrics.DENSITY_600:
-                        case DisplayMetrics.DENSITY_XXXHIGH:
-                            densityType = "xxxhdpi";
-                            break;
-                        case DisplayMetrics.DENSITY_TV:
-                            densityType = "tvdpi";
-                            break;
-                        default:
-                            densityType = "unknown";
-                            break;
-                    }
-                    densityType += ".apk";
-                    for (int i = 2; i < checkedItems.length; i++) {
-                        final String name = apkNames[i];
-                        if (name.equals("base.apk")
-                                || !name.startsWith("config") && !name.startsWith("split") // this is base.apk probably
-                                || name.contains(Locale.getDefault().getLanguage())
-                                || name.contains((
-                                    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? Build.SUPPORTED_ABIS[0] : Build.CPU_ABI)
-                                    .replace('-', '_')) // fix the format
-                                || (name.endsWith(densityType) && !name.replace(densityType, "").endsWith("x"))) // ensure that it dont select xxhdpi for xhdpi etc
-                        {
-                            checkedItems[i] = isChecked;
-                            ((AlertDialog) dialog).getListView().setItemChecked(i, isChecked);
-                        }
-                    }
-                    boolean didNotFindAppropriateDpi = true;
-                    for (int i = 2; i < checkedItems.length; i++) {
-                        if (checkedItems[i] && apkNames[i].contains("dpi")) {
-                            didNotFindAppropriateDpi = false;
-                            break;
-                        }
-                    }
-                    if (didNotFindAppropriateDpi) {
+            builder.setMultiChoiceItems(apkNames, checkedItems, (dialog, which, isChecked) -> {
+                switch (which) {
+                    case 0:
+                        // "Select All" option
+                        for (int i = 2; i < checkedItems.length; i++) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                        break;
+                    case 1:
+                        // device specs option
                         for (int i = 2; i < checkedItems.length; i++) {
-                            if (apkNames[i].contains("hdpi")) {
-                                checkedItems[i] = isChecked;
-                                ((AlertDialog) dialog).getListView().setItemChecked(i, isChecked);
+                            if (DeviceSpecsUtil.shouldIncludeSplit(apkNames[i], this)) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                        }
+                        boolean didNotFindAppropriateDpi = true;
+                        for (int i = 2; i < checkedItems.length; i++) {
+                            if (checkedItems[i] && apkNames[i].contains("dpi")) {
+                                didNotFindAppropriateDpi = false;
                                 break;
                             }
                         }
-                    }
-                    break;
-                default:
-                    // Uncheck "Select All" if any individual item is unchecked
-                    if (!isChecked) {
-                        checkedItems[0] = false;
-                        ((AlertDialog) dialog).getListView().setItemChecked(0, false);
-                    }
-                    break;
-            }
-        });
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            for (int i = 1; i < checkedItems.length; i++) {
-                if (checkedItems[i]) splits.remove(apkNames[i]); // ?????
-            }
+                        if (didNotFindAppropriateDpi) {
+                            for (int i = 2; i < checkedItems.length; i++) {
+                                if (apkNames[i].contains("hdpi")) {
+                                    ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        // Uncheck "Select All" if any individual item is unchecked
+                        if (!isChecked) ((AlertDialog) dialog).getListView().setItemChecked(0, checkedItems[0] = false);
+                        break;
+                }
+            });
+            builder.setPositiveButton("OK", (dialog, which) -> {
+                for (int i = 1; i < checkedItems.length; i++) {
+                    if (checkedItems[i]) splits.remove(apkNames[i]); // ?????
+                }
 
-            if (splits.size() == initialSize) {
-                urisAreSplitApks = true; // reset
-                showError(getString(R.string.nothing));
-            } else {
-                splitsToUse = splits;
-                selectDirToSaveAPKOrSaveNow();
-            }
-        });
-        builder.setNegativeButton("Cancel", null);
-        runOnUiThread(() -> {
-            final AlertDialog ad = builder.create();
-            ad.show();
-            ad.getListView().setAdapter(new CustomArrayAdapter(this, apkNames, textColor));
-            try {
-                Objects.requireNonNull(ad.getWindow()).getDecorView().getBackground().setColorFilter(new LightingColorFilter(0xFF000000, bgColor));
-            } catch (NullPointerException ignored) {}
-        });
+                if (splits.size() == initialSize) {
+                    urisAreSplitApks = true; // reset
+                    showError(getString(R.string.nothing));
+                } else {
+                    splitsToUse = splits;
+                    selectDirToSaveAPKOrSaveNow();
+                }
+            });
+            builder.setNegativeButton("Cancel", null);
+            runOnUiThread(() -> {
+                final AlertDialog ad = builder.create();
+                ad.show();
+                ad.getListView().setAdapter(new CustomArrayAdapter(this, apkNames, textColor));
+                try {
+                    Objects.requireNonNull(ad.getWindow()).getDecorView().getBackground().setColorFilter(new LightingColorFilter(0xFF000000, bgColor));
+                } catch (NullPointerException ignored) {}
+            });
+        } catch (IOException e) {
+            showError(e);
+        }
     }
 
     private void showSuccess() {
@@ -614,7 +541,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         else startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT)
                 .addCategory(Intent.CATEGORY_OPENABLE)
                 .setType("application/vnd.android.package-archive")
-                .putExtra(Intent.EXTRA_TITLE, urisAreSplitApks ? getOriginalFileName(this, splitAPKUri) : getNameFromNonSplitApks()), REQUEST_CODE_SAVE_APK);
+                .putExtra(Intent.EXTRA_TITLE, urisAreSplitApks ? getOriginalFileName(this, splitAPKUri) : getNameFromNonSplitApks()), 2);
     }
 
     private String getNameFromNonSplitApks() {
@@ -627,6 +554,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     break;
                 } catch (NullPointerException ignored) {}
             } else if (!name.startsWith("config") && !name.startsWith("split")) {
+                // this should be base.apk renamed to the package name
                 fileName = name;
                 break;
             }

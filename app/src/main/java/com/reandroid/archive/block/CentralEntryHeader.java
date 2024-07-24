@@ -20,7 +20,6 @@ import com.reandroid.utils.HexUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class CentralEntryHeader extends CommonHeader {
@@ -79,7 +78,7 @@ public class CentralEntryHeader extends CommonHeader {
         if(comment==null){
             comment="";
         }
-        byte[] strBytes = comment.getBytes(StandardCharsets.UTF_8);
+        byte[] strBytes = comment.getBytes(com.starry.FileUtils.UTF_8);
         int length = strBytes.length;
         setCommentLength(length);
         if(length==0){
