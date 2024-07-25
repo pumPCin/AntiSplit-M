@@ -292,7 +292,7 @@ public class BlockReader extends InputStream {
 
     private static byte[] loadBuffer(File file) throws IOException {
         byte[] result;
-        try (InputStream in = FileUtils.getFileInputStream(file)) {
+        try (InputStream in = FileUtils.getInputStream(file)) {
             result = loadBuffer(in);
         }
         return result;

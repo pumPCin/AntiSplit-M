@@ -24,7 +24,6 @@ import com.reandroid.utils.CompareUtil;
 import com.starry.FileUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
@@ -188,7 +187,7 @@ public class UncompressedFiles implements JSONConvert<JSONObject> {
         if(!jsonFile.isFile()){
             return;
         }
-        try (InputStream fis = FileUtils.getFileInputStream(jsonFile)) {
+        try (InputStream fis = FileUtils.getInputStream(jsonFile)) {
             JSONObject jsonObject=new JSONObject(fis);
             fromJson(jsonObject);
         }

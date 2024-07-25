@@ -66,7 +66,7 @@ public class UnknownChunk extends Chunk<HeaderBlock> implements HeaderBlock.Head
         return outputStream.toByteArray();
     }
     public int readBytes(File file) throws IOException{
-        try (InputStream inputStream=FileUtils.getFileInputStream(file)) {
+        try (InputStream inputStream=FileUtils.getInputStream(file)) {
             int result=readBytes(inputStream);
             inputStream.close();
             return result;
@@ -86,7 +86,7 @@ public class UnknownChunk extends Chunk<HeaderBlock> implements HeaderBlock.Head
                 throw new IOException("Can not create directory: "+dir);
             }
         }
-        OutputStream outputStream= FileUtils.getFileOutputStream(file);
+        OutputStream outputStream= FileUtils.getOutputStream(file);
         int length = super.writeBytes(outputStream);
         outputStream.close();
         return length;

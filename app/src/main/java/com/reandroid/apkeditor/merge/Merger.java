@@ -73,7 +73,7 @@ public class Merger {
                                 if (!canonicalizedPath.startsWith(cacheDir.getCanonicalPath() + File.separator)) {
                                     throw new IOException("Zip entry is outside of the target dir: " + name);
                                 }
-                                OutputStream fos = FileUtils.getFileOutputStream(file);
+                                OutputStream fos = FileUtils.getOutputStream(file);
                                 int len;
                                 while ((len = zis.read(buffer)) > 0) {
                                     fos.write(buffer, 0, len);
@@ -87,17 +87,18 @@ public class Merger {
                     zis.closeEntry();
                 }
             } else {
-                LogUtil.logMessage(R.string.detected_xapk);
-                File bruh = new File(new FileUtils(context).getPath(xapkUri));
+                LogUtil.logMessage(R.string.detected_xapk); //ZipInputStream is reading XAPK files as if all files inside the splits were in 1 zip which breaks everything
+                File bruh = new File(FileUtils.getPath(xapkUri, context));
                 final boolean couldntRead = !bruh.canRead();
                 if(couldntRead) {
                     // copy to cache dir if no permission
                     bruh = new File(cacheDir, getOriginalFileName(context, xapkUri));
-                    OutputStream fos = FileUtils.getFileOutputStream(bruh);
-                    byte[] buffer = new byte[4096];
-                    int length;
-                    while ((length = ins.read(buffer)) > 0) {
-                        fos.write(buffer, 0, length);
+                    try (OutputStream fos = FileUtils.getOutputStream(bruh)) {
+                        byte[] buffer = new byte[4096];
+                        int length;
+                        while ((length = ins.read(buffer)) > 0) {
+                            fos.write(buffer, 0, length);
+                        }
                     }
                 }
                 try (ZipFile zipFile = new ZipFile(bruh)) {
@@ -117,7 +118,7 @@ public class Merger {
                                 }
 
                                 try (InputStream is = zipFile.getInputStream(entry);
-                                     OutputStream fos = FileUtils.getFileOutputStream(outFile)) {
+                                     OutputStream fos = FileUtils.getOutputStream(outFile)) {
                                     byte[] buffy = new byte[1024];
                                     int len;
                                     while ((len = is.read(buffy)) > 0) {
@@ -212,7 +213,7 @@ public class Merger {
             final File temp = new File(cacheDir, "temp.apk");
             mergedModule.writeApk(temp);
             LogUtil.logMessage(R.string.signing);
-            try (InputStream fis = FileUtils.getFileInputStream(temp)) {
+            try (InputStream fis = FileUtils.getInputStream(temp)) {
                 new com.aefyr.pseudoapksigner.PseudoApkSignerWrapper(context).sign(fis, out);
             } catch (Exception e) {
                 LogUtil.logMessage(R.string.sign_failed);

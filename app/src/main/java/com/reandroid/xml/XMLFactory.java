@@ -23,7 +23,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 
 public class XMLFactory {
 
@@ -66,7 +65,7 @@ public class XMLFactory {
         if(dir != null && !dir.exists()){
             dir.mkdirs();
         }
-        return newSerializer(FileUtils.getFileOutputStream(file));
+        return newSerializer(FileUtils.getOutputStream(file));
     }
     public static XmlSerializer newSerializer(OutputStream outputStream) throws IOException{
         XmlSerializer serializer = newSerializer();

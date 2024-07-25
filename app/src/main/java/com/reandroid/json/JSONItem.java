@@ -20,7 +20,6 @@ import com.starry.FileUtils;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Map;
@@ -37,7 +36,7 @@ public abstract class JSONItem {
         if(dir != null && !dir.exists()){
             dir.mkdirs();
         }
-        OutputStream outputStream= FileUtils.getFileOutputStream(file);
+        OutputStream outputStream= FileUtils.getOutputStream(file);
         write(outputStream, indentFactor);
         outputStream.close();
     }

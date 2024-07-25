@@ -164,7 +164,7 @@ public abstract class Archive<T extends ZipInput> implements Closeable {
                 }
             }
             if(archiveEntry.getMethod() != Archive.STORED){
-                OutputStream outputStream = FileUtils.getFileOutputStream(file);
+                OutputStream outputStream = FileUtils.getOutputStream(file);
                 IOUtil.writeAll(openInputStream(archiveEntry), outputStream);
             }else {
                 extractStored(file, archiveEntry);

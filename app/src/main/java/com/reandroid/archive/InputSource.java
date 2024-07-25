@@ -95,7 +95,7 @@ public abstract class InputSource {
         if(!dir.exists()){
             dir.mkdirs();
         }
-        OutputStream outputStream = FileUtils.getFileOutputStream(file);
+        OutputStream outputStream = FileUtils.getOutputStream(file);
         write(outputStream);
         outputStream.close();
     }

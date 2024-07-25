@@ -32,13 +32,13 @@ public class DeviceSpecsUtil {
         List<String> splits = new ArrayList<>();
 
         if (splitAPKUri.getPath().endsWith("xapk")) {
-            File bruh = new File(new FileUtils(context).getPath(splitAPKUri));
+            File bruh = new File(FileUtils.getPath(splitAPKUri, context));
             final boolean couldntRead = !bruh.canRead();
             if (couldntRead) {
                 // copy to cache dir if no permission
                 bruh = new File(context.getExternalCacheDir() + File.separator + getOriginalFileName(context, splitAPKUri));
                 try (InputStream ins = context.getContentResolver().openInputStream(splitAPKUri)) {
-                    OutputStream fos = FileUtils.getFileOutputStream(bruh);
+                    OutputStream fos = FileUtils.getOutputStream(bruh);
                     byte[] buffer = new byte[4096];
                     int length;
                     while ((length = ins.read(buffer)) > 0) {

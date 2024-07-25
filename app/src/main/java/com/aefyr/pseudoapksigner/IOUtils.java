@@ -14,7 +14,7 @@ public class IOUtils {
 
     public static void copyFileFromAssets(Context context, String assetFileName, File destination) throws IOException {
         try (InputStream inputStream = context.getAssets().open(assetFileName)) {
-            OutputStream outputStream = FileUtils.getFileOutputStream(destination);
+            OutputStream outputStream = FileUtils.getOutputStream(destination);
             byte[] buf = new byte[1024 * 1024];
             int len;
             while ((len = inputStream.read(buf)) > 0) outputStream.write(buf, 0, len);

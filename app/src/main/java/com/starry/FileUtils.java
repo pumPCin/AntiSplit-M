@@ -1,5 +1,7 @@
 package com.starry;
 
+import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.doesNotHaveStoragePerm;
+
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.Context;
@@ -52,36 +54,40 @@ public class FileUtils {
     https://github.com/starry-shivam/FileUtils/blob/main/file-utils/src/main/java/com/starry/file_utils/FileUtils.kt
      */
 
-    private static String FALLBACK_COPY_FOLDER = "upload_part";
-    private Context context;
-
     public static final Charset UTF_8 = Charset.forName("UTF-8");
-
-    public FileUtils(Context context) {
-        this.context = context;
-    }
 
     private static final boolean supportsNewOutputStream = (Build.VERSION.SDK_INT > 25);
 
-    public static OutputStream getFileOutputStream(String filepath) throws IOException {
-        return getFileOutputStream(new File(filepath));
+    public static OutputStream getOutputStream(String filepath) throws IOException {
+        return getOutputStream(new File(filepath));
     }
 
-    public static OutputStream getFileOutputStream(File file) throws IOException {
-        return supportsNewOutputStream ? Files.newOutputStream(file.toPath(), java.nio.file.StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE) : new FileOutputStream(file);
+    public static OutputStream getOutputStream(File file) throws IOException {
+        return supportsNewOutputStream ? Files.newOutputStream(file.toPath(), java.nio.file.StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING) : new FileOutputStream(file);
     }
 
-    public static InputStream getFileInputStream(File file) throws IOException {
+    public static OutputStream getOutputStream(Uri uri, Context context) throws IOException {
+        if(doesNotHaveStoragePerm(context)) return context.getContentResolver().openOutputStream(uri);
+        File file = new File(getPath(uri, context));
+        return file.canWrite() ? getOutputStream(file) : context.getContentResolver().openOutputStream(uri);
+    }
+
+    public static InputStream getInputStream(File file) throws IOException {
         return supportsNewOutputStream ? Files.newInputStream(file.toPath(), StandardOpenOption.READ) : new FileInputStream(file);
     }
 
-    public static InputStream getFileInputStream(String filePath) throws IOException {
+    public static InputStream getInputStream(String filePath) throws IOException {
         return supportsNewOutputStream ? Files.newInputStream(Paths.get(filePath), StandardOpenOption.READ) : new FileInputStream(filePath);
     }
 
+    public static InputStream getInputStream(Uri uri, Context context) throws IOException {
+        if(doesNotHaveStoragePerm(context)) return context.getContentResolver().openInputStream(uri);
+        File file = new File(getPath(uri, context));
+        return file.canRead() ? getInputStream(file) : context.getContentResolver().openInputStream(uri);
+    }
+
     private static boolean fileExists(String filePath) {
-        File file = new File(filePath);
-        return file.exists();
+        return new File(filePath).exists();
     }
 
     private static String getPathFromExtSD(String[] pathData) {
@@ -132,21 +138,18 @@ public class FileUtils {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
     }
 
-    private static boolean isWhatsAppFile(Uri uri) {
-        return "com.whatsapp.provider.media".equals(uri.getAuthority());
-    }
-
     @SuppressLint("NewApi")
-    public String getPath(Uri uri) {
+    public static String getPath(Uri uri, Context context) {
         String selection;
         String[] selectionArgs;
 
+        String FALLBACK_COPY_FOLDER = "upload_part";
         if (isExternalStorageDocument(uri)) {
             String docId = DocumentsContract.getDocumentId(uri);
             String[] split = docId.split(":");
             String fullPath = getPathFromExtSD(split);
             if (fullPath == null || !fileExists(fullPath)) {
-                fullPath = copyFileToInternalStorage(uri, FALLBACK_COPY_FOLDER);
+                fullPath = copyFileToInternalStorage(uri, FALLBACK_COPY_FOLDER, context);
             }
             return !TextUtils.isEmpty(fullPath) ? fullPath : null;
         }
@@ -205,17 +208,13 @@ public class FileUtils {
             return getDataColumn(context, contentUri, selection, selectionArgs);
         }
 
-        if (isWhatsAppFile(uri)) {
-            return getFilePathForWhatsApp(uri);
-        }
-
         if ("content".equalsIgnoreCase(uri.getScheme())) {
             if (isGooglePhotosUri(uri)) {
                 return uri.getLastPathSegment();
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                return copyFileToInternalStorage(uri, FALLBACK_COPY_FOLDER);
+                return copyFileToInternalStorage(uri, FALLBACK_COPY_FOLDER, context);
             } else {
                 return getDataColumn(context, uri, null, null);
             }
@@ -225,10 +224,10 @@ public class FileUtils {
             return uri.getPath();
         }
 
-        return copyFileToInternalStorage(uri, FALLBACK_COPY_FOLDER);
+        return copyFileToInternalStorage(uri, FALLBACK_COPY_FOLDER, context);
     }
 
-    private String copyFileToInternalStorage(Uri uri, String newDirName) {
+    private static String copyFileToInternalStorage(Uri uri, String newDirName, Context context) {
         Cursor returnCursor = context.getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE}, null, null, null);
         int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
         returnCursor.moveToFirst();
@@ -247,7 +246,7 @@ public class FileUtils {
             output = new File(context.getCacheDir() + File.separator + name);
         }
 
-        try (OutputStream outputStream = FileUtils.getFileOutputStream(output)) {
+        try (OutputStream outputStream = FileUtils.getOutputStream(output)) {
             try (InputStream cursor = context.getContentResolver().openInputStream(uri)) {
                 int read;
                 int bufferSize = 1024;
@@ -261,11 +260,7 @@ public class FileUtils {
         return output.getPath();
     }
 
-    private String getFilePathForWhatsApp(Uri uri) {
-        return copyFileToInternalStorage(uri, "whatsapp");
-    }
-
-    private String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
+    private static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
         Cursor cursor = null;
         final String column = "_data";
         final String[] projection = {column};

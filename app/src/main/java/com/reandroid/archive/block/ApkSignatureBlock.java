@@ -119,7 +119,7 @@ public class ApkSignatureBlock extends LengthPrefixedList<SignatureInfo>
             if(dir1 != null && !dir1.exists()){
                 dir1.mkdirs();
             }
-            OutputStream outputStream = FileUtils.getFileOutputStream(file1);
+            OutputStream outputStream = FileUtils.getOutputStream(file1);
             signatureInfo.writeBytes(outputStream);
             outputStream.close();
             File file = file1;

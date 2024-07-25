@@ -1,11 +1,9 @@
 package com.abdurazaaqmohammed.AntiSplit.main;
 
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
-
 import static com.reandroid.apkeditor.merge.LogUtil.logEnabled;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
@@ -203,17 +201,19 @@ public class MainActivity extends Activity implements Merger.LogListener {
         return antisplitMFolder.exists() || antisplitMFolder.mkdir() ? antisplitMFolder : new File(Environment.getExternalStorageDirectory(), "Download");
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
     private void checkStoragePerm() {
-        final boolean write = Build.VERSION.SDK_INT < 30;
-        final boolean noPermission = write ?
-                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED :
-                !Environment.isExternalStorageManager();
-        if (noPermission) {
+        if(Build.VERSION.SDK_INT < 23) return;
+        if(doesNotHaveStoragePerm(this)) {
             Toast.makeText(this, R.string.grant_storage, Toast.LENGTH_LONG).show();
-            if(write) requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+            if(Build.VERSION.SDK_INT < 30) requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
             else startActivityForResult(new Intent(ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + getPackageName())), 0);
         }
+    }
+
+    public static boolean doesNotHaveStoragePerm(Context context) {
+        return (Build.VERSION.SDK_INT < 23) || (Build.VERSION.SDK_INT < 30 ?
+                context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED :
+                !Environment.isExternalStorageManager());
     }
 
     @Override
@@ -272,6 +272,11 @@ public class MainActivity extends Activity implements Merger.LogListener {
         @Override
         protected Void doInBackground(Uri... uris) {
             MainActivity activity = activityReference.get();
+            final File cacheDir = activity.getExternalCacheDir();
+            if (cacheDir != null && activity.urisAreSplitApks) {
+                deleteDir(cacheDir);
+            }
+
             List<String> splits = activity.splitsToUse;
             if(activity.urisAreSplitApks) {
                 if(selectSplitsForDevice) {
@@ -288,8 +293,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
             } else {
                 // These are the splits from inside the APK, just copy the splits to cache folder then merger will load it
                 for(Uri uri : activity.uris) {
-                    try(InputStream is = activity.getContentResolver().openInputStream(uri);
-                        OutputStream fos = FileUtils.getFileOutputStream(activity.getExternalCacheDir() + File.separator + getOriginalFileName(activity, uri))) {
+                    try(InputStream is = FileUtils.getInputStream(uri, activity);
+                        OutputStream fos = FileUtils.getOutputStream(cacheDir + File.separator + getOriginalFileName(activity, uri))) {
                         byte[] buffer = new byte[4096];
                         int length;
                         while ((length = is.read(buffer)) > 0) {
@@ -301,10 +306,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 }
             }
             activity.runOnUiThread(() -> ((TextView) activity.findViewById(R.id.logField)).setText(""));
-            final File cacheDir = activity.getExternalCacheDir();
-            if (cacheDir != null && activity.urisAreSplitApks) {
-                deleteDir(cacheDir);
-            }
 
             Uri xapkUri;
             try {
@@ -313,9 +314,9 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 xapkUri = null;
             }
 
-            try (OutputStream os = activity.getContentResolver().openOutputStream(uris[0])) {
+            try (OutputStream os = FileUtils.getOutputStream(uris[0], activity)) {
                 Merger.run(
-                        activity.urisAreSplitApks ? activity.getContentResolver().openInputStream(activity.splitAPKUri) : null,
+                        activity.urisAreSplitApks ? FileUtils.getInputStream(activity.splitAPKUri, activity) : null,
                         cacheDir,
                         os,
                         xapkUri,
@@ -361,6 +362,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 break;
             case 1:
                 // opened through button in the app
+
                 ClipData clipData = data.getClipData();
                 if (clipData == null) processOneSplitApkUri(data.getData());
                 else {
@@ -526,7 +528,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     private void selectDirToSaveAPKOrSaveNow() {
         if (android.os.Build.VERSION.SDK_INT < 19 || !ask) {
             checkStoragePerm();
-            final String originalFilePath = urisAreSplitApks ? new FileUtils(this).getPath(splitAPKUri) : getNameFromNonSplitApks();
+            final String originalFilePath = urisAreSplitApks ? FileUtils.getPath(splitAPKUri, this) : getNameFromNonSplitApks();
             runOnUiThread(() -> ((TextView)findViewById(R.id.workingFileField)).setText(originalFilePath));
 
             String newFilePath = originalFilePath.replaceFirst("\\.(?:xapk|aspk|apk[sm])", "_antisplit.apk");
@@ -550,7 +552,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             final String name = getOriginalFileName(this, uri);
             if (name.equals("base.apk")) {
                 try {
-                    fileName = Objects.requireNonNull(getPackageManager().getPackageArchiveInfo(new FileUtils(this).getPath(uri), 0)).packageName;
+                    fileName = Objects.requireNonNull(getPackageManager().getPackageArchiveInfo(Objects.requireNonNull(FileUtils.getPath(uri, this)), 0)).packageName;
                     break;
                 } catch (NullPointerException ignored) {}
             } else if (!name.startsWith("config") && !name.startsWith("split")) {
