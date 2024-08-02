@@ -15,12 +15,11 @@
  */
 package com.reandroid.apkeditor.merge;
 
-import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.getOriginalFileName;
-
 import android.content.Context;
 import android.net.Uri;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
+import com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil;
 import com.reandroid.apk.ApkBundle;
 import com.reandroid.apk.ApkModule;
 import com.reandroid.apkeditor.common.AndroidManifestHelper;
@@ -66,7 +65,7 @@ public class Merger {
                     while (zipEntry != null) {
                         final String name = zipEntry.getName();
                         if (name.endsWith(".apk")) {
-                            if((splits != null && !splits.isEmpty() && splits.contains(name))) LogUtil.logMessage(context.getString(R.string.skipping) + " " + name + context.getString(R.string.unselected));
+                            if((splits != null && !splits.isEmpty() && splits.contains(name))) LogUtil.logMessage(context.getString(R.string.skipping) + name + context.getString(R.string.unselected));
                             else {
                                 File file = new File(cacheDir, name);
                                 String canonicalizedPath = file.getCanonicalPath();
@@ -81,26 +80,16 @@ public class Merger {
                                 fos.close();
                                 LogUtil.logMessage("Extracted " + name);
                             }
-                        } else LogUtil.logMessage(context.getString(R.string.skipping) + " " +  name + " " + context.getString(R.string.not_apk));
+                        } else LogUtil.logMessage(context.getString(R.string.skipping) + name + context.getString(R.string.not_apk));
                         zipEntry = zis.getNextEntry();
                     }
                     zis.closeEntry();
                 }
             } else {
                 LogUtil.logMessage(R.string.detected_xapk); //ZipInputStream is reading XAPK files as if all files inside the splits were in 1 zip which breaks everything
-                File bruh = new File(FileUtils.getPath(xapkUri, context));
+                File bruh = DeviceSpecsUtil.splitApkPath == null ? new File(FileUtils.getPath(xapkUri, context)) : DeviceSpecsUtil.splitApkPath; // if file was already copied to get splits list do not copy it again
                 final boolean couldntRead = !bruh.canRead();
-                if(couldntRead) {
-                    // copy to cache dir if no permission
-                    bruh = new File(cacheDir, getOriginalFileName(context, xapkUri));
-                    try (OutputStream fos = FileUtils.getOutputStream(bruh)) {
-                        byte[] buffer = new byte[4096];
-                        int length;
-                        while ((length = ins.read(buffer)) > 0) {
-                            fos.write(buffer, 0, length);
-                        }
-                    }
-                }
+                if (couldntRead) bruh = FileUtils.copyFileToInternalStorage(xapkUri, null, context);
                 try (ZipFile zipFile = new ZipFile(bruh)) {
                     Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
@@ -109,7 +98,7 @@ public class Merger {
                         String fileName = entry.getName();
 
                         if (fileName.endsWith(".apk")) {
-                            if((splits != null && !splits.isEmpty() && splits.contains(fileName))) LogUtil.logMessage(context.getString(R.string.skipping) + " " + fileName + context.getString(R.string.unselected));
+                            if((splits != null && !splits.isEmpty() && splits.contains(fileName))) LogUtil.logMessage(context.getString(R.string.skipping) + fileName + context.getString(R.string.unselected));
                             else {
                                 File outFile = new File(cacheDir, fileName);
                                 File parentDir = outFile.getParentFile();
@@ -126,7 +115,7 @@ public class Merger {
                                     }
                                 }
                             }
-                        } else LogUtil.logMessage(context.getString(R.string.skipping) + " " +  fileName + " " + context.getString(R.string.not_apk));
+                        } else LogUtil.logMessage(context.getString(R.string.skipping) + fileName + context.getString(R.string.not_apk));
                     }
                     if(couldntRead) bruh.delete();
                 }

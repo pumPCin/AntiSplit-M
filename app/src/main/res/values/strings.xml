@@ -17,7 +17,7 @@
     <string name="for_device">Select for your device specifications</string>
     <string name="select_splits">Select splits</string>
     <string name="sign_apk">Sign the APK after merging</string>
-    <string name="automatically_select">Automatically select splits for your device specifications (enable this if you want to use the merged APK in ReVanced Manager)</string>
+    <string name="automatically_select">Automatically select splits for your device specifications</string>
     <string name="sign_failed">Failed to sign APK, saving without signing</string>
     <string name="signing">Signing APK…</string>
     <string name="saving">Saving…</string>
@@ -28,4 +28,7 @@
     <string name="unselected">: Unselected</string>
     <string name="detected_xapk">XAPK file detected, ensuring it can be extracted properly</string>
     <string name="searching">Searching apk files…</string>
+    <string name="revanced">ReVanced Manager produces an error when attempting to patch merged APKs. The error is not an actual problem and is produced incorrectly by a third party library. For most people, using the option to select splits for your device specifications will fix it. If it still doesn\'t work, the easiest thing to do is download a version of ReVanced Manager with the error removed.</string>
+    <string name="note">Note for ReVanced</string>
+    <string name="download_fix">Download fixed ReVanced Manager</string>
 </resources>

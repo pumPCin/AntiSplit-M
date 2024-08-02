@@ -45,12 +45,8 @@ public class PseudoApkSignerInputStream extends InputStream {
             mPseudoApkSigner.setSignerName(signerName);
 
         mPipeOutput = new PipedOutputStream();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            mPipeInput = new PipedInputStream(1024 * 1024);
-            mPipeInput.connect(mPipeOutput);
-        } else {
-            mPipeInput = new PipedInputStream(mPipeOutput);
-        }
+        mPipeInput = new PipedInputStream(1024 * 1024);
+        mPipeInput.connect(mPipeOutput);
 
         new Thread(new Runnable() {
             @Override

@@ -115,11 +115,7 @@ public class FileUtils {
         }
 
         fullPath = System.getenv("EXTERNAL_STORAGE") + relativePath;
-        if (fileExists(fullPath)) {
-            return fullPath;
-        } else {
-            return null;
-        }
+        return fileExists(fullPath) ? fullPath : null;
     }
 
     private static boolean isExternalStorageDocument(Uri uri) {
@@ -139,7 +135,7 @@ public class FileUtils {
     }
 
     @SuppressLint("NewApi")
-    public static String getPath(Uri uri, Context context) {
+    public static String getPath(Uri uri, Context context) throws IOException {
         String selection;
         String[] selectionArgs;
 
@@ -149,9 +145,9 @@ public class FileUtils {
             String[] split = docId.split(":");
             String fullPath = getPathFromExtSD(split);
             if (fullPath == null || !fileExists(fullPath)) {
-                fullPath = copyFileToInternalStorage(uri, FALLBACK_COPY_FOLDER, context);
+                fullPath = copyFileToInternalStorageAndGetPath(uri, FALLBACK_COPY_FOLDER, context);
             }
-            return !TextUtils.isEmpty(fullPath) ? fullPath : null;
+            return TextUtils.isEmpty(fullPath) ? null : fullPath;
         }
 
         if (isDownloadsDocument(uri)) {
@@ -214,7 +210,7 @@ public class FileUtils {
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                return copyFileToInternalStorage(uri, FALLBACK_COPY_FOLDER, context);
+                return copyFileToInternalStorageAndGetPath(uri, FALLBACK_COPY_FOLDER, context);
             } else {
                 return getDataColumn(context, uri, null, null);
             }
@@ -224,10 +220,14 @@ public class FileUtils {
             return uri.getPath();
         }
 
-        return copyFileToInternalStorage(uri, FALLBACK_COPY_FOLDER, context);
+        return copyFileToInternalStorageAndGetPath(uri, FALLBACK_COPY_FOLDER, context);
     }
 
-    private static String copyFileToInternalStorage(Uri uri, String newDirName, Context context) {
+    public static String copyFileToInternalStorageAndGetPath(Uri uri, String newDirName, Context context) throws IOException {
+        return copyFileToInternalStorage(uri, newDirName, context).getPath();
+    }
+
+    public static File copyFileToInternalStorage(Uri uri, String newDirName, Context context) throws IOException {
         Cursor returnCursor = context.getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE}, null, null, null);
         int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
         returnCursor.moveToFirst();
@@ -235,29 +235,25 @@ public class FileUtils {
         returnCursor.close();
 
         File output;
-        if (!TextUtils.isEmpty(newDirName)) {
+        if (TextUtils.isEmpty(newDirName)) {
+            output = new File(context.getCacheDir() + File.separator + name);
+        } else {
             String randomCollisionAvoidance = UUID.randomUUID().toString();
             File dir = new File(context.getCacheDir() + File.separator + newDirName + File.separator + randomCollisionAvoidance);
             if (!dir.exists()) {
                 dir.mkdirs();
             }
             output = new File(context.getCacheDir() + File.separator + newDirName + File.separator + randomCollisionAvoidance + File.separator + name);
-        } else {
-            output = new File(context.getCacheDir() + File.separator + name);
         }
 
-        try (OutputStream outputStream = FileUtils.getOutputStream(output)) {
-            try (InputStream cursor = context.getContentResolver().openInputStream(uri)) {
-                int read;
-                int bufferSize = 1024;
-                byte[] buffers = new byte[bufferSize];
-                while ((read = cursor.read(buffers)) != -1) {
-                    outputStream.write(buffers, 0, read);
-                }
+        try (OutputStream outputStream = FileUtils.getOutputStream(output); InputStream cursor = getInputStream(uri, context)) {
+            int read;
+            byte[] buffers = new byte[1024];
+            while ((read = cursor.read(buffers)) != -1) {
+                outputStream.write(buffers, 0, read);
             }
-        } catch (IOException e) {
         }
-        return output.getPath();
+        return output;
     }
 
     private static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
