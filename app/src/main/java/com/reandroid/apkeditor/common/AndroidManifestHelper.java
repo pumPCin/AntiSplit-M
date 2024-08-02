@@ -16,11 +16,13 @@
 package com.reandroid.apkeditor.common;
 
 import com.reandroid.apk.ApkUtil;
+import com.reandroid.apkeditor.merge.LogUtil;
 import com.reandroid.app.AndroidManifest;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
 import com.reandroid.arsc.chunk.xml.ResXmlElement;
 import com.reandroid.arsc.value.ValueType;
+import com.reandroid.utils.HexUtil;
 import com.reandroid.utils.collection.CollectionUtil;
 import com.reandroid.utils.collection.EmptyList;
 
@@ -67,6 +69,19 @@ public class AndroidManifestHelper {
             return;
         }
         manifestElement.removeAttributesWithName(resourceName);
+    }
+
+    public static void removeAttributeFromManifestById(AndroidManifestBlock androidManifestBlock,
+                                                       int resourceId){
+        ResXmlElement manifestElement = androidManifestBlock.getManifestElement();
+        if(manifestElement == null){
+            LogUtil.logMessage("WARN: AndroidManifest don't have <manifest>");
+            return;
+        }
+        int removed = manifestElement.removeAttributesWithId(resourceId);
+        if (removed > 0) {
+            LogUtil.logMessage("Removed-attribute : " + HexUtil.toHex8("@0x", resourceId));
+        }
     }
 
     public static void removeAttributeFromManifestAndApplication(AndroidManifestBlock androidManifestBlock,

@@ -67,9 +67,10 @@ public class FileUtils {
     }
 
     public static OutputStream getOutputStream(Uri uri, Context context) throws IOException {
-        if(doesNotHaveStoragePerm(context)) return context.getContentResolver().openOutputStream(uri);
-        File file = new File(getPath(uri, context));
-        return file.canWrite() ? getOutputStream(file) : context.getContentResolver().openOutputStream(uri);
+       // if(doesNotHaveStoragePerm(context))
+            return context.getContentResolver().openOutputStream(uri);
+       // File file = new File(getPath(uri, context));
+       // return file.canWrite() ? getOutputStream(file) : context.getContentResolver().openOutputStream(uri);
     }
 
     public static InputStream getInputStream(File file) throws IOException {
@@ -81,9 +82,10 @@ public class FileUtils {
     }
 
     public static InputStream getInputStream(Uri uri, Context context) throws IOException {
-        if(doesNotHaveStoragePerm(context)) return context.getContentResolver().openInputStream(uri);
-        File file = new File(getPath(uri, context));
-        return file.canRead() ? getInputStream(file) : context.getContentResolver().openInputStream(uri);
+       // if(doesNotHaveStoragePerm(context))
+            return context.getContentResolver().openInputStream(uri);
+        //File file = new File(getPath(uri, context));
+        //return file.canRead() ? getInputStream(file) : context.getContentResolver().openInputStream(uri);
     }
 
     private static boolean fileExists(String filePath) {

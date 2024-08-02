@@ -130,6 +130,16 @@ public class Merger {
         if(mergedModule.hasAndroidManifest()) {
             AndroidManifestBlock manifest = mergedModule.getAndroidManifest();
             LogUtil.logMessage(R.string.sanitizing_manifest);
+            int ID_requiredSplitTypes = 0x0101064e;
+            int ID_splitTypes = 0x0101064f;
+
+            AndroidManifestHelper.removeAttributeFromManifestById(manifest,
+                    ID_requiredSplitTypes);
+            AndroidManifestHelper.removeAttributeFromManifestById(manifest,
+                    ID_splitTypes);
+            AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
+                    AndroidManifest.NAME_splitTypes);
+
             AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
                     AndroidManifest.NAME_requiredSplitTypes);
             AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
@@ -140,6 +150,7 @@ public class Merger {
             AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
                     AndroidManifest.ID_isSplitRequired
             );
+
             ResXmlElement application = manifest.getApplicationElement();
             List<ResXmlElement> splitMetaDataElements =
                     AndroidManifestHelper.listSplitRequired(application);
