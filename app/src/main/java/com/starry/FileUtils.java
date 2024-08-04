@@ -1,6 +1,7 @@
 package com.starry;
 
 import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.doesNotHaveStoragePerm;
+import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.getOriginalFileName;
 
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
@@ -11,8 +12,9 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.provider.OpenableColumns;
 import android.text.TextUtils;
+
+import com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,11 +22,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.UUID;
 
 public class FileUtils {
 
@@ -54,38 +53,62 @@ public class FileUtils {
     https://github.com/starry-shivam/FileUtils/blob/main/file-utils/src/main/java/com/starry/file_utils/FileUtils.kt
      */
 
-    public static final Charset UTF_8 = Charset.forName("UTF-8");
-
-    private static final boolean supportsNewOutputStream = (Build.VERSION.SDK_INT > 25);
 
     public static OutputStream getOutputStream(String filepath) throws IOException {
         return getOutputStream(new File(filepath));
     }
 
     public static OutputStream getOutputStream(File file) throws IOException {
-        return supportsNewOutputStream ? Files.newOutputStream(file.toPath(), java.nio.file.StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING) : new FileOutputStream(file);
+        return LegacyUtils.supportsFileChannel ?
+                Files.newOutputStream(file.toPath(), java.nio.file.StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
+        : new FileOutputStream(file);
+    }
+
+    public static void copyFile(File sourceFile, File destinationFile) throws IOException {
+        try (InputStream fis = getInputStream(sourceFile);
+             OutputStream fos = getOutputStream(destinationFile)) {
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = fis.read(buffer)) > 0) {
+                fos.write(buffer, 0, length);
+            }
+        }
+    }
+
+    public static void copyFile(InputStream sourceFile, File destinationFile) throws IOException {
+        try (OutputStream fos = getOutputStream(destinationFile)) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = sourceFile.read(buffer)) > 0) {
+                fos.write(buffer, 0, length);
+            }
+        }
     }
 
     public static OutputStream getOutputStream(Uri uri, Context context) throws IOException {
-       // if(doesNotHaveStoragePerm(context))
+        if(doesNotHaveStoragePerm(context))
             return context.getContentResolver().openOutputStream(uri);
-       // File file = new File(getPath(uri, context));
-       // return file.canWrite() ? getOutputStream(file) : context.getContentResolver().openOutputStream(uri);
+        String filePath = getPath(uri, context);
+        File file = filePath == null ? null : new File(filePath);
+        return file != null && file.canWrite() ? getOutputStream(file) : context.getContentResolver().openOutputStream(uri);
     }
 
     public static InputStream getInputStream(File file) throws IOException {
-        return supportsNewOutputStream ? Files.newInputStream(file.toPath(), StandardOpenOption.READ) : new FileInputStream(file);
+        return LegacyUtils.supportsFileChannel ?
+                Files.newInputStream(file.toPath(), StandardOpenOption.READ)
+                : new FileInputStream(file);
     }
 
     public static InputStream getInputStream(String filePath) throws IOException {
-        return supportsNewOutputStream ? Files.newInputStream(Paths.get(filePath), StandardOpenOption.READ) : new FileInputStream(filePath);
+        return getInputStream(new File(filePath));
     }
 
     public static InputStream getInputStream(Uri uri, Context context) throws IOException {
-       // if(doesNotHaveStoragePerm(context))
-            return context.getContentResolver().openInputStream(uri);
-        //File file = new File(getPath(uri, context));
-        //return file.canRead() ? getInputStream(file) : context.getContentResolver().openInputStream(uri);
+        if(doesNotHaveStoragePerm(context)) return context.getContentResolver().openInputStream(uri);
+        String filePath = getPath(uri, context);
+        File file = filePath == null ? null : new File(filePath);
+        return file != null && file.canRead() ? getInputStream(file) : context.getContentResolver().openInputStream(uri);
     }
 
     private static boolean fileExists(String filePath) {
@@ -141,13 +164,12 @@ public class FileUtils {
         String selection;
         String[] selectionArgs;
 
-        String FALLBACK_COPY_FOLDER = "upload_part";
         if (isExternalStorageDocument(uri)) {
             String docId = DocumentsContract.getDocumentId(uri);
             String[] split = docId.split(":");
             String fullPath = getPathFromExtSD(split);
             if (fullPath == null || !fileExists(fullPath)) {
-                fullPath = copyFileToInternalStorageAndGetPath(uri, FALLBACK_COPY_FOLDER, context);
+                fullPath = copyFileToInternalStorageAndGetPath(uri, context);
             }
             return TextUtils.isEmpty(fullPath) ? null : fullPath;
         }
@@ -211,9 +233,9 @@ public class FileUtils {
                 return uri.getLastPathSegment();
             }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                return copyFileToInternalStorageAndGetPath(uri, FALLBACK_COPY_FOLDER, context);
-            } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                return copyFileToInternalStorageAndGetPath(uri, context);
+            else {
                 return getDataColumn(context, uri, null, null);
             }
         }
@@ -222,33 +244,17 @@ public class FileUtils {
             return uri.getPath();
         }
 
-        return copyFileToInternalStorageAndGetPath(uri, FALLBACK_COPY_FOLDER, context);
+        return copyFileToInternalStorageAndGetPath(uri, context);
     }
 
-    public static String copyFileToInternalStorageAndGetPath(Uri uri, String newDirName, Context context) throws IOException {
-        return copyFileToInternalStorage(uri, newDirName, context).getPath();
+    public static String copyFileToInternalStorageAndGetPath(Uri uri, Context context) throws IOException {
+        return copyFileToInternalStorage(uri, context).getPath();
     }
 
-    public static File copyFileToInternalStorage(Uri uri, String newDirName, Context context) throws IOException {
-        Cursor returnCursor = context.getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE}, null, null, null);
-        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-        returnCursor.moveToFirst();
-        String name = returnCursor.getString(nameIndex);
-        returnCursor.close();
-
-        File output;
-        if (TextUtils.isEmpty(newDirName)) {
-            output = new File(context.getCacheDir() + File.separator + name);
-        } else {
-            String randomCollisionAvoidance = UUID.randomUUID().toString();
-            File dir = new File(context.getCacheDir() + File.separator + newDirName + File.separator + randomCollisionAvoidance);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-            output = new File(context.getCacheDir() + File.separator + newDirName + File.separator + randomCollisionAvoidance + File.separator + name);
-        }
-
-        try (OutputStream outputStream = FileUtils.getOutputStream(output); InputStream cursor = getInputStream(uri, context)) {
+    public static File copyFileToInternalStorage(Uri uri, Context context) throws IOException {
+        File output = new File(context.getCacheDir(), getOriginalFileName(context, uri));
+        if(output.exists() && output.length() > 999) return output;
+        try (OutputStream outputStream = FileUtils.getOutputStream(output); InputStream cursor = context.getContentResolver().openInputStream(uri)) {
             int read;
             byte[] buffers = new byte[1024];
             while ((read = cursor.read(buffers)) != -1) {

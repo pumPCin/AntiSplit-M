@@ -103,15 +103,6 @@
                 android:layout_weight="1"
                 android:text="@string/note" />
 
-            <EditText
-                android:id="@+id/workingFileField"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:ems="10"
-                android:inputType="textNoSuggestions"
-                android:hint="@string/working_file"
-                android:importantForAutofill="no"/>
-
             <TextView
                 android:id="@+id/errorField"
                 android:layout_width="match_parent"

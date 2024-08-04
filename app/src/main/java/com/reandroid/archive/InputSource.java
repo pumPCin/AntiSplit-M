@@ -26,7 +26,7 @@ import java.util.zip.CRC32;
 
 public abstract class InputSource {
     private final String name;
-    private String alias;
+    private final String alias;
     private long mCrc;
     private long mLength;
     private int method = Archive.DEFLATED;

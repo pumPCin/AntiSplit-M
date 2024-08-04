@@ -83,39 +83,6 @@ public class TableIdentifier{
         file = new File(file, PackageBlock.PUBLIC_XML);
         return file;
     }
-    public void loadPublicXml(Collection<File> pubXmlFileList) throws IOException {
-        for(File file : pubXmlFileList){
-            try {
-                loadPublicXml(file);
-            } catch (XmlPullParserException ex) {
-                throw new IOException(ex);
-            }
-        }
-    }
-    public PackageIdentifier loadPublicXml(File file) throws IOException, XmlPullParserException {
-        PackageIdentifier packageIdentifier = new PackageIdentifier();
-        packageIdentifier.loadPublicXml(file);
-        add(packageIdentifier);
-        packageIdentifier.setTag(file);
-        return packageIdentifier;
-    }
-    public PackageIdentifier loadPublicXml(InputStream inputStream) throws IOException, XmlPullParserException {
-        PackageIdentifier packageIdentifier = new PackageIdentifier();
-        packageIdentifier.loadPublicXml(inputStream);
-        add(packageIdentifier);
-        return packageIdentifier;
-    }
-    public PackageIdentifier loadPublicXml(Reader reader) throws IOException, XmlPullParserException {PackageIdentifier packageIdentifier = new PackageIdentifier();
-        packageIdentifier.loadPublicXml(reader);
-        add(packageIdentifier);
-        return packageIdentifier;
-    }
-    public PackageIdentifier loadPublicXml(XmlPullParser parser) throws IOException, XmlPullParserException {
-        PackageIdentifier packageIdentifier = new PackageIdentifier();
-        packageIdentifier.loadPublicXml(parser);
-        add(packageIdentifier);
-        return packageIdentifier;
-    }
     public ResourceIdentifier get(String packageName, String type, String name){
         PackageIdentifier packageIdentifier = mNameMap.get(packageName);
         if(packageIdentifier != null){

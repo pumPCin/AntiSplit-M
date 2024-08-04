@@ -18,6 +18,7 @@ package com.reandroid.archive.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
@@ -69,7 +70,9 @@ public class ZipFileOutput extends ZipOutput{
             return fileChannel;
         }
         synchronized (this){
-            fileChannel = FileChannel.open(this.file.toPath(), StandardOpenOption.WRITE);
+            fileChannel = com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsFileChannel ?
+                    FileChannel.open(this.file.toPath(), StandardOpenOption.WRITE) : new RandomAccessFile(file, "rw").getChannel();
+
             this.fileChannel = fileChannel;
             return fileChannel;
         }

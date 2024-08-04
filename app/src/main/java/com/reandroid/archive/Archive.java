@@ -15,21 +15,26 @@
  */
 package com.reandroid.archive;
 
-import com.reandroid.apk.APKLogger;
-import com.reandroid.archive.block.*;
-import com.reandroid.archive.io.*;
+import com.reandroid.archive.block.ApkSignatureBlock;
+import com.reandroid.archive.block.EndRecord;
+import com.reandroid.archive.io.ZipInput;
 import com.reandroid.archive.model.CentralFileDirectory;
 import com.reandroid.archive.model.LocalFileDirectory;
 import com.reandroid.utils.ObjectsUtil;
 import com.reandroid.utils.collection.ArrayIterator;
 import com.reandroid.utils.collection.CollectionUtil;
 import com.reandroid.utils.collection.ComputeIterator;
-import com.reandroid.utils.io.FileUtil;
-import com.reandroid.utils.io.IOUtil;
-import com.starry.FileUtils;
 
-import java.io.*;
-import java.util.*;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
@@ -134,44 +139,6 @@ public abstract class Archive<T extends ZipInput> implements Closeable {
     }
     public ApkSignatureBlock getApkSignatureBlock() {
         return apkSignatureBlock;
-    }
-    public EndRecord getEndRecord() {
-        return endRecord;
-    }
-
-    public int extractAll(File dir) throws IOException {
-        return extractAll(dir, null, null);
-    }
-    public int extractAll(File dir, APKLogger logger) throws IOException {
-        return extractAll(dir, null, logger);
-    }
-    public int extractAll(File dir, Predicate<ArchiveEntry> filter) throws IOException {
-        return extractAll(dir, filter, null);
-    }
-    public int extractAll(File dir, Predicate<ArchiveEntry> filter, APKLogger logger) throws IOException {
-        Iterator<ArchiveEntry> iterator = iterator(filter);
-        int result = 0;
-        while (iterator.hasNext()){
-            ArchiveEntry archiveEntry = iterator.next();
-            String name = archiveEntry.getName().replace('/', File.separatorChar);
-            File file = new File(dir, name);
-            FileUtil.ensureParentDirectory(file);
-            if(logger != null){
-                long size = archiveEntry.getDataSize();
-                if(size > LOG_LARGE_FILE_SIZE){
-                    logger.logVerbose("Extracting ["
-                            + FileUtil.toReadableFileSize(size) + "] "+ archiveEntry.getName());
-                }
-            }
-            if(archiveEntry.getMethod() != Archive.STORED){
-                OutputStream outputStream = FileUtils.getOutputStream(file);
-                IOUtil.writeAll(openInputStream(archiveEntry), outputStream);
-            }else {
-                extractStored(file, archiveEntry);
-            }
-            result ++;
-        }
-        return result;
     }
 
     abstract void extractStored(File file, ArchiveEntry archiveEntry) throws IOException;

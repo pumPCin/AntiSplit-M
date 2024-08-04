@@ -15,21 +15,22 @@
  */
 package com.reandroid.archive.block;
 
+import android.view.contentcapture.ContentCaptureSession;
+
+import com.aefyr.pseudoapksigner.Constants;
 import com.reandroid.archive.ZipSignature;
 import com.reandroid.utils.HexUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class CentralEntryHeader extends CommonHeader {
     private String mComment;
     public CentralEntryHeader(){
         super(OFFSET_fileName, ZipSignature.CENTRAL_FILE, OFFSET_general_purpose);
-    }
-    public CentralEntryHeader(String name){
-        this();
-        setFileName(name);
     }
 
     @Override
@@ -74,11 +75,11 @@ public class CentralEntryHeader extends CommonHeader {
         }
         return mComment;
     }
-    public void setComment(String comment){
+    public void setComment(String comment) throws UnsupportedEncodingException {
         if(comment==null){
             comment="";
         }
-        byte[] strBytes = comment.getBytes(com.starry.FileUtils.UTF_8);
+        byte[] strBytes = comment.getBytes(Constants.UTF8);
         int length = strBytes.length;
         setCommentLength(length);
         if(length==0){
@@ -119,17 +120,13 @@ public class CentralEntryHeader extends CommonHeader {
     public int getInternalFileAttributes(){
         return getShortUnsigned(OFFSET_internalFileAttributes);
     }
-    public void setInternalFileAttributes(int value){
-        putShort(OFFSET_internalFileAttributes, value);
-    }
+
     public int getExternalFileAttributes(){
         return getShortUnsigned(OFFSET_externalFileAttributes);
     }
-    public void setExternalFileAttributes(int value){
-        putShort(OFFSET_externalFileAttributes, value);
-    }
+
     @Override
-    void onUtf8Changed(boolean oldValue){
+    void onUtf8Changed(boolean oldValue) throws UnsupportedEncodingException {
         String str = mComment;
         if(str != null){
             setComment(str);

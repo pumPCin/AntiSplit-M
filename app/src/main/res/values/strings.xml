@@ -8,7 +8,7 @@
     <string name="ask">Ask where to save the file each time (if disabled, save the merged APK to the same directory where the split file was from)</string>
     <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
     <string name="no_filepath">Couldn\'t find filepath of the selected file</string>
-    <string name="output">Output directory:</string>
+    <string name="output">"Output directory: "</string>
     <string name="show_dialog">Show dialog allowing selection of which splits to include</string>
     <string name="nothing">Nothing selected</string>
     <string name="change_text_color">Change text color</string>
@@ -31,4 +31,11 @@
     <string name="revanced">ReVanced Manager produces an error when attempting to patch merged APKs. The error is not an actual problem and is produced incorrectly by a third party library. For most people, using the option to select splits for your device specifications will fix it. If it still doesn\'t work, the easiest thing to do is download a version of ReVanced Manager with the error removed.</string>
     <string name="note">Note for ReVanced</string>
     <string name="download_fix">Download fixed ReVanced Manager</string>
+    <string name="cancel_button_label">Cancel</string>
+    <string name="choose_button_label">Select</string>
+    <string name="default_dir" translatable="false">/sdcard</string>
+    <string name="label_parent_directory">Parent Directory</string>
+    <string name="last_edit">Last edited: </string>
+    <string name="error_dir_access">Directory cannot be accessed</string>
+    <string name="label_parent_dir" translatable="false">...</string>
 </resources>

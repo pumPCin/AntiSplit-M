@@ -21,14 +21,7 @@ import java.nio.charset.StandardCharsets;
 @SuppressWarnings({"ResultOfMethodCallIgnored"})
 public class IOUtil {
 
-    public static void writeUtf8(String content, File file) throws IOException {
-        writeUtf8(content, FileUtil.outputStream(file));
-    }
-    public static void writeUtf8(String content, OutputStream outputStream) throws IOException {
-        byte[] bytes = content.getBytes(com.starry.FileUtils.UTF_8);
-        outputStream.write(bytes, 0, bytes.length);
-        outputStream.close();
-    }
+
     public static void writeAll(InputStream inputStream, File file) throws IOException {
         FileUtil.ensureParentDirectory(file);
         File tmp = file;

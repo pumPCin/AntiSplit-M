@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -244,7 +245,12 @@ public class AmbilWarnaDialog {
 				if (AmbilWarnaDialog.this.supportsAlpha) moveAlphaCursor();
 				moveTarget();
 				if (AmbilWarnaDialog.this.supportsAlpha) updateAlphaView();
-				view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				ViewTreeObserver vto = view.getViewTreeObserver();
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+					vto.removeOnGlobalLayoutListener(this);
+				} else {
+					vto.removeGlobalOnLayoutListener(this);
+				}
 			}
 		});
 	}

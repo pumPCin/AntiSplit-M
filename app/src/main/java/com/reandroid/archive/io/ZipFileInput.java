@@ -17,7 +17,11 @@ package com.reandroid.archive.io;
 
 import com.reandroid.common.FileChannelInputStream;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
@@ -81,7 +85,7 @@ public class ZipFileInput extends ZipInput {
             if(!file.isFile()){
                 throw new FileNotFoundException("No such file: " + file);
             }
-            fileChannel = FileChannel.open(this.file.toPath(), StandardOpenOption.READ);
+            fileChannel = com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsFileChannel ? FileChannel.open(this.file.toPath(), StandardOpenOption.READ) : new RandomAccessFile(file, "r").getChannel();
             this.fileChannel = fileChannel;
             return fileChannel;
         }

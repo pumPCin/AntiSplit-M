@@ -1,7 +1,9 @@
 package com.abdurazaaqmohammed.AntiSplit.main;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
 import com.starry.FileUtils;
@@ -25,7 +27,7 @@ public class DeviceSpecsUtil {
         if (splitAPKUri.getPath().endsWith("xapk")) {
             splitApkPath = new File(FileUtils.getPath(splitAPKUri, context));
             final boolean couldntRead = !splitApkPath.canRead();
-            if (couldntRead) splitApkPath = FileUtils.copyFileToInternalStorage(splitAPKUri, null, context);
+            if (couldntRead) splitApkPath = FileUtils.copyFileToInternalStorage(splitAPKUri, context);
             try (ZipFile zipFile = new ZipFile(splitApkPath)) {
                 Enumeration<? extends ZipEntry> entries = zipFile.entries();
                 while (entries.hasMoreElements()) {
@@ -35,7 +37,7 @@ public class DeviceSpecsUtil {
                 if (couldntRead) splitApkPath.delete();
             }
         } else {
-            try (ZipInputStream zis = new ZipInputStream(context.getContentResolver().openInputStream(splitAPKUri))) {
+            try (ZipInputStream zis = new ZipInputStream(FileUtils.getInputStream(splitAPKUri, context))) {
                 ZipEntry zipEntry = zis.getNextEntry();
                 while (zipEntry != null) {
                     final String name = zipEntry.getName();
@@ -52,7 +54,7 @@ public class DeviceSpecsUtil {
 
     public static String getDeviceDpi(Context context) {
         String densityType;
-        if((densityType = context.getSharedPreferences("set", Context.MODE_PRIVATE).getString("deviceDpi", "")).isEmpty()) {
+        if(TextUtils.isEmpty(densityType = context.getSharedPreferences("set", Context.MODE_PRIVATE).getString("deviceDpi", ""))) {
             switch (context.getResources().getDisplayMetrics().densityDpi) {
                 case DisplayMetrics.DENSITY_LOW:
                     densityType = "ldpi";
@@ -60,12 +62,6 @@ public class DeviceSpecsUtil {
                 case DisplayMetrics.DENSITY_MEDIUM:
                 case DisplayMetrics.DENSITY_140:
                     densityType = "mdpi";
-                    break;
-                case DisplayMetrics.DENSITY_HIGH:
-                case DisplayMetrics.DENSITY_220:
-                case DisplayMetrics.DENSITY_200:
-                case DisplayMetrics.DENSITY_180:
-                    densityType = "hdpi";
                     break;
                 case DisplayMetrics.DENSITY_XHIGH:
                 case DisplayMetrics.DENSITY_280:
@@ -92,12 +88,18 @@ public class DeviceSpecsUtil {
                 case DisplayMetrics.DENSITY_TV:
                     densityType = "tvdpi";
                     break;
+                case DisplayMetrics.DENSITY_HIGH:
+                case DisplayMetrics.DENSITY_220:
+                case DisplayMetrics.DENSITY_200:
+                case DisplayMetrics.DENSITY_180:
                 default:
                     densityType = "hdpi";
                     break;
             }
             densityType += ".apk";
-            context.getSharedPreferences("set", Context.MODE_PRIVATE).edit().putString("deviceDpi", densityType).apply();
+            SharedPreferences.Editor e = context.getSharedPreferences("set", Context.MODE_PRIVATE).edit().putString("deviceDpi", densityType);
+            if(LegacyUtils.supportsArraysCopyOf) e.apply();
+            else e.commit();
         }
         return densityType;
     }

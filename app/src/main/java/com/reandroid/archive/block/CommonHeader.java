@@ -15,12 +15,14 @@
  */
 package com.reandroid.archive.block;
 
+import com.aefyr.pseudoapksigner.Constants;
 import com.reandroid.archive.Archive;
 import com.reandroid.archive.ZipSignature;
 import com.reandroid.utils.HexUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
@@ -292,11 +294,16 @@ public abstract class CommonHeader extends ZipHeader {
         }
         return mFileName;
     }
-    public void setFileName(String fileName){
+    public void setFileName(String fileName) {
         if(fileName==null){
             fileName="";
         }
-        byte[] nameBytes = fileName.getBytes(com.starry.FileUtils.UTF_8);
+        byte[] nameBytes;
+        try {
+            nameBytes = fileName.getBytes(Constants.UTF8);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
         getGeneralPurposeFlag().setUtf8(true, false);
         int length = nameBytes.length;
         setFileNameLength(length);
@@ -314,7 +321,7 @@ public abstract class CommonHeader extends ZipHeader {
     public boolean hasDataDescriptor(){
         return getGeneralPurposeFlag().hasDataDescriptor();
     }
-    private String decodeFileName(){
+    private String decodeFileName() {
         int length = getFileNameLength();
         byte[] bytes = getBytesInternal();
         int offset = offsetFileName;
@@ -325,7 +332,11 @@ public abstract class CommonHeader extends ZipHeader {
         if(length>max){
             length = max;
         }
-        return new String(bytes, offset, length, com.starry.FileUtils.UTF_8);
+        try {
+            return new String(bytes, offset, length, Constants.UTF8);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
     public String decodeComment(){
         int length = getExtraLength();
@@ -338,9 +349,13 @@ public abstract class CommonHeader extends ZipHeader {
         if(length>max){
             length = max;
         }
-        return new String(bytes, offset, length, com.starry.FileUtils.UTF_8);
+        try {
+            return new String(bytes, offset, length, Constants.UTF8);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
-    void onUtf8Changed(boolean oldValue){
+    void onUtf8Changed(boolean oldValue) throws UnsupportedEncodingException {
         String str = mFileName;
         if(str != null){
             setFileName(str);
@@ -423,7 +438,11 @@ public abstract class CommonHeader extends ZipHeader {
             }
             this.localFileHeader.putBit(offset +1, 3, flag);
             if(notify){
-                this.localFileHeader.onUtf8Changed(oldUtf8);
+                try {
+                    this.localFileHeader.onUtf8Changed(oldUtf8);
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
 
@@ -437,7 +456,11 @@ public abstract class CommonHeader extends ZipHeader {
             boolean oldUtf8 = getUtf8();
             this.localFileHeader.putShort(offset, value);
             if(oldUtf8 != getUtf8()){
-                this.localFileHeader.onUtf8Changed(oldUtf8);
+                try {
+                    this.localFileHeader.onUtf8Changed(oldUtf8);
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         public void initDefault(){

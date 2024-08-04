@@ -20,6 +20,8 @@
 
 package com.reandroid.xml.kxml2;
 
+import android.text.TextUtils;
+
 import java.io.*;
 import java.util.Arrays;
 import java.util.Locale;
@@ -111,11 +113,11 @@ public class KXmlSerializer implements XmlSerializer {
 
         for (int i = nspCounts[depth - 1]; i < nspCounts[depth]; i++){
             append(" xmlns");
-            if(!nspStack[i * 2].isEmpty()){
+            if(!TextUtils.isEmpty(nspStack[i * 2])){
                 append(':');
                 append(nspStack[i * 2]);
             }
-            else if(getNamespace().isEmpty() && !nspStack[i * 2 + 1].isEmpty())
+            else if(TextUtils.isEmpty(getNamespace()) && !TextUtils.isEmpty(nspStack[i * 2 + 1]))
                 throw new IllegalStateException("Cannot set default namespace for elements in no namespace");
             append("=\"");
             writeEscaped(nspStack[i * 2 + 1], '"');
@@ -224,7 +226,7 @@ public class KXmlSerializer implements XmlSerializer {
         for (int i = nspCounts[depth + 1] * 2 - 2; i >= 0;i -= 2){
             if(nspStack[i + 1].equals(namespace)
                     && (includeDefault 
-                    || !nspStack[i].isEmpty())){
+                    || !TextUtils.isEmpty(nspStack[i]))){
                 String cand = nspStack[i];
                 for (int j = i + 2; j < nspCounts[depth + 1] * 2; j++){
                     if(nspStack[j].equals(cand)){
@@ -243,7 +245,7 @@ public class KXmlSerializer implements XmlSerializer {
 
         String prefix;
 
-        if(namespace.isEmpty()) {
+        if(TextUtils.isEmpty(namespace)) {
             prefix = "";
         }else {
             do {
@@ -386,9 +388,9 @@ public class KXmlSerializer implements XmlSerializer {
         String prefix = namespace == null?
                 "" : getPrefix(namespace, true, true);
 
-        if(namespace != null && namespace.isEmpty()){
+        if(namespace != null && TextUtils.isEmpty(namespace)){
             for (int i = nspCounts[depth]; i < nspCounts[depth + 1]; i++){
-                if(nspStack[i * 2].isEmpty() && !nspStack[i * 2 + 1].isEmpty()){
+                if(TextUtils.isEmpty(nspStack[i * 2]) && !TextUtils.isEmpty(nspStack[i * 2 + 1])){
                     throw new IllegalStateException("Cannot set default namespace for elements in no namespace");
                 }
             }
@@ -398,7 +400,7 @@ public class KXmlSerializer implements XmlSerializer {
         elementStack[esp] = name;
         append('<');
         indentAttributeReference += 1;
-        if(!prefix.isEmpty()){
+        if(!TextUtils.isEmpty(prefix)){
             append(prefix);
             append(':');
             indentAttributeReference += prefix.length() + 1;
@@ -421,11 +423,11 @@ public class KXmlSerializer implements XmlSerializer {
         if(namespace == null) {
             namespace = "";
         }
-        String prefix = namespace.isEmpty() ?
+        String prefix = TextUtils.isEmpty(namespace) ?
                 "" : getPrefix(namespace, false, true);
         attributeIndent();
         append(' ');
-        if(!prefix.isEmpty()){
+        if(!TextUtils.isEmpty(prefix)){
             append(prefix);
             append(':');
         }
@@ -468,7 +470,7 @@ public class KXmlSerializer implements XmlSerializer {
             }
             append("</");
             String prefix = elementStack[depth * 3 + 1];
-            if(!prefix.isEmpty()){
+            if(!TextUtils.isEmpty(prefix)){
                 append(prefix);
                 append(':');
             }

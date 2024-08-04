@@ -15,10 +15,13 @@
  */
 package com.reandroid.common;
 
+import com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
@@ -52,11 +55,12 @@ public class FileChannelInputStream extends InputStream {
         this(fileChannel, length, DEFAULT_BUFFER_SIZE);
     }
     public FileChannelInputStream(File file, long length, int bufferSize) throws IOException {
-        this(FileChannel.open(file.toPath(), StandardOpenOption.READ), length, bufferSize);
+            this(LegacyUtils.supportsFileChannel ? FileChannel.open(file.toPath(), StandardOpenOption.READ) : new RandomAccessFile(file, "r").getChannel(), length, bufferSize);
+
         this.mAutoClosable = true;
     }
     public FileChannelInputStream(File file) throws IOException {
-        this(FileChannel.open(file.toPath(), StandardOpenOption.READ), file.length());
+        this(LegacyUtils.supportsFileChannel ? FileChannel.open(file.toPath(), StandardOpenOption.READ) : new RandomAccessFile(file, "r").getChannel(), file.length());
         this.mAutoClosable = true;
     }
 

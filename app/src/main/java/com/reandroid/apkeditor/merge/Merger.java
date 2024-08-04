@@ -20,6 +20,8 @@ import android.net.Uri;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
 import com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil;
+import com.aefyr.pseudoapksigner.IOUtils;
+import com.aefyr.pseudoapksigner.PseudoApkSigner;
 import com.reandroid.apk.ApkBundle;
 import com.reandroid.apk.ApkModule;
 import com.reandroid.apkeditor.common.AndroidManifestHelper;
@@ -89,7 +91,7 @@ public class Merger {
                 LogUtil.logMessage(R.string.detected_xapk); //ZipInputStream is reading XAPK files as if all files inside the splits were in 1 zip which breaks everything
                 File bruh = DeviceSpecsUtil.splitApkPath == null ? new File(FileUtils.getPath(xapkUri, context)) : DeviceSpecsUtil.splitApkPath; // if file was already copied to get splits list do not copy it again
                 final boolean couldntRead = !bruh.canRead();
-                if (couldntRead) bruh = FileUtils.copyFileToInternalStorage(xapkUri, null, context);
+                if (couldntRead) bruh = FileUtils.copyFileToInternalStorage(xapkUri, context);
                 try (ZipFile zipFile = new ZipFile(bruh)) {
                     Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
@@ -214,7 +216,19 @@ public class Merger {
             mergedModule.writeApk(temp);
             LogUtil.logMessage(R.string.signing);
             try (InputStream fis = FileUtils.getInputStream(temp)) {
-                new com.aefyr.pseudoapksigner.PseudoApkSignerWrapper(context).sign(fis, out);
+                final String FILE_NAME_PAST = "testkey.past";
+                final String FILE_NAME_PRIVATE_KEY = "testkey.pk8";
+                File signingEnvironment = new File(context.getFilesDir(), "signing");
+                File pastFile = new File(signingEnvironment, FILE_NAME_PAST);
+                File privateKeyFile = new File(signingEnvironment, FILE_NAME_PRIVATE_KEY);
+
+                if (!pastFile.exists() || !privateKeyFile.exists()) {
+                    signingEnvironment.mkdir();
+                    IOUtils.copyFileFromAssets(context, FILE_NAME_PAST, pastFile);
+                    IOUtils.copyFileFromAssets(context, FILE_NAME_PRIVATE_KEY, privateKeyFile);
+                }
+
+                PseudoApkSigner.sign(fis, out, pastFile, privateKeyFile);
             } catch (Exception e) {
                 LogUtil.logMessage(R.string.sign_failed);
                 mergedModule.writeApk(out);

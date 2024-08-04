@@ -49,8 +49,9 @@ class OutputSource {
         CountingOutputStream<DeflaterOutputStream> deflateCounter = null;
 
         if(inputSource.getMethod() != Archive.STORED){
-            DeflaterOutputStream deflaterInputStream =
-                    new DeflaterOutputStream(rawCounter, new Deflater(Deflater.BEST_SPEED, true), true);
+            DeflaterOutputStream deflaterInputStream = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) ?
+                    new DeflaterOutputStream(rawCounter, new Deflater(Deflater.BEST_SPEED, true), true)
+                    :  new DeflaterOutputStream(rawCounter, new Deflater(Deflater.BEST_SPEED, true));
             deflateCounter = new CountingOutputStream<>(deflaterInputStream, false);
         }
         if(deflateCounter != null){

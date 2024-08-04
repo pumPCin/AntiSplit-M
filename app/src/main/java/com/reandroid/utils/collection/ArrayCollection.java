@@ -15,8 +15,11 @@
  */
 package com.reandroid.utils.collection;
 
+import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsArraysCopyOf;
+
 import com.reandroid.common.ArraySupplier;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -337,7 +340,16 @@ public class ArrayCollection<T> implements ArraySupplier<T>, List<T>, Set<T> {
             }
             return out;
         }
-        return (T1[]) Arrays.copyOf(elements, size, out.getClass());
+        if (supportsArraysCopyOf) {
+            return (T1[]) Arrays.copyOf(elements, size, out.getClass());
+        } else {
+            T[] copy = ((Object)size == (Object)Object[].class)
+                    ? (T[]) new Object[size]
+                    : (T[]) Array.newInstance(out.getClass().getComponentType(), size);
+            System.arraycopy(elements, 0, copy, 0,
+                    Math.min(elements.length, size));
+            return (T1[]) copy;
+        }
     }
 
     public T removeItem(Object item){

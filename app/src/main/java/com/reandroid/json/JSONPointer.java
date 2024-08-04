@@ -7,6 +7,8 @@ package com.reandroid.json;
 
 import static java.lang.String.format;
 
+import android.text.TextUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -53,7 +55,7 @@ public class JSONPointer {
         if (pointer == null) {
             throw new NullPointerException("pointer cannot be null");
         }
-        if (pointer.isEmpty() || pointer.equals("#")) {
+        if (TextUtils.isEmpty(pointer) || pointer.equals("#")) {
             this.refTokens = Collections.emptyList();
             return;
         }

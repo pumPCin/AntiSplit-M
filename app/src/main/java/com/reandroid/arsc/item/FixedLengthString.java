@@ -15,9 +15,11 @@
  */
 package com.reandroid.arsc.item;
 
+import com.aefyr.pseudoapksigner.Constants;
 import com.reandroid.arsc.io.BlockReader;
 import com.reandroid.utils.StringsUtil;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 public class FixedLengthString  extends StringItem {
@@ -69,7 +71,11 @@ public class FixedLengthString  extends StringItem {
             return null;
         }
         int length = getEndNullPosition(bytes);
-        return new String(bytes,0, length, StandardCharsets.UTF_16LE);
+        try {
+            return new String(bytes,0, length, Constants.UTF16);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
     private static int getEndNullPosition(byte[] bytes){
         int length = bytes.length;

@@ -63,5 +63,4 @@ public abstract class StringBlock extends BlockItem{
         return get();
     }
 
-    public static final CharsetDecoder UTF8_DECODER = com.starry.FileUtils.UTF_8.newDecoder();
 }

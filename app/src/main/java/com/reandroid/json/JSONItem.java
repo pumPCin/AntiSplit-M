@@ -15,11 +15,15 @@
  */
 package com.reandroid.json;
 
+import android.text.TextUtils;
+
+import com.aefyr.pseudoapksigner.Constants;
 import com.starry.FileUtils;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Map;
@@ -44,7 +48,7 @@ public abstract class JSONItem {
         write(outputStream, INDENT_FACTOR);
     }
     public void write(OutputStream outputStream, int indentFactor) throws IOException {
-        Writer writer=new OutputStreamWriter(outputStream, com.starry.FileUtils.UTF_8);
+        Writer writer=new OutputStreamWriter(outputStream, Constants.UTF8);
         writer= write(writer, indentFactor, 0);
         writer.flush();
         writer.close();
@@ -122,7 +126,7 @@ public abstract class JSONItem {
     }
 
     public static Writer quote(String string, Writer w) throws IOException {
-        if (string == null || string.isEmpty()) {
+        if (TextUtils.isEmpty(string)) {
             w.write("\"\"");
             return w;
         }

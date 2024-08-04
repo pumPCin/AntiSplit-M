@@ -8,11 +8,11 @@ android {
 
     defaultConfig {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
-        minSdk = 16
+        minSdk = 4
         targetSdk = 35
-        versionCode = 12
-        versionName = "1.6.2"
-
+        versionCode = 15
+        versionName = "1.6.3"
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -26,6 +26,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -33,5 +34,7 @@ android {
         viewBinding = false
     }
     dependencies {
+        implementation("com.android.support:multidex:1.0.3")
+        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
     }
 }

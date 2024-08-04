@@ -1,10 +1,9 @@
 package com.aefyr.pseudoapksigner;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.interfaces.RSAPrivateKey;
@@ -12,27 +11,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class PseudoApkSigner {
-    private static final String[] META_INF_FILES_TO_SKIP_ENDINGS = new String[]{"manifest.mf", ".sf", ".rsa", ".dsa", ".ec"};
-    private static final String HASHING_ALGORITHM = "SHA1";
+    public static void sign(InputStream apkInputStream, OutputStream output, File mTemplateFile, File privateKey) throws Exception {
+        final RSAPrivateKey mPrivateKey = Utils.readPrivateKey(privateKey);
+        final String HASHING_ALGORITHM = "SHA1";
+        final String[] META_INF_FILES_TO_SKIP_ENDINGS = new String[]{"manifest.mf", ".sf", ".rsa", ".dsa", ".ec"};
 
-    private RSAPrivateKey mPrivateKey;
-    private File mTemplateFile;
-
-    private String mSignerName = "CERT";
-
-    /**
-     * Creates a new PseudoApkSigner with given template and private key
-     *
-     * @param template   .RSA file from an APK signed with an actual apksigner with the same private key with last 256 bytes removed
-     * @param privateKey .pk8 private key file
-     */
-    public PseudoApkSigner(File template, File privateKey) throws Exception {
-        mTemplateFile = template;
-        mPrivateKey = Utils.readPrivateKey(privateKey);
-    }
-
-
-    public void sign(InputStream apkInputStream, OutputStream output) throws Exception {
         ManifestBuilder manifest = new ManifestBuilder();
         SignatureFileGenerator signature = new SignatureFileGenerator(manifest, HASHING_ALGORITHM);
 
@@ -81,6 +64,7 @@ public class PseudoApkSigner {
         zipOutputStream.write(manifest.build().getBytes(Constants.UTF8));
         zipOutputStream.closeEntry();
 
+        String mSignerName = "CERT";
         zipOutputStream.putNextEntry(new ZipEntry(String.format("META-INF/%s.SF", mSignerName)));
         zipOutputStream.write(signature.generate().getBytes(Constants.UTF8));
         zipOutputStream.closeEntry();
@@ -92,15 +76,5 @@ public class PseudoApkSigner {
 
         apkZipInputStream.close();
         zipOutputStream.close();
-    }
-
-
-    /**
-     * Sets name of the .SF and .RSA file in META-INF
-     *
-     * @param signerName desired .SF and .RSA files name
-     */
-    public void setSignerName(String signerName) {
-        mSignerName = signerName;
     }
 }

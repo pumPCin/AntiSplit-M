@@ -15,6 +15,8 @@
   */
 package com.reandroid.arsc.model;
 
+import android.text.TextUtils;
+
 import com.reandroid.arsc.ARSCLib;
 import com.reandroid.arsc.array.SpecTypePairArray;
 import com.reandroid.arsc.array.TypeBlockArray;
@@ -93,7 +95,7 @@ public class FrameworkTable extends TableBlock {
             PackageBlock packageBlock = pickOne();
             if(packageBlock!=null){
                 String name = packageBlock.getName();
-                if(name!=null && !name.trim().isEmpty()){
+                if(name!=null && !TextUtils.isEmpty(name.trim())){
                     frameworkName = name;
                 }
             }

@@ -15,11 +15,13 @@
  */
 package com.reandroid.archive.io;
 
+import com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils;
 import com.reandroid.archive.Archive;
 import com.reandroid.archive.ArchiveEntry;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
@@ -53,6 +55,7 @@ public class ArchiveFileEntrySource extends ArchiveEntrySource<ZipFileInput> {
     @Override
     public void write(File file) throws IOException {
         FileChannel fileChannel = getFileChannel();
+
         if(getMethod() != Archive.STORED || fileChannel == null){
             super.write(file);
             return;
@@ -65,10 +68,9 @@ public class ArchiveFileEntrySource extends ArchiveEntrySource<ZipFileInput> {
             file.delete();
         }
         file.createNewFile();
-        StandardOpenOption openOption = StandardOpenOption.WRITE;
-        FileChannel outputChannel = FileChannel.open(file.toPath(), openOption);
-        outputChannel.transferFrom(fileChannel, 0, getLength());
-        outputChannel.close();
+        try(FileChannel outputChannel = LegacyUtils.supportsFileChannel ?
+                FileChannel.open(file.toPath(), StandardOpenOption.WRITE) : new RandomAccessFile(file, "rw").getChannel()) {
+            outputChannel.transferFrom(fileChannel, 0, getLength());
+        }
     }
-
 }

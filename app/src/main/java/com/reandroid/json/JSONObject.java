@@ -5,6 +5,9 @@
  */
 package com.reandroid.json;
 
+import android.text.TextUtils;
+
+import com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils;
 import com.reandroid.common.FileChannelInputStream;
 
 import java.io.*;
@@ -29,9 +32,9 @@ public class JSONObject extends JSONItem {
 
     public JSONObject(JSONObject jo, String ... names) {
         this(names.length);
-        for (int i = 0; i < names.length; i += 1) {
+        for (String name : names) {
             try {
-                this.putOnce(names[i], jo.opt(names[i]));
+                this.putOnce(name, jo.opt(name));
             } catch (Exception ignore) {
             }
         }
@@ -704,7 +707,7 @@ public class JSONObject extends JSONItem {
                     && method.getReturnType() != Void.TYPE
                     && isValidMethodName(method.getName())) {
                 final String key = getKeyNameFromMethod(method);
-                if (key != null && !key.isEmpty()) {
+                if (key != null && !TextUtils.isEmpty(key)) {
                     try {
                         final Object result = method.invoke(bean);
                         if (result != null) {
@@ -743,7 +746,7 @@ public class JSONObject extends JSONItem {
             }
         }
         JSONPropertyName annotation = getAnnotation(method, JSONPropertyName.class);
-        if (annotation != null && annotation.value() != null && !annotation.value().isEmpty()) {
+        if (annotation != null && !TextUtils.isEmpty(annotation.value())) {
             return annotation.value();
         }
         String key;
@@ -762,9 +765,9 @@ public class JSONObject extends JSONItem {
             return null;
         }
         if (key.length() == 1) {
-            key = key.toLowerCase(Locale.ROOT);
+            key = key.toLowerCase(LegacyUtils.supportsArraysCopyOf ? Locale.ROOT : Locale.getDefault());
         } else if (!Character.isUpperCase(key.charAt(1))) {
-            key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
+            key = key.substring(0, 1).toLowerCase(LegacyUtils.supportsArraysCopyOf ? Locale.ROOT : Locale.getDefault()) + key.substring(1);
         }
         return key;
     }

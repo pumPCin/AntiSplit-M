@@ -15,6 +15,7 @@
   */
 package com.reandroid.arsc.item;
 
+import com.aefyr.pseudoapksigner.Constants;
 import com.reandroid.arsc.base.Block;
 import com.reandroid.arsc.coder.ThreeByteCharsetDecoder;
 import com.reandroid.arsc.coder.XmlSanitizer;
@@ -30,9 +31,11 @@ import org.xmlpull.v1.XmlSerializer;
 
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -260,12 +263,8 @@ public class StringItem extends StringBlock implements JSONConvert<JSONObject>, 
         }else {
             offLen=decodeUtf16StringByteLength(allStringBytes);
         }
-        CharsetDecoder charsetDecoder;
-        if(isUtf8){
-            charsetDecoder=UTF8_DECODER;
-        }else {
-            charsetDecoder=UTF16LE_DECODER;
-        }
+        CharsetDecoder charsetDecoder = Charset.forName(isUtf8 ? Constants.UTF8 : Constants.UTF16).newDecoder();
+
         try {
             ByteBuffer buf=ByteBuffer.wrap(allStringBytes, offLen[0], offLen[1]);
             CharBuffer charBuffer=charsetDecoder.decode(buf);
@@ -274,7 +273,11 @@ public class StringItem extends StringBlock implements JSONConvert<JSONObject>, 
             if(isUtf8){
                 return tryThreeByteDecoder(allStringBytes, offLen[0], offLen[1]);
             }
-            return new String(allStringBytes, offLen[0], offLen[1], StandardCharsets.UTF_16LE);
+            try {
+                return new String(allStringBytes, offLen[0], offLen[1], Constants.UTF16);
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
     private String tryThreeByteDecoder(byte[] bytes, int offset, int length){
@@ -283,7 +286,11 @@ public class StringItem extends StringBlock implements JSONConvert<JSONObject>, 
             CharBuffer charBuffer = DECODER_3B.decode(byteBuffer);
             return charBuffer.toString();
         } catch (CharacterCodingException e) {
-            return new String(bytes, offset, length, com.starry.FileUtils.UTF_8);
+            try {
+                return new String(bytes, offset, length, Constants.UTF8);
+            } catch (UnsupportedEncodingException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
     public boolean hasStyle(){
@@ -429,7 +436,11 @@ public class StringItem extends StringBlock implements JSONConvert<JSONObject>, 
         byte[] bts;
         byte[] lenBytes=new byte[2];
         if(str!=null){
-            bts=str.getBytes(com.starry.FileUtils.UTF_8);
+            try {
+                bts=str.getBytes(Constants.UTF8);
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
             int strLen=bts.length;
             if((strLen & 0xff80)!=0){
                 lenBytes=new byte[4];
@@ -477,7 +488,11 @@ public class StringItem extends StringBlock implements JSONConvert<JSONObject>, 
         return addBytes(lenBytes, bts, new byte[2]);
     }
     static byte[] getUtf16Bytes(String str){
-        return str.getBytes(StandardCharsets.UTF_16LE);
+        try {
+            return str.getBytes(Constants.UTF16);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static byte[] addBytes(byte[] bts1, byte[] bts2, byte[] bts3){
@@ -510,7 +525,6 @@ public class StringItem extends StringBlock implements JSONConvert<JSONObject>, 
         return result;
     }
 
-    private static final CharsetDecoder UTF16LE_DECODER = StandardCharsets.UTF_16LE.newDecoder();
     private static final CharsetDecoder DECODER_3B = ThreeByteCharsetDecoder.INSTANCE;
 
     public static final String NAME_string = ObjectsUtil.of("string");

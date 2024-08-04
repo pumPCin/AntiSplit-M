@@ -85,7 +85,11 @@ public class ArchiveEntry {
         return getCentralEntryHeader().getComment();
     }
     public void setComment(String comment) {
-        getCentralEntryHeader().setComment(comment);
+        try {
+            getCentralEntryHeader().setComment(comment);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
     public boolean isFile() {
         return !isDirectory();

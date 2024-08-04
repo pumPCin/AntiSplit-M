@@ -5,9 +5,6 @@
 */
 package com.reandroid.json;
 
-import android.os.Build;
-
-import java.util.Base64;
 
 public class JsonUtil {
 
@@ -17,7 +14,7 @@ public class JsonUtil {
         }
         text = text.substring(JSONItem.MIME_BIN_BASE64.length());
         try{
-            return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ? Base64.getUrlDecoder().decode(text) : android.util.Base64.decode(text, android.util.Base64.URL_SAFE);
+            return java.util.Base64.getUrlDecoder().decode(text);
         }catch (Throwable throwable){
             throw new JSONException(throwable);
         }
