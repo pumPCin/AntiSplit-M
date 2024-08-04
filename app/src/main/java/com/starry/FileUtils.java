@@ -229,15 +229,11 @@ public class FileUtils {
         }
 
         if ("content".equalsIgnoreCase(uri.getScheme())) {
-            if (isGooglePhotosUri(uri)) {
-                return uri.getLastPathSegment();
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                return copyFileToInternalStorageAndGetPath(uri, context);
-            else {
-                return getDataColumn(context, uri, null, null);
-            }
+            return isGooglePhotosUri(uri) ?
+                    uri.getLastPathSegment() :
+                    doesNotHaveStoragePerm(context) ?
+                            copyFileToInternalStorageAndGetPath(uri, context) :
+                            getDataColumn(context, uri, null, null);
         }
 
         if ("file".equalsIgnoreCase(uri.getScheme())) {
