@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">AntiSplit M</string>
-    <string name="oldAndroidInfo">Note: Your version of Android is too old to use the file picker. You have to input the location of the file manually. The files will be saved to Download folder in the internal storage.</string>
-    <string name="working_file">Working file</string>
     <string name="merge">Select split APK to Merge/AntiSplit</string>
     <string name="success_saved">File saved successfully</string>
     <string name="enable_logs">Enable logs</string>
@@ -33,7 +31,6 @@
     <string name="download_fix">Download fixed ReVanced Manager</string>
     <string name="cancel_button_label">Cancel</string>
     <string name="choose_button_label">Select</string>
-    <string name="default_dir" translatable="false">/sdcard</string>
     <string name="label_parent_directory">Parent Directory</string>
     <string name="last_edit">Last edited: </string>
     <string name="error_dir_access">Directory cannot be accessed</string>

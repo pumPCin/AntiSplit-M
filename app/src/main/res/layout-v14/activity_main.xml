@@ -53,61 +53,40 @@
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/logToggleText"
+            <Switch
+                android:id="@+id/logToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="@string/enable_logs" />
 
-            <ToggleButton
-                android:id="@+id/logToggle"
-                android:layout_height="wrap_content" android:layout_width="match_parent"/>
-
-            <TextView
-                android:id="@+id/askText"
+            <Switch
+                android:id="@+id/ask"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="@string/ask" />
 
-            <ToggleButton
-                android:id="@+id/ask"
-                 android:layout_height="wrap_content" android:layout_width="match_parent"/>
-
-            <TextView
-                android:id="@+id/showDialogToggleText"
+            <Switch
+                android:id="@+id/showDialogToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="@string/show_dialog" />
 
-            <ToggleButton
-                android:id="@+id/showDialogToggle"
-                android:layout_height="wrap_content" android:layout_width="match_parent"/>
-
-            <TextView
-                android:id="@+id/selectSplitsForDeviceToggleText"
+            <Switch
+                android:id="@+id/selectSplitsForDeviceToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="@string/automatically_select" />
 
-            <ToggleButton
-                android:id="@+id/selectSplitsForDeviceToggle"
-                android:layout_height="wrap_content" android:layout_width="match_parent"/>
-
-            <TextView
-                android:id="@+id/signToggleText"
+            <Switch
+                android:id="@+id/signToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="@string/sign_apk" />
-
-            <ToggleButton
-                android:id="@+id/signToggle"
-                android:layout_height="wrap_content" android:layout_width="match_parent"/>
-
 
             <Button
                 android:id="@+id/revanced"

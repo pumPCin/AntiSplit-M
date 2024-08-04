@@ -32,7 +32,7 @@ import java.util.Locale;
  */
 public class ExtensionFilter implements FileFilter {
     private final String[] validExtensions;
-    private DialogProperties properties;
+    private final DialogProperties properties;
 
     public ExtensionFilter(DialogProperties properties) {
         if(properties.extensions!=null) {

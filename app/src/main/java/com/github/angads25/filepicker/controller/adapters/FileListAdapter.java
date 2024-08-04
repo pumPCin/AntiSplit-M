@@ -50,9 +50,9 @@ import java.util.Locale;
  * used to populate {@link ListView} with file info.
  */
 public class FileListAdapter extends BaseAdapter{
-    private ArrayList<FileListItem> listItem;
-    private Context context;
-    private DialogProperties properties;
+    private final ArrayList<FileListItem> listItem;
+    private final Context context;
+    private final DialogProperties properties;
     private NotifyItemChecked notifyItemChecked;
     private final int textColor;
 

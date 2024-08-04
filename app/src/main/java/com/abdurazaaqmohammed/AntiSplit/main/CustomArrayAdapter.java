@@ -1,4 +1,4 @@
-package com.abdurazaaqmohammed.AntiSplit.main;// CustomAdapter.java
+package com.abdurazaaqmohammed.AntiSplit.main;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;

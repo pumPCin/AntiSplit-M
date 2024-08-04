@@ -37,9 +37,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class StringItem extends StringBlock implements JSONConvert<JSONObject>, Comparable<StringItem> {
@@ -60,18 +58,15 @@ public class StringItem extends StringBlock implements JSONConvert<JSONObject>, 
                                                  Predicate<T> resultFilter){
 
         Collection<ReferenceItem> referencedList = getReferencedList();
-        if(referencedList.size() == 0){
+        if(referencedList.isEmpty()){
             return EmptyIterator.of();
         }
-        return new ComputeIterator<>(referencedList.iterator(), new Function<ReferenceItem, T>() {
-            @Override
-            public T apply(ReferenceItem referenceItem) {
-                T result = referenceItem.getReferredParent(parentClass);
-                if (resultFilter != null && !resultFilter.test(result)) {
-                    result = null;
-                }
-                return result;
+        return new ComputeIterator<>(referencedList.iterator(), referenceItem -> {
+            T result = referenceItem.getReferredParent(parentClass);
+            if (resultFilter != null && !resultFilter.test(result)) {
+                result = null;
             }
+            return result;
         });
 
     }
@@ -87,7 +82,7 @@ public class StringItem extends StringBlock implements JSONConvert<JSONObject>, 
     }
     public boolean hasReference(){
         ensureStringLinkUnlocked();
-        return mReferencedList.size() > 0;
+        return !mReferencedList.isEmpty();
     }
     public Collection<ReferenceItem> getReferencedList(){
         ensureStringLinkUnlocked();

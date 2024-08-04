@@ -34,7 +34,6 @@ import android.widget.Toast;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
-import com.github.angads25.filepicker.controller.NotifyItemChecked;
 import com.github.angads25.filepicker.controller.adapters.FileListAdapter;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
@@ -56,7 +55,7 @@ import java.util.Objects;
  */
 
 public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickListener {
-    private Context context;
+    private final Context context;
     private ListView listView;
     private TextView dname, dir_path, title;
     private DialogProperties properties;
@@ -108,13 +107,12 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_main);
-        listView = (ListView) findViewById(R.id.fileList);
-        select = (Button) findViewById(R.id.select);
+        listView = findViewById(R.id.fileList);
+        select = findViewById(R.id.select);
         int size = MarkedItemList.getFileCount();
         if (size == 0) {
             select.setEnabled(false);
@@ -126,73 +124,62 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
             }
             select.setTextColor(Color.argb(128, Color.red(color), Color.green(color), Color.blue(color)));
         }
-        dname = (TextView) findViewById(R.id.dname);
-        title = (TextView) findViewById(R.id.title);
-        dir_path = (TextView) findViewById(R.id.dir_path);
-        Button cancel = (Button) findViewById(R.id.cancel);
+        dname = findViewById(R.id.dname);
+        title = findViewById(R.id.title);
+        dir_path = findViewById(R.id.dir_path);
+        Button cancel = findViewById(R.id.cancel);
         if (negativeBtnNameStr != null) {
             cancel.setText(negativeBtnNameStr);
         }
-        select.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /*  Select Button is clicked. Get the array of all selected items
-                 *  from MarkedItemList singleton.
-                 */
-                String paths[] = MarkedItemList.getSelectedPaths();
-                //NullPointerException fixed in v1.0.2
-                if (callbacks != null) {
-                    callbacks.onSelectedFilePaths(paths);
-                }
-                dismiss();
+        select.setOnClickListener(view -> {
+            /*  Select Button is clicked. Get the array of all selected items
+             *  from MarkedItemList singleton.
+             */
+            String[] paths = MarkedItemList.getSelectedPaths();
+            //NullPointerException fixed in v1.0.2
+            if (callbacks != null) {
+                callbacks.onSelectedFilePaths(paths);
             }
+            dismiss();
         });
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cancel();
-            }
-        });
+        cancel.setOnClickListener(view -> cancel());
         mFileListAdapter = new FileListAdapter(internalList, context, properties, textColor);
-        mFileListAdapter.setNotifyItemCheckedListener(new NotifyItemChecked() {
-            @Override
-            public void notifyCheckBoxIsClicked() {
-                /*  Handler function, called when a checkbox is checked ie. a file is
-                 *  selected.
+        mFileListAdapter.setNotifyItemCheckedListener(() -> {
+            /*  Handler function, called when a checkbox is checked ie. a file is
+             *  selected.
+             */
+            positiveBtnNameStr = positiveBtnNameStr == null ?
+                    context.getResources().getString(R.string.choose_button_label) : positiveBtnNameStr;
+            int size1 = MarkedItemList.getFileCount();
+            if (size1 == 0) {
+                select.setEnabled(false);
+                int color;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    color = context.getResources().getColor(R.color.colorAccent, context.getTheme());
+                }
+                else {
+                    color = context.getResources().getColor(R.color.colorAccent);
+                }
+                select.setTextColor(Color.argb(128, Color.red(color), Color.green(color), Color.blue(color)));
+                select.setText(positiveBtnNameStr);
+            } else {
+                select.setEnabled(true);
+                int color;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    color = context.getResources().getColor(R.color.colorAccent, context.getTheme());
+                }
+                else {
+                    color = context.getResources().getColor(R.color.colorAccent);
+                }
+                select.setTextColor(color);
+                String button_label = positiveBtnNameStr + " (" + size1 + ") ";
+                select.setText(button_label);
+            }
+            if (properties.selection_mode == DialogConfigs.SINGLE_MODE) {
+                /*  If a single file has to be selected, clear the previously checked
+                 *  checkbox from the list.
                  */
-                positiveBtnNameStr = positiveBtnNameStr == null ?
-                        context.getResources().getString(R.string.choose_button_label) : positiveBtnNameStr;
-                int size = MarkedItemList.getFileCount();
-                if (size == 0) {
-                    select.setEnabled(false);
-                    int color;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                        color = context.getResources().getColor(R.color.colorAccent, context.getTheme());
-                    }
-                    else {
-                        color = context.getResources().getColor(R.color.colorAccent);
-                    }
-                    select.setTextColor(Color.argb(128, Color.red(color), Color.green(color), Color.blue(color)));
-                    select.setText(positiveBtnNameStr);
-                } else {
-                    select.setEnabled(true);
-                    int color;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                        color = context.getResources().getColor(R.color.colorAccent, context.getTheme());
-                    }
-                    else {
-                        color = context.getResources().getColor(R.color.colorAccent);
-                    }
-                    select.setTextColor(color);
-                    String button_label = positiveBtnNameStr + " (" + size + ") ";
-                    select.setText(button_label);
-                }
-                if (properties.selection_mode == DialogConfigs.SINGLE_MODE) {
-                    /*  If a single file has to be selected, clear the previously checked
-                     *  checkbox from the list.
-                     */
-                    mFileListAdapter.notifyDataSetChanged();
-                }
+                mFileListAdapter.notifyDataSetChanged();
             }
         });
         listView.setAdapter(mFileListAdapter);
@@ -288,7 +275,7 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
                     Toast.makeText(context, R.string.error_dir_access, Toast.LENGTH_SHORT).show();
                 }
             } else {
-                MaterialCheckbox fmark = (MaterialCheckbox) view.findViewById(R.id.file_mark);
+                MaterialCheckbox fmark = view.findViewById(R.id.file_mark);
                 fmark.performClick();
             }
         }
@@ -334,7 +321,7 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
     }
 
     public void markFiles(List<String> paths) {
-        if (paths != null && paths.size() > 0) {
+        if (paths != null && !paths.isEmpty()) {
             if (properties.selection_mode == DialogConfigs.SINGLE_MODE) {
                 File temp = new File(paths.get(0));
                 switch (properties.selection_type) {
@@ -449,7 +436,7 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
     public void onBackPressed() {
         //currentDirName is dependent on dname
         String currentDirName = dname.getText().toString();
-        if (internalList.size() > 0) {
+        if (!internalList.isEmpty()) {
             FileListItem fitem = internalList.get(0);
             File currLoc = new File(fitem.getLocation());
             if (currentDirName.equals(properties.root.getName()) ||

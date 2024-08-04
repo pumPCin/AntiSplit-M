@@ -94,20 +94,4 @@ public class Utility {
         return internalList;
     }
 
-    /**
-     * Method checks whether the Support Library has been imported by application
-     * or not.
-     *
-     * @return A boolean notifying value wheter support library is imported as a
-     * dependency or not.
-     */
-    private boolean hasSupportLibraryInClasspath() {
-        try {
-            Class.forName("com.android.support:appcompat-v7");
-            return true;
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
 }

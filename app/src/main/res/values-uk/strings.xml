@@ -14,7 +14,7 @@
     <string name="error_dir_access">Доступ до каталогу неможливий</string>
     <string name="for_device">Вибір відповідно до вашої архітектури пристрою</string>
     <string name="grant_storage">Необхідний дозвіл на зберігання для збереження в тій же папці, що й вибраний файл</string>
-    <string name="label_parent_dir">...</string>
+    <string name="label_parent_dir">…</string>
     <string name="label_parent_directory">Батьківський каталог</string>
     <string name="last_edit">Останнє редагування:</string>
     <string name="merge">Виберіть (Split APK) для обєднання/антирозділення</string>
@@ -22,7 +22,6 @@
     <string name="not_apk">: Не APK-файл</string>
     <string name="note">Примітка для ReVanced</string>
     <string name="nothing">Нічого не вибрано</string>
-    <string name="oldAndroidInfo">Примітка: Ваша версія Android занадто стара, щоб використовувати засіб вибору файлів. Вам доведеться ввести місцезнаходження файлу вручну. Файли будуть збережені у папці «Завантаження» у внутрішній памяті.</string>
     <string name="output">"Вихідний каталог: "</string>
     <string name="removed_table_entry">"Видалено запис у таблиці : "</string>
     <string name="revanced">"ReVanced Manager видає помилку під час спроби виправити обєднані APKs. Ця помилка не є реальною проблемою та неправильно створюється сторонньою бібліотекою. Для більшості людей використання опції вибору поділу відповідно до специфікацій пристрою вирішить проблему. Якщо не працює, найпростіше завантажити версію ReVanced Manager з усуненою помилкою."</string>

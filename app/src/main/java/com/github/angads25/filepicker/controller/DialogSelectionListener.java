@@ -32,5 +32,5 @@ public interface DialogSelectionListener {
      *
      * @param files The array of String containing selected file paths.
      */
-    void onSelectedFilePaths(String files[]);
+    void onSelectedFilePaths(String[] files);
 }

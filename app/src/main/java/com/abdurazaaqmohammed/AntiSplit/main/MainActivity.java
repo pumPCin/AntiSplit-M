@@ -29,9 +29,9 @@ import android.os.Looper;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.ScrollView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,15 +67,15 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
     private void setColor(int color, boolean isTextColor) {
         if(isTextColor) {
+            final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
             textColor = color;
-            ((TextView) findViewById(R.id.oldAndroidInfo)).setTextColor(color);
             ((TextView) findViewById(R.id.errorField)).setTextColor(color);
             ((TextView) findViewById(R.id.logField)).setTextColor(color);
-            ((TextView) findViewById(R.id.logToggle)).setTextColor(color);
-            ((TextView) findViewById(R.id.ask)).setTextColor(color);
-            ((TextView) findViewById(R.id.showDialogToggle)).setTextColor(color);
-            ((TextView) findViewById(R.id.signToggle)).setTextColor(color);
-            ((TextView) findViewById(R.id.selectSplitsForDeviceToggle)).setTextColor(color);
+            ((TextView) findViewById(supportsSwitch ? R.id.logToggle : R.id.logToggleText)).setTextColor(color);
+            ((TextView) findViewById(supportsSwitch ? R.id.ask : R.id.askText)).setTextColor(color);
+            ((TextView) findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setTextColor(color);
+            ((TextView) findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setTextColor(color);
+            ((TextView) findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setTextColor(color);
         } else {
             bgColor = color;
             findViewById(R.id.main).setBackgroundColor(color);
@@ -111,17 +111,17 @@ public class MainActivity extends Activity implements Merger.LogListener {
         LogUtil.setLogListener(this);
 
 
-        Switch logSwitch = findViewById(R.id.logToggle);
+        CompoundButton logSwitch = findViewById(R.id.logToggle);
         logSwitch.setChecked(logEnabled);
         logSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> logEnabled = isChecked);
 
         signApk = settings.getBoolean("signApk", true);
-        Switch signToggle = findViewById(R.id.signToggle);
+        CompoundButton signToggle = findViewById(R.id.signToggle);
         signToggle.setChecked(signApk);
         signToggle.setOnCheckedChangeListener((buttonView, isChecked) -> signApk = isChecked);
 
-        Switch selectSplitsAutomaticallySwitch = findViewById(R.id.selectSplitsForDeviceToggle);
-        Switch showDialogSwitch = findViewById(R.id.showDialogToggle);
+        CompoundButton selectSplitsAutomaticallySwitch = findViewById(R.id.selectSplitsForDeviceToggle);
+        CompoundButton showDialogSwitch = findViewById(R.id.showDialogToggle);
 
         showDialog = settings.getBoolean("showDialog", false);
         showDialogSwitch.setChecked(showDialog);
@@ -143,7 +143,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             }
         });
 
-        Switch askSwitch = findViewById(R.id.ask);
+        CompoundButton askSwitch = findViewById(R.id.ask);
         if(LegacyUtils.doesNotSupportInbuiltAndroidFilePicker) {
             ask = false;
             askSwitch.setVisibility(View.GONE);
@@ -167,7 +167,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 properties.offset = new File(DialogConfigs.DEFAULT_DIR);
                 properties.extensions = new String[] {"apk", "zip", "apks", "aspk", "apks", "xapk", "apkm"};
                 FilePickerDialog dialog = new FilePickerDialog(MainActivity.this, properties, textColor, bgColor);
-                dialog.setTitle("Select");
+                dialog.setTitle(R.string.choose_button_label);
                 dialog.setDialogSelectionListener(files -> {
                     urisAreSplitApks = !files[0].endsWith(".apk");
                     uris = new ArrayList<>();
@@ -289,9 +289,9 @@ public class MainActivity extends Activity implements Merger.LogListener {
     }
 
     @Override
-    public void onLog(String log) {
+    public void onLog(String msg) {
         runOnUiThread(() -> {
-            ((TextView)findViewById(R.id.logField)).append(log + "\n");
+            ((TextView)findViewById(R.id.logField)).append(msg + '\n');
             ScrollView scrollView = findViewById(R.id.scrollView);
             scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
         });
@@ -324,7 +324,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 || name.contains(Locale.getDefault().getLanguage()) // this should probably not be cached
         ) return true;
         String arch = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) ? Build.SUPPORTED_ABIS[0] : Build.CPU_ABI;
-        if(name.contains(arch) || name.contains(arch.replace('-', '_'))) return true;
+        if(name.contains(arch) || name.replace('-', '_').contains(arch.replace('-', '_'))) return true;
         String densityType = getDeviceDpi(this);
         return (name.endsWith(densityType) && !name.replace(densityType, "").endsWith("x")); // ensure that it does not select xxhdpi for xhdpi etc
     }
@@ -638,7 +638,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 String newFilePath = TextUtils.isEmpty(originalFilePath) ?
                         getAntisplitMFolder() + File.separator + getOriginalFileName(this, splitAPKUri) // If originalFilePath is null urisAreSplitApks must be true because getNameFromNonSplitApks will always return something
                         : originalFilePath.replaceFirst("\\.(?:xapk|aspk|apk[sm])", "_antisplit.apk");
-                if(TextUtils.isEmpty(newFilePath) || newFilePath.startsWith("/data/") || !(f = new File(newFilePath)).canWrite()) { // when shared it in /data/ bruh
+                if(TextUtils.isEmpty(newFilePath) || newFilePath.startsWith("/data/") || !(f = new File(newFilePath)).canWrite()) { // when a file is shared it in /data/
                     f = new File(getAntisplitMFolder(), newFilePath.substring(newFilePath.lastIndexOf(File.separator) + 1));
                     showError(getString(R.string.no_filepath));
                 }
