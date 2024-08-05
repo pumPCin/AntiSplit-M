@@ -33,8 +33,8 @@
     <string name="cancel_button_label">İptal et</string>
     <string name="choose_button_label">Seç</string>
     <string name="default_dir" translatable="false">/sdcard</string>
-    <string name="label_parent_directory">Parent Directory</string>
+    <string name="label_parent_directory">Ana Klasör</string>
     <string name="last_edit">Son düzenlenme: </string>
-    <string name="error_dir_access">Directory cannot be accessed</string>
+    <string name="error_dir_access">Klasöre erişilemedi</string>
     <string name="label_parent_dir" translatable="false">...</string>
 </resources>
