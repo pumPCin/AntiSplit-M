@@ -3,7 +3,7 @@
     <string name="merge">Pilih APK terpisah untuk Dileburkan/Di-AntiSplit</string>
     <string name="success_saved">Berkas berhasil disimpan</string>
     <string name="enable_logs" >Aktifkan log</string>
-    <string name="ask">Tanyakan terus di mana berkas akan disimpan (jika dinonaktifkan, simpan APK yang digabungkan ke direktori yang sama tempatnya berkas terpisah berasal)</string>
+    <string name="ask">Tanyakan terus di mana berkas akan disimpan (jika dinonaktifkan, simpan APK yang dileburkan ke direktori yang sama tempatnya berkas terpisah berasal)</string>
     <string name="grant_storage">Izin penyimpanan diperlukan untuk menyimpan ke direktori yang sama dengan berkas yang dipilih</string>
     <string name="no_filepath">Tidak bisa menemukan jalur berkas dari berkas yang dipilih</string>
     <string name="output">"Direktori keluaran: "</string>
