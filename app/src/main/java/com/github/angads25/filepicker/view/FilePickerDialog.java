@@ -149,7 +149,7 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
              *  selected.
              */
             positiveBtnNameStr = positiveBtnNameStr == null ?
-                    context.getResources().getString(R.string.choose_button_label) : positiveBtnNameStr;
+                    com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.choose_button_label) : positiveBtnNameStr;
             int size1 = MarkedItemList.getFileCount();
             if (size1 == 0) {
                 select.setEnabled(false);
@@ -215,7 +215,7 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
         super.onStart();
         positiveBtnNameStr = (
                 positiveBtnNameStr == null ?
-                context.getResources().getString(R.string.choose_button_label) :
+                com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.choose_button_label) :
                 positiveBtnNameStr
         );
         select.setText(positiveBtnNameStr);
@@ -225,7 +225,7 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
             if (properties.offset.isDirectory() && validateOffsetPath()) {
                 currLoc = new File(properties.offset.getAbsolutePath());
                 FileListItem parent = new FileListItem();
-                parent.setFilename(context.getString(R.string.label_parent_dir));
+                parent.setFilename(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.label_parent_dir));
                 parent.setDirectory(true);
                 parent.setLocation(currLoc.getParentFile().getAbsolutePath());
                 parent.setTime(currLoc.lastModified());
@@ -263,7 +263,7 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
                     internalList.clear();
                     if (!currLoc.getName().equals(properties.root.getName())) {
                         FileListItem parent = new FileListItem();
-                        parent.setFilename(context.getString(R.string.label_parent_dir));
+                        parent.setFilename(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.label_parent_dir));
                         parent.setDirectory(true);
                         parent.setLocation(currLoc.getParentFile().getAbsolutePath());
                         parent.setTime(currLoc.lastModified());
@@ -272,7 +272,7 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
                     internalList = Utility.prepareFileListEntries(internalList, currLoc, filter);
                     mFileListAdapter.notifyDataSetChanged();
                 } else {
-                    Toast.makeText(context, R.string.error_dir_access, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.error_dir_access), Toast.LENGTH_SHORT).show();
                 }
             } else {
                 MaterialCheckbox fmark = view.findViewById(R.id.file_mark);
@@ -417,7 +417,7 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
         } else {
             super.show();
             positiveBtnNameStr = positiveBtnNameStr == null ?
-                    context.getResources().getString(R.string.choose_button_label) : positiveBtnNameStr;
+                    com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.choose_button_label) : positiveBtnNameStr;
             select.setText(positiveBtnNameStr);
             int size = MarkedItemList.getFileCount();
             if (size == 0) {
@@ -448,7 +448,7 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
                 internalList.clear();
                 if (!currLoc.getName().equals(properties.root.getName())) {
                     FileListItem parent = new FileListItem();
-                    parent.setFilename(context.getString(R.string.label_parent_dir));
+                    parent.setFilename(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.label_parent_dir));
                     parent.setDirectory(true);
                     parent.setLocation(currLoc.getParentFile().getAbsolutePath());
                     parent.setTime(currLoc.lastModified());

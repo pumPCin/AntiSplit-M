@@ -16,8 +16,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.LightingColorFilter;
+import android.graphics.Paint;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -28,6 +34,8 @@ import android.os.Looper;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -46,8 +54,10 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
+import ankur035.LocaleHelper;
 import yuku.ambilwarna.AmbilWarnaDialog;
 
 /** @noinspection deprecation*/
@@ -62,6 +72,17 @@ public class MainActivity extends Activity implements Merger.LogListener {
     public static int textColor;
     public static int bgColor;
     public static boolean errorOccurred;
+    public static String lang;
+
+    private void setButtonBorder(Button button) {
+        ShapeDrawable border = new ShapeDrawable(new RectShape());
+        Paint paint = border.getPaint();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(textColor);
+        paint.setStrokeWidth(4);
+
+        button.setBackgroundDrawable(border);
+    }
 
     private void setColor(int color, boolean isTextColor) {
         if(isTextColor) {
@@ -74,9 +95,38 @@ public class MainActivity extends Activity implements Merger.LogListener {
             ((TextView) findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setTextColor(color);
             ((TextView) findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setTextColor(color);
             ((TextView) findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setTextColor(color);
+            Button langPicker = findViewById(R.id.langPicker);
+            langPicker.setTextColor(color);
+            setButtonBorder(langPicker);
+            Button revanced = findViewById(R.id.revanced);
+            revanced.setTextColor(color);
+            setButtonBorder(revanced);
+            Button decodeButton = findViewById(R.id.decodeButton);
+            decodeButton.setTextColor(color);
+            setButtonBorder(decodeButton);
+            Button changeTextColor = findViewById(R.id.changeTextColor);
+            changeTextColor.setTextColor(color);
+            setButtonBorder(changeTextColor);
+            Button changeBgColor = findViewById(R.id.changeBgColor);
+            changeBgColor.setTextColor(color);
+            setButtonBorder(changeBgColor);
         } else {
             bgColor = color;
-            findViewById(R.id.main).setBackgroundColor(color);
+            Button langPicker = findViewById(R.id.langPicker);
+            langPicker.setBackgroundColor(color);
+            setButtonBorder(langPicker);
+            Button revanced = findViewById(R.id.revanced);
+            revanced.setBackgroundColor(color);
+            setButtonBorder(revanced);
+            Button decodeButton = findViewById(R.id.decodeButton);
+            decodeButton.setBackgroundColor(color);
+            setButtonBorder(decodeButton);
+            Button changeTextColor = findViewById(R.id.changeTextColor);
+            changeTextColor.setBackgroundColor(color);
+            setButtonBorder(changeTextColor);
+            Button changeBgColor = findViewById(R.id.changeBgColor);
+            changeBgColor.setBackgroundColor(color);
+            setButtonBorder(changeBgColor);
         }
     }
 
@@ -108,6 +158,9 @@ public class MainActivity extends Activity implements Merger.LogListener {
         logEnabled = settings.getBoolean("logEnabled", true);
         LogUtil.setLogListener(this);
 
+        lang = settings.getString("lang", "en");
+        if(lang.equals(Locale.getDefault().getLanguage())) rss = getResources();
+        else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources());
 
         CompoundButton logSwitch = findViewById(R.id.logToggle);
         logSwitch.setChecked(logEnabled);
@@ -155,6 +208,27 @@ public class MainActivity extends Activity implements Merger.LogListener {
             });
         }
 
+        findViewById(R.id.langPicker).setOnClickListener(v -> {
+            int curr = -1;
+
+            /*
+            for(int i=0; i<langs.length; i++) {
+                if (langs[i].equals(lang)) {
+                    curr = i;
+                    break;
+                }
+            }
+            Idk why it aint working
+             */
+
+            String[] display = rss.getStringArray(R.array.langs_display);
+
+            styleAlertDialog(new AlertDialog.Builder(this).setSingleChoiceItems(display, curr, (dialog, which) -> {
+                updateLang(LocaleHelper.setLocale(MainActivity.this, lang = rss.getStringArray(R.array.langs)[which]).getResources());
+                dialog.dismiss();
+            }).create(), display);
+        });
+
         findViewById(R.id.decodeButton).setOnClickListener(v -> {
             if(LegacyUtils.doesNotSupportInbuiltAndroidFilePicker) {
                 DialogProperties properties = new DialogProperties();
@@ -165,7 +239,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 properties.offset = new File(DialogConfigs.DEFAULT_DIR);
                 properties.extensions = new String[] {"apk", "zip", "apks", "aspk", "apks", "xapk", "apkm"};
                 FilePickerDialog dialog = new FilePickerDialog(MainActivity.this, properties, textColor, bgColor);
-                dialog.setTitle(R.string.choose_button_label);
+                dialog.setTitle(rss.getString(R.string.choose_button_label));
                 dialog.setDialogSelectionListener(files -> {
                     urisAreSplitApks = !files[0].endsWith(".apk");
                     uris = new ArrayList<>();
@@ -190,27 +264,21 @@ public class MainActivity extends Activity implements Merger.LogListener {
         findViewById(R.id.changeBgColor).setOnClickListener(v -> showColorPickerDialog(false, bgColor));
         findViewById(R.id.changeTextColor).setOnClickListener(v -> showColorPickerDialog(true, textColor));
         findViewById(R.id.revanced).setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
             TextView title = new TextView(this);
-            title.setText(R.string.note);
+            title.setText(rss.getString(R.string.note));
             title.setTextSize(20);
             title.setTextColor(textColor);
-            builder.setCustomTitle(title);
-
+            title.setPadding(15,15,15,15);
             TextView message = new TextView(this);
-            message.setText(R.string.revanced);
+            message.setText(rss.getString(R.string.revanced));
             message.setTextSize(15);
             message.setTextColor(textColor);
-            builder.setView(message);
-
-            builder.setPositiveButton(R.string.download_fix, (dialog, which) -> startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/revanced-antisplit"))))
-            .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-
-            final AlertDialog ad = builder.create();
-            ad.show();
-            try {
-                Objects.requireNonNull(ad.getWindow()).getDecorView().getBackground().setColorFilter(new LightingColorFilter(0xFF000000, bgColor));
-            } catch (NullPointerException ignored) {}
+            message.setPadding(15,15,15,15);
+            styleAlertDialog(new AlertDialog.Builder(this)
+                    .setCustomTitle(title)
+                    .setView(message)
+                    .setPositiveButton(rss.getString(R.string.download_fix), (dialog, which) -> startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/revanced-antisplit"))))
+                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss()).create(), null);
         });
 
         // Check if user shared or opened file with the app.
@@ -236,6 +304,42 @@ public class MainActivity extends Activity implements Merger.LogListener {
         }
     }
 
+    public void styleAlertDialog(AlertDialog ad, String[] display) {
+        GradientDrawable border = new GradientDrawable();
+        border.setColor(bgColor); // Background color
+        border.setStroke(5, textColor); // Border width and color
+        border.setCornerRadius(16);
+
+        LayerDrawable layerDrawable = new LayerDrawable(new GradientDrawable[]{border});
+
+        runOnUiThread(() -> {
+            ad.show();
+            if(display != null) ad.getListView().setAdapter(new CustomArrayAdapter(this, display, textColor));
+            Window w = ad.getWindow();
+            if (w != null) {
+                w.getDecorView().getBackground().setColorFilter(new LightingColorFilter(0xFF000000, bgColor));
+                w.setBackgroundDrawable(layerDrawable);
+            }
+        });
+    }
+
+    public static Resources rss;
+
+    private void updateLang(Resources res) {
+        rss = res;
+        ((TextView) findViewById(R.id.langPicker)).setText(res.getString(R.string.lang));
+        final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
+        ((TextView) findViewById(supportsSwitch ? R.id.logToggle : R.id.logToggleText)).setText(res.getString(R.string.enable_logs));
+        ((TextView) findViewById(supportsSwitch ? R.id.ask : R.id.askText)).setText(res.getString(R.string.ask));
+        ((TextView) findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setText(res.getString(R.string.show_dialog));
+        ((TextView) findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setText(res.getString(R.string.sign_apk));
+        ((TextView) findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setText(res.getString(R.string.automatically_select));
+        ((TextView) findViewById(R.id.decodeButton)).setText(res.getString(R.string.merge));
+        ((TextView) findViewById(R.id.changeTextColor)).setText(res.getString(R.string.change_text_color));
+        ((TextView) findViewById(R.id.changeBgColor)).setText(res.getString(R.string.change_background_color));
+        ((TextView) findViewById(R.id.revanced)).setText(res.getString(R.string.note));
+    }
+
     private void showColorPickerDialog(boolean isTextColor, int currentColor) {
         new AmbilWarnaDialog(this, currentColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
             @Override
@@ -258,7 +362,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     @TargetApi(Build.VERSION_CODES.M)
     private void checkStoragePerm() {
         if(doesNotHaveStoragePerm(this)) {
-            Toast.makeText(this, R.string.grant_storage, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, rss.getString(R.string.grant_storage), Toast.LENGTH_LONG).show();
             if(LegacyUtils.supportsWriteExternalStorage) requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
             else startActivityForResult(new Intent(ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + getPackageName())), 0);
         }
@@ -280,7 +384,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 .putBoolean("signApk", signApk)
                 .putBoolean("selectSplitsForDevice", selectSplitsForDevice)
                 .putInt("textColor", textColor)
-                .putInt("backgroundColor", bgColor);
+                .putInt("backgroundColor", bgColor)
+                .putString("lang", lang);
         if (LegacyUtils.supportsArraysCopyOf) e.apply();
         else e.commit();
         super.onPause();
@@ -479,25 +584,23 @@ public class MainActivity extends Activity implements Merger.LogListener {
             String[] apkNames = new String[initialSize + 5];
             boolean[] checkedItems = new boolean[initialSize + 5];
 
-            apkNames[0] = getString(R.string.all);
-            apkNames[1] = getString(R.string.for_device);
-            apkNames[2] = getString(R.string.arch_for_device);
-            apkNames[3] = getString(R.string.dpi_for_device);
-            apkNames[4] = getString(R.string.lang_for_device);
+            apkNames[0] = rss.getString(R.string.all);
+            apkNames[1] = rss.getString(R.string.for_device);
+            apkNames[2] = rss.getString(R.string.arch_for_device);
+            apkNames[3] = rss.getString(R.string.dpi_for_device);
+            apkNames[4] = rss.getString(R.string.lang_for_device);
             for (int i = 5; i < initialSize + 5; i++) {
                 apkNames[i] = splits.get(i - 5);
                 checkedItems[i] = false;
             }
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
             TextView title = new TextView(this);
             title.setTextColor(textColor);
             title.setTextSize(20);
-            title.setText(R.string.select_splits);
-            builder.setCustomTitle(title);
+            title.setText(rss.getString(R.string.select_splits));
+            title.setPadding(15,15,15,15);
 
-            builder.setMultiChoiceItems(apkNames, checkedItems, (dialog, which, isChecked) -> {
+            styleAlertDialog(new AlertDialog.Builder(this).setCustomTitle(title).setMultiChoiceItems(apkNames, checkedItems, (dialog, which, isChecked) -> {
                 switch (which) {
                     case 0:
                         // "Select All" option
@@ -567,29 +670,19 @@ public class MainActivity extends Activity implements Merger.LogListener {
                         }
                         break;
                 }
-            });
-            builder.setPositiveButton("OK", (dialog, which) -> {
+            }).setPositiveButton("OK", (dialog, which) -> {
                 for (int i = 1; i < checkedItems.length; i++) {
                     if (checkedItems[i]) splits.remove(apkNames[i]); // ?????
                 }
 
                 if (splits.size() == initialSize) {
                     urisAreSplitApks = true; // reset
-                    showError(getString(R.string.nothing));
+                    showError(rss.getString(R.string.nothing));
                 } else {
                     splitsToUse = splits;
                     selectDirToSaveAPKOrSaveNow();
                 }
-            });
-            builder.setNegativeButton("Cancel", null);
-            runOnUiThread(() -> {
-                final AlertDialog ad = builder.create();
-                ad.show();
-                ad.getListView().setAdapter(new CustomArrayAdapter(this, apkNames, textColor));
-                try {
-                    Objects.requireNonNull(ad.getWindow()).getDecorView().getBackground().setColorFilter(new LightingColorFilter(0xFF000000, bgColor));
-                } catch (NullPointerException ignored) {}
-            });
+            }).setNegativeButton("Cancel", null).create(), apkNames);
         } catch (IOException e) {
             showError(e);
         }
@@ -597,8 +690,9 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
     private void showSuccess() {
         if(!errorOccurred) {
-            LogUtil.logMessage(R.string.success_saved);
-            runOnUiThread(() -> Toast.makeText(this, R.string.success_saved, Toast.LENGTH_SHORT).show());
+            final String success = rss.getString(R.string.success_saved);
+            LogUtil.logMessage(success);
+            runOnUiThread(() -> Toast.makeText(this, success, Toast.LENGTH_SHORT).show());
         }
     }
 
@@ -668,9 +762,9 @@ public class MainActivity extends Activity implements Merger.LogListener {
                         : originalFilePath.replaceFirst("\\.(?:xapk|aspk|apk[sm])", "_antisplit.apk");
                 if(TextUtils.isEmpty(newFilePath) || newFilePath.startsWith("/data/") || !(f = new File(newFilePath)).canWrite()) { // when a file is shared it in /data/
                     f = new File(getAntisplitMFolder(), newFilePath.substring(newFilePath.lastIndexOf(File.separator) + 1));
-                    showError(getString(R.string.no_filepath));
+                    showError(rss.getString(R.string.no_filepath));
                 }
-                LogUtil.logMessage(getString(R.string.output) + f);
+                LogUtil.logMessage(rss.getString(R.string.output) + f);
 
                 new ProcessTask(this).execute(Uri.fromFile(f));
             } catch (IOException e) {

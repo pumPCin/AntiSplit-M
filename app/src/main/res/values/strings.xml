@@ -31,11 +31,26 @@
     <string name="searching">Searching apk files…</string>
     <string name="revanced">ReVanced Manager produces an error when attempting to patch merged APKs. The error is not an actual problem and is produced incorrectly by a third party library. For most people, using the option to select splits for your device specifications will fix it. If it still doesn\'t work, the easiest thing to do is download a version of ReVanced Manager with the error removed.</string>
     <string name="note">Note for ReVanced</string>
-    <string name="download_fix">Download fixed ReVanced Manager</string>
+    <string name="download_fix">Go to fixed ReVanced Manager</string>
     <string name="cancel_button_label">Cancel</string>
     <string name="choose_button_label">Select</string>
     <string name="label_parent_directory">Parent Directory</string>
     <string name="last_edit">Last edited: </string>
     <string name="error_dir_access">Directory cannot be accessed</string>
     <string name="label_parent_dir" translatable="false">...</string>
+    <string name="lang" translatable="false">Language</string>
+    <string-array name="langs_display">
+        <item>English</item>
+        <item>Bahasa Indonesia</item>
+        <item>русский язык</item>
+        <item>Türkçe</item>
+        <item>українська мова</item>
+    </string-array>
+    <string-array name="langs">
+        <item>en</item>
+        <item>in</item>
+        <item>ru</item>
+        <item>tr</item>
+        <item>uk</item>
+    </string-array>
 </resources>

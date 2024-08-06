@@ -57,7 +57,7 @@ public class Merger {
     }
 
     public static void run(InputStream ins, File cacheDir, OutputStream out, Uri xapkUri, Context context, List<String> splits, boolean signApk) throws Exception {
-        LogUtil.logMessage(R.string.searching);
+        LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.searching));
 
         if(ins!=null) {
             if(xapkUri == null) {
@@ -67,7 +67,7 @@ public class Merger {
                     while (zipEntry != null) {
                         final String name = zipEntry.getName();
                         if (name.endsWith(".apk")) {
-                            if((splits != null && !splits.isEmpty() && splits.contains(name))) LogUtil.logMessage(context.getString(R.string.skipping) + name + context.getString(R.string.unselected));
+                            if((splits != null && !splits.isEmpty() && splits.contains(name))) LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.skipping) + name + com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.unselected));
                             else {
                                 File file = new File(cacheDir, name);
                                 String canonicalizedPath = file.getCanonicalPath();
@@ -82,13 +82,13 @@ public class Merger {
                                 fos.close();
                                 LogUtil.logMessage("Extracted " + name);
                             }
-                        } else LogUtil.logMessage(context.getString(R.string.skipping) + name + context.getString(R.string.not_apk));
+                        } else LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.skipping) + name + com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.not_apk));
                         zipEntry = zis.getNextEntry();
                     }
                     zis.closeEntry();
                 }
             } else {
-                LogUtil.logMessage(R.string.detected_xapk); //ZipInputStream is reading XAPK files as if all files inside the splits were in 1 zip which breaks everything
+                LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.detected_xapk)); //ZipInputStream is reading XAPK files as if all files inside the splits were in 1 zip which breaks everything
                 File bruh = DeviceSpecsUtil.splitApkPath == null ? new File(FileUtils.getPath(xapkUri, context)) : DeviceSpecsUtil.splitApkPath; // if file was already copied to get splits list do not copy it again
                 final boolean couldntRead = !bruh.canRead();
                 if (couldntRead) bruh = FileUtils.copyFileToInternalStorage(xapkUri, context);
@@ -100,7 +100,7 @@ public class Merger {
                         String fileName = entry.getName();
 
                         if (fileName.endsWith(".apk")) {
-                            if((splits != null && !splits.isEmpty() && splits.contains(fileName))) LogUtil.logMessage(context.getString(R.string.skipping) + fileName + context.getString(R.string.unselected));
+                            if((splits != null && !splits.isEmpty() && splits.contains(fileName))) LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.skipping) + fileName + com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.unselected));
                             else {
                                 File outFile = new File(cacheDir, fileName);
                                 File parentDir = outFile.getParentFile();
@@ -117,7 +117,7 @@ public class Merger {
                                     }
                                 }
                             }
-                        } else LogUtil.logMessage(context.getString(R.string.skipping) + fileName + context.getString(R.string.not_apk));
+                        } else LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.skipping) + fileName + com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.not_apk));
                     }
                     if(couldntRead) bruh.delete();
                 }
@@ -131,7 +131,7 @@ public class Merger {
         ApkModule mergedModule = bundle.mergeModules();
         if(mergedModule.hasAndroidManifest()) {
             AndroidManifestBlock manifest = mergedModule.getAndroidManifest();
-            LogUtil.logMessage(R.string.sanitizing_manifest);
+            LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.sanitizing_manifest));
             int ID_requiredSplitTypes = 0x0101064e;
             int ID_splitTypes = 0x0101064f;
 
@@ -185,7 +185,7 @@ public class Merger {
                                                 continue;
                                             }
                                             String path = resValue.getValueAsString();
-                                            LogUtil.logMessage(context.getString(R.string.removed_table_entry) + " " + path);
+                                            LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.removed_table_entry) + " " + path);
                                             //Remove file entry
                                             zipEntryMap.remove(path);
                                             // It's not safe to destroy entry, resource id might be used in dex code.
@@ -209,12 +209,12 @@ public class Merger {
             }
             manifest.refresh();
         }
-        LogUtil.logMessage((R.string.saving));
+        LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.saving));
 
         if(signApk) {
             final File temp = new File(cacheDir, "temp.apk");
             mergedModule.writeApk(temp);
-            LogUtil.logMessage(R.string.signing);
+            LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.signing));
             try (InputStream fis = FileUtils.getInputStream(temp)) {
                 final String FILE_NAME_PAST = "testkey.past";
                 final String FILE_NAME_PRIVATE_KEY = "testkey.pk8";
@@ -230,7 +230,7 @@ public class Merger {
 
                 PseudoApkSigner.sign(fis, out, pastFile, privateKeyFile);
             } catch (Exception e) {
-                LogUtil.logMessage(R.string.sign_failed);
+                LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.sign_failed));
                 mergedModule.writeApk(out);
                 throw(e); // for showError
             }

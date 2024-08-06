@@ -132,14 +132,14 @@ public class FileListAdapter extends BaseAdapter{
         SimpleDateFormat sdate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         SimpleDateFormat stime = new SimpleDateFormat("hh:mm aa", Locale.getDefault());
         Date date = new Date(item.getTime());
-        if(i==0&&item.getFilename().startsWith(context.getString(R.string.label_parent_dir))) {
-            holder.type.setText(R.string.label_parent_directory);
+        if(i==0&&item.getFilename().startsWith(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.label_parent_dir))) {
+            holder.type.setText(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.label_parent_directory));
         }
         else {
-            holder.type.setText(context.getString(R.string.last_edit) + sdate.format(date) + ", " + stime.format(date));
+            holder.type.setText(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.last_edit) + sdate.format(date) + ", " + stime.format(date));
         }
         if(holder.fmark.getVisibility()==View.VISIBLE) {
-            if(i==0&&item.getFilename().startsWith(context.getString(R.string.label_parent_dir)))
+            if(i==0&&item.getFilename().startsWith(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.label_parent_dir)))
             {   holder.fmark.setVisibility(View.INVISIBLE);
             }
             holder.fmark.setChecked(MarkedItemList.hasItem(item.getLocation()));

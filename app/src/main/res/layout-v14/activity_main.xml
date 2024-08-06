@@ -89,6 +89,13 @@
                 android:text="@string/sign_apk" />
 
             <Button
+                android:id="@+id/langPicker"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/lang" />
+
+            <Button
                 android:id="@+id/revanced"
                 android:layout_width="fill_parent"
                 android:layout_height="0dp"
