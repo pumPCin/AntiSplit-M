@@ -1,7 +1,6 @@
 package com.abdurazaaqmohammed.AntiSplit.main;
 
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
-import static com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.getDeviceDpi;
 import static com.reandroid.apkeditor.merge.LogUtil.logEnabled;
 
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -47,7 +46,6 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
@@ -318,16 +316,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
         super.onDestroy();
     }
 
-    public boolean shouldIncludeSplit(String name) {
-        if (name.equals("base.apk")
-                || !name.startsWith("config") && !name.startsWith("split") // this is base.apk hopefully
-                || name.contains(Locale.getDefault().getLanguage()) // this should probably not be cached
-        ) return true;
-        String arch = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) ? Build.SUPPORTED_ABIS[0] : Build.CPU_ABI;
-        if(name.contains(arch) || name.replace('-', '_').contains(arch.replace('-', '_'))) return true;
-        String densityType = getDeviceDpi(this);
-        return (name.endsWith(densityType) && !name.replace(densityType, "").endsWith("x")); // ensure that it does not select xxhdpi for xhdpi etc
-    }
 
     private List<String> splitsToUse = null;
 
@@ -358,7 +346,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                             if(!splitApkContainsArch && (thisSplit.contains("armeabi") || thisSplit.contains("arm64") || thisSplit.contains("x86") || thisSplit.contains("mips"))) {
                                 splitApkContainsArch = true;
                             }
-                            if (activity.shouldIncludeSplit(thisSplit)) splits.remove(thisSplit);
+                            if (DeviceSpecsUtil.shouldIncludeSplit(thisSplit, activity)) splits.remove(thisSplit);
                         }
                         if(splitApkContainsArch) {
                             boolean selectedSplitsContainsArch = false;
@@ -488,13 +476,16 @@ public class MainActivity extends Activity implements Merger.LogListener {
         try {
             List<String> splits = DeviceSpecsUtil.getListOfSplits(splitAPKUri, this);
             final int initialSize = splits.size();
-            String[] apkNames = new String[initialSize + 2];
-            boolean[] checkedItems = new boolean[initialSize + 2];
+            String[] apkNames = new String[initialSize + 5];
+            boolean[] checkedItems = new boolean[initialSize + 5];
 
             apkNames[0] = getString(R.string.all);
             apkNames[1] = getString(R.string.for_device);
-            for (int i = 2; i < initialSize + 2; i++) {
-                apkNames[i] = splits.get(i - 2);
+            apkNames[2] = getString(R.string.arch_for_device);
+            apkNames[3] = getString(R.string.dpi_for_device);
+            apkNames[4] = getString(R.string.lang_for_device);
+            for (int i = 5; i < initialSize + 5; i++) {
+                apkNames[i] = splits.get(i - 5);
                 checkedItems[i] = false;
             }
 
@@ -510,22 +501,22 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 switch (which) {
                     case 0:
                         // "Select All" option
-                        for (int i = 2; i < checkedItems.length; i++) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                        for (int i = 5; i < checkedItems.length; i++) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
                         break;
                     case 1:
                         // device specs option
-                        for (int i = 2; i < checkedItems.length; i++) {
-                            ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = (isChecked && shouldIncludeSplit(apkNames[i])));
+                        for (int i = 5; i < checkedItems.length; i++) {
+                            ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = (isChecked && DeviceSpecsUtil.shouldIncludeSplit(apkNames[i], this)));
                         }
                         boolean didNotFindAppropriateDpi = true;
-                        for (int i = 2; i < checkedItems.length; i++) {
+                        for (int i = 5; i < checkedItems.length; i++) {
                             if (checkedItems[i] && apkNames[i].contains("dpi")) {
                                 didNotFindAppropriateDpi = false;
                                 break;
                             }
                         }
                         if (didNotFindAppropriateDpi) {
-                            for (int i = 2; i < checkedItems.length; i++) {
+                            for (int i = 5; i < checkedItems.length; i++) {
                                 if (apkNames[i].contains("hdpi")) {
                                     ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
                                     break;
@@ -533,10 +524,47 @@ public class MainActivity extends Activity implements Merger.LogListener {
                             }
                         }
                         break;
+                    case 2:
+                        //arch for device
+                        for (int i = 5; i < checkedItems.length; i++) {
+                            if(DeviceSpecsUtil.shouldIncludeArch(apkNames[i])) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                        }
+                    break;
+                    case 3:
+                        //dpi for device
+                        for (int i = 5; i < checkedItems.length; i++) {
+                            if(DeviceSpecsUtil.shouldIncludeDpi(apkNames[i], this)) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                        }
+                        boolean didNotFoundAppropriateDpi = true;
+                        for (int i = 5; i < checkedItems.length; i++) {
+                            if (checkedItems[i] && apkNames[i].contains("dpi")) {
+                                didNotFoundAppropriateDpi = false;
+                                break;
+                            }
+                        }
+                        if (didNotFoundAppropriateDpi) {
+                            for (int i = 5; i < checkedItems.length; i++) {
+                                if (apkNames[i].contains("hdpi")) {
+                                    ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                                    break;
+                                }
+                            }
+                        }
+                    break;
+                    case 4:
+                        //lang for device
+                        for (int i = 5; i < checkedItems.length; i++) {
+                            if(DeviceSpecsUtil.shouldIncludeLang(apkNames[i])) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                        }
+                    break;
                     default:
                         ListView listView = ((AlertDialog) dialog).getListView();
                         if (!isChecked) listView.setItemChecked(0, checkedItems[0] = false); // Uncheck "Select All" if any individual item is unchecked
-                        if (checkedItems[1] && !shouldIncludeSplit(apkNames[which])) listView.setItemChecked(1, checkedItems[1] = false); // uncheck device arch if non device arch selected
+                        for (int i = 1; i <= 4; i++) {
+                            if (checkedItems[i] && !DeviceSpecsUtil.shouldIncludeSplit(apkNames[which], this)) {
+                                listView.setItemChecked(i, checkedItems[i] = false); // uncheck device arch if non device arch selected
+                            }
+                        }
                         break;
                 }
             });

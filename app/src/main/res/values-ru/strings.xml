@@ -12,7 +12,10 @@
     <string name="download_fix">Скачать исправленный ReVanced Manager</string>
     <string name="enable_logs">Включить журналы</string>
     <string name="error_dir_access">Доступ к каталогу невозможен</string>
-    <string name="for_device">Выбор в соответствии  вашей архитектуры устройства</string>
+    <string name="for_device">Выбор все в соответствии вашей архитектуры устройства</string>
+    <string name="lang_for_device">Выбор язык для вашего устройства</string>
+    <string name="arch_for_device">Выбор архитектуру для вашего устройства</string>
+    <string name="dpi_for_device">Выбор ширину экрана для вашего устройства</string>
     <string name="grant_storage">Необходимо разрешение на хранение для сохранения в той же папке, что и выбранный файл</string>
     <string name="label_parent_dir">…</string>
     <string name="label_parent_directory">Родительский каталог</string>

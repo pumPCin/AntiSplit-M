@@ -3,6 +3,7 @@ package com.abdurazaaqmohammed.AntiSplit.main;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -50,7 +52,25 @@ public class DeviceSpecsUtil {
         return splits;
     }
 
+    public static boolean shouldIncludeSplit(String name, Context context) {
+        return name.equals("base.apk")
+                || !name.startsWith("config") && !name.startsWith("split") // this is base.apk hopefully
+                || shouldIncludeLang(name) || shouldIncludeArch(name) || shouldIncludeDpi(name, context);
+    }
 
+    public static boolean shouldIncludeLang(String name) {
+        return name.contains(Locale.getDefault().getLanguage());
+    }
+
+    public static boolean shouldIncludeArch(String name) {
+        String arch = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) ? Build.SUPPORTED_ABIS[0] : Build.CPU_ABI;
+        return name.contains(arch) || name.replace('-', '_').contains(arch.replace('-', '_'));
+    }
+
+    public static boolean shouldIncludeDpi(String name, Context context) {
+        String densityType = getDeviceDpi(context);
+        return (name.endsWith(densityType) && !name.replace(densityType, "").endsWith("x")); // ensure that it does not select xxhdpi for xhdpi etc
+    }
 
     public static String getDeviceDpi(Context context) {
         String densityType;

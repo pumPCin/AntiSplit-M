@@ -2,7 +2,7 @@
     <string name="app_name">AntiSplit M</string>
     <string name="merge">Select split APK to Merge/AntiSplit</string>
     <string name="success_saved">File saved successfully</string>
-    <string name="enable_logs">Enable logs</string>
+    <string name="enable_logs" >Enable logs</string>
     <string name="ask">Ask where to save the file each time (if disabled, save the merged APK to the same directory where the split file was from)</string>
     <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
     <string name="no_filepath">Couldn\'t find filepath of the selected file</string>
@@ -12,7 +12,10 @@
     <string name="change_text_color">Change text color</string>
     <string name="change_background_color">Change background color</string>
     <string name="all">Select All</string>
-    <string name="for_device">Select for your device specifications</string>
+    <string name="for_device">Select all splits for your device specifications</string>
+    <string name="lang_for_device">Select language for your device</string>
+    <string name="arch_for_device">Select architecture for your device</string>
+    <string name="dpi_for_device">Select screen widths for your device</string>
     <string name="select_splits">Select splits</string>
     <string name="sign_apk">Sign the APK after merging</string>
     <string name="automatically_select">Automatically select splits for your device specifications</string>
