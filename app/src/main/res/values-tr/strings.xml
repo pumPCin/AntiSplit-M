@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">AntiSplit M</string>
+    <string name="oldAndroidInfo">Not: Android sürümünüz dosya seçiciyi kullanmak için çok eski. Dosyanın konumunu manuel olarak girmeniz gerekiyor. Dosyalar dahili depolama alanındaki "İndirilenler" klasörüne kaydedilecektir.</string>
+    <string name="merge">Birleştirmek/Ayrıştırmak için split APK'yı seçin.</string>
+    <string name="success_saved">Dosya başarıyla kaydedildi.</string>
+    <string name="enable_logs">Kayıtları etkinleştir</string>
+    <string name="ask">Her seferinde dosyanın nereye kaydedileceğini sor (devre dışı bırakılırsa, birleştirilmiş APK, split APK'nın bulunduğu klasöre kaydedilir)</string>
+    <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
+    <string name="no_filepath">Seçilen dosyanın dosya yolu bulunamadı</string>
+    <string name="output">"Çıktı klasörü: "</string>
+    <string name="show_dialog">Hangi splitlerin seçileceğine dair olan diyaloğu göster</string>
+    <string name="nothing">Hiçbir şey seçilmedi</string>
+    <string name="change_text_color">Yazı rengini değiştir</string>
+    <string name="change_background_color">Arkaplan rengini değiştir </string>
+    <string name="all">Hepsini seç</string>
+    <string name="for_device">Cihazın özelliklerine göre seç</string>
+    <string name="select_splits">Splitleri seç</string>
+    <string name="sign_apk">APK'yı birleştirdikten sonra imzala</string>
+    <string name="automatically_select">Cihazınızın özelliklerine uygun splitleri otomatik olarak seçin</string>
+    <string name="sign_failed">APK imzalanamadığından böylece kaydediliyor.</string>
+    <string name="signing">APK imzalanıyor…</string>
+    <string name="saving">Kaydediliyor…</string>
+    <string name="removed_table_entry">"Removed table-entry : "</string>
+    <string name="sanitizing_manifest">Manifesto sanitize ediliyor…</string>
+    <string name="skipping">Geçiliyor</string>
+    <string name="not_apk">Bu bir APK dosyası değil.</string>
+    <string name="unselected">Seçilmedi </string>
+    <string name="detected_xapk">XAPK dosyası tespit edildi, düzgün bir şekilde çıkarılabilmesi sağlanacak</string>
+    <string name="searching">APK dosyası aranıyor…</string>
+    <string name="revanced">ReVanced Manager, split APK'ları patchlemeye çalışırken bir hata ortaya çıkıyor. Bu hata gerçek bir sorun değil ve üçüncü taraf bir kütüphaneden dolayı kaynaklanıyor. Çoğu kişi için, cihaz özellikleriniz için seçme seçeneğini kullanmak sorunu çözecektir. Yine de çalışmazsa yapılacak en kolay şey ReVanced Manager'ın hatanın kaldırıldığı sürümü indirmektir.</string>
+    <string name="note">ReVanced için not</string>
+    <string name="download_fix">Hatanın düzeltildiği ReVanced Manager'ı indir</string>
+    <string name="cancel_button_label">İptal et</string>
+    <string name="choose_button_label">Seç</string>
+    <string name="default_dir" translatable="false">/sdcard</string>
+    <string name="label_parent_directory">Ana Klasör</string>
+    <string name="last_edit">Son düzenlenme: </string>
+    <string name="error_dir_access">Klasöre erişilemedi</string>
+    <string name="label_parent_dir" translatable="false">...</string>
+</resources>
