@@ -75,14 +75,30 @@ public class FileUtils {
         }
     }
 
-    public static void copyFile(InputStream sourceFile, File destinationFile) throws IOException {
+    public static void copyFile(File in, OutputStream os) throws IOException {
+        try(InputStream is = getInputStream(in)) {
+            copyFile(is, os);
+        }
+    }
+
+    public static void copyFile(InputStream is, File destinationFile) throws IOException {
         try (OutputStream fos = getOutputStream(destinationFile)) {
             byte[] buffer = new byte[1024];
             int length;
-            while ((length = sourceFile.read(buffer)) > 0) {
+            while ((length = is.read(buffer)) > 0) {
                 fos.write(buffer, 0, length);
             }
         }
+    }
+
+    public static void copyFile(InputStream is, OutputStream os) throws IOException {
+        if(LegacyUtils.supportsWriteExternalStorage) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = is.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+        } else android.os.FileUtils.copy(is, os);
     }
 
     public static OutputStream getOutputStream(Uri uri, Context context) throws IOException {

@@ -499,11 +499,11 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 xapkUri = null;
             }
 
-            try (OutputStream os = FileUtils.getOutputStream(uris[0], activity)) {
+            try{
                 Merger.run(
                         activity.urisAreSplitApks ? FileUtils.getInputStream(activity.splitAPKUri, activity) : null,
                         cacheDir,
-                        os,
+                        uris[0],
                         xapkUri,
                         activity,
                         splits,
@@ -762,11 +762,12 @@ public class MainActivity extends Activity implements Merger.LogListener {
                         getAntisplitMFolder() + File.separator + getOriginalFileName(this, splitAPKUri) // If originalFilePath is null urisAreSplitApks must be true because getNameFromNonSplitApks will always return something
                         : originalFilePath.replaceFirst("\\.(?:xapk|aspk|apk[sm])", "_antisplit.apk");
                 if(TextUtils.isEmpty(newFilePath) ||
-                        newFilePath.startsWith("/data/") || // when a file is shared it in /data/
-                        !(f = new File(newFilePath)).createNewFile() || f.canWrite()) {
+                        newFilePath.startsWith("/data/")  // when a file is shared it in /data/
+                       // || !(f = new File(newFilePath)).createNewFile() || f.canWrite()
+                        ) {
                     f = new File(getAntisplitMFolder(), newFilePath.substring(newFilePath.lastIndexOf(File.separator) + 1));
                     showError(rss.getString(R.string.no_filepath) + newFilePath);
-                }
+                } else f = new File(newFilePath);
                 ((TextView) findViewById(R.id.logField)).setText("");
                 LogUtil.logMessage(rss.getString(R.string.output) + f);
 
