@@ -5,7 +5,7 @@
     <string name="enable_logs" >Enable logs</string>
     <string name="ask">Ask where to save the file each time (if disabled, save the merged APK to the same directory where the split file was from)</string>
     <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
-    <string name="no_filepath">Couldn\'t find filepath of the selected file</string>
+    <string name="no_filepath">"Can\'t write to the filepath "</string>
     <string name="output">"Output directory: "</string>
     <string name="show_dialog">Show dialog allowing selection of which splits to include</string>
     <string name="nothing">Nothing selected</string>

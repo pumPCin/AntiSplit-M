@@ -10,8 +10,8 @@ android {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
         minSdk = 4
         targetSdk = 35
-        versionCode = 19
-        versionName = "1.6.3.4"
+        versionCode = 20
+        versionName = "1.6.3.5"
         multiDexEnabled = true
     }
 

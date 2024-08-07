@@ -112,6 +112,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             setButtonBorder(changeBgColor);
         } else {
             bgColor = color;
+            findViewById(R.id.main).setBackgroundColor(color);
             Button langPicker = findViewById(R.id.langPicker);
             langPicker.setBackgroundColor(color);
             setButtonBorder(langPicker);
@@ -490,7 +491,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     }
                 }
             }
-            activity.runOnUiThread(() -> ((TextView) activity.findViewById(R.id.logField)).setText(""));
 
             Uri xapkUri;
             try {
@@ -572,6 +572,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 break;
             case 2:
                 // going to process and save a file now
+                ((TextView) findViewById(R.id.logField)).setText("");
                 new ProcessTask(this).execute(data.getData());
                 break;
         }
@@ -760,10 +761,13 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 String newFilePath = TextUtils.isEmpty(originalFilePath) ?
                         getAntisplitMFolder() + File.separator + getOriginalFileName(this, splitAPKUri) // If originalFilePath is null urisAreSplitApks must be true because getNameFromNonSplitApks will always return something
                         : originalFilePath.replaceFirst("\\.(?:xapk|aspk|apk[sm])", "_antisplit.apk");
-                if(TextUtils.isEmpty(newFilePath) || newFilePath.startsWith("/data/") || !(f = new File(newFilePath)).canWrite()) { // when a file is shared it in /data/
+                if(TextUtils.isEmpty(newFilePath) ||
+                        newFilePath.startsWith("/data/") || // when a file is shared it in /data/
+                        !(f = new File(newFilePath)).createNewFile() || f.canWrite()) {
                     f = new File(getAntisplitMFolder(), newFilePath.substring(newFilePath.lastIndexOf(File.separator) + 1));
-                    showError(rss.getString(R.string.no_filepath));
+                    showError(rss.getString(R.string.no_filepath) + newFilePath);
                 }
+                ((TextView) findViewById(R.id.logField)).setText("");
                 LogUtil.logMessage(rss.getString(R.string.output) + f);
 
                 new ProcessTask(this).execute(Uri.fromFile(f));
