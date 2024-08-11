@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="all">Seleccionar todo</string>
+    <string name="app_name">AntiSplit M</string>
+    <string name="arch_for_device">Seleccionar arquitectura para tu dispositivo</string>
+    <string name="ask">Preguntar dónde guardar el archivo cada vez (si está deshabilitado, guarda el APK fusionado en el mismo directorio de donde proviene el archivo split).</string>
+    <string name="automatically_select">Seleccionar automáticamente para las especificaciones de tu dispositivo.</string>
+    <string name="cancel_button_label">Cancelar</string>
+    <string name="change_background_color">Cambiar color de fondo</string>
+    <string name="change_text_color">Cambiar color del texto</string>
+    <string name="choose_button_label">Seleccionar</string>
+    <string name="detected_xapk">Archivo XAPK detectado, asegurándose de que pueda extraerse correctamente</string>
+    <string name="download_fix">Descargar ReVanced Manager corregido</string>
+    <string name="dpi_for_device">Seleccionar anchos de pantalla para tu dispositivo</string>
+    <string name="enable_logs">Habilitar registros.</string>
+    <string name="error_dir_access">No se puede acceder al directorio</string>
+    <string name="for_device">Seleccionar todas las splits especificas para tu dispositivo</string>
+    <string name="grant_storage">Se necesita permiso de almacenamiento para guardar en el mismo directorio que el archivo seleccionado</string>
+    <string name="label_parent_dir">...</string>
+    <string name="label_parent_directory">Directorio padre</string>
+    <string name="lang">Idioma</string>
+    <string name="lang_for_device">Seleccionar idioma para tu dispositivo</string>
+    <string name="last_edit">Última edición:</string>
+    <string name="merge">Seleccionar APK divididos para Fusionar/AntiSplit</string>
+    <string name="no_filepath">"No se puede escribir en la ruta del archivo "</string>
+    <string name="not_apk">: No es un archivo APK</string>
+    <string name="note">Nota para ReVanced</string>
+    <string name="nothing">Nada seleccionado</string>
+    <string name="output">"Directorio de salida: "</string>
+    <string name="removed_table_entry">"Entrada de tabla eliminada : "</string>
+    <string name="revanced">"ReVanced Manager produce un error al intentar parchear APKs fusionados. El error no es un problema real y es producido incorrectamente por una biblioteca de terceros. Para la mayoría, usar la opción para seleccionar splits para las especificaciones de tu dispositivo lo solucionará. Si aún no funciona, lo más fácil es descargar una versión de ReVanced Manager con el error corregido."</string>
+    <string name="sanitizing_manifest">Sanitizando manifiesto…</string>
+    <string name="saving">Guardando…</string>
+    <string name="searching">Buscando archivos apk…</string>
+    <string name="select_splits">Seleccionar splits</string>
+    <string name="show_dialog">Mostrar diálogo que permite la selección de splits a incluir.</string>
+    <string name="sign_apk">Firmar el APK después de fusionar.</string>
+    <string name="sign_failed">Error al firmar el APK, guardando sin firmar</string>
+    <string name="signing">Firmando APK…</string>
+    <string name="skipping">"Excluyendo "</string>
+    <string name="success_saved">Archivo guardado exitosamente</string>
+    <string name="unselected">: No seleccionado</string>
+</resources>
+
