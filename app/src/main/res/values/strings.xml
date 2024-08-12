@@ -41,14 +41,18 @@
     <string name="lang" translatable="false">Language</string>
     <string-array name="langs_display">
         <item>English</item>
+        <item>Español</item>
         <item>Bahasa Indonesia</item>
+        <item>Italiano</item>
         <item>русский язык</item>
         <item>Türkçe</item>
         <item>українська мова</item>
     </string-array>
     <string-array name="langs">
         <item>en</item>
+        <item>es</item>
         <item>in</item>
+        <item>it</item>
         <item>ru</item>
         <item>tr</item>
         <item>uk</item>
