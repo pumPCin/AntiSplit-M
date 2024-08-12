@@ -1,0 +1,58 @@
+<resources>
+    <string name="app_name">AntiSplit M</string>
+    <string name="merge">Seleziona l\'APK suddiviso da unire</string>
+    <string name="success_saved">Esportazione file APK unito completata</string>
+    <string name="enable_logs" >Attiva registro eventi</string>
+    <string name="ask">Chiedi ogni volta dove salvare il file (se disattivato, il file APK unito verrà esportato nella medesima cartella del file APK suddiviso)</string>
+    <string name="grant_storage">È richiesto il permesso di accesso alla memoria interna per effettuare il salvataggio nella stessa cartella del file suddiviso selezionato</string>
+    <string name="no_filepath">"Impossibile salvare nel percorso "</string>
+    <string name="output">"Cartella di salvataggio: "</string>
+    <string name="show_dialog">Mostra finestra di scelta delle suddivisioni da implementare</string>
+    <string name="nothing">Non è stata effettuata alcuna selezione</string>
+    <string name="change_text_color">Modifica colore del testo</string>
+    <string name="change_background_color">Modifica colore di sfondo</string>
+    <string name="all">Seleziona Tutto</string>
+    <string name="for_device">Seleziona tutte le suddivisioni specifiche per il tuo dispositivo</string>
+    <string name="lang_for_device">Seleziona la lingua per il tuo dispositivo</string>
+    <string name="arch_for_device">Seleziona l\'architettura per il tuo dispositivo</string>
+    <string name="dpi_for_device">Seleziona la dimensione dello schermo per il tuo dispositivo</string>
+    <string name="select_splits">Seleziona suddivisioni</string>
+    <string name="sign_apk">Firma l\'APK dopo l\'unione</string>
+    <string name="automatically_select">Seleziona automaticamente le suddivisioni in base alle specifiche del tuo dispositivo</string>
+    <string name="sign_failed">Errore durante la firma del file APK, il file salvato  non sarà firmato</string>
+    <string name="signing">Applicazione Firma APK…</string>
+    <string name="saving">Salvataggio…</string>
+    <string name="removed_table_entry">"Rimozione corrispondenze-tabella: "</string>
+    <string name="sanitizing_manifest">Pulizia file manifest…</string>
+    <string name="skipping">"Escludo "</string>
+    <string name="not_apk">: Non è un file APK</string>
+    <string name="unselected">: Non selezionato</string>
+    <string name="detected_xapk">Rilevato file con estensione XAPK, mi assicuro che possa essere estratto correttamente</string>
+    <string name="searching">Ricerca file apk…</string>
+    <string name="revanced">ReVanced Manager genera un errore durante la modifica dei file APK uniti. L\'errore non è causato da un problema reale ed è generato dal malfunzionamento di una libreria di terze parti. Nella maggior parte dei casi, per risolvere il problema basterà utilizzare l\'opzione per la selezione delle suddivisioni specifiche del proprio dispositivo. Se il problema dovesse persistere anche in questo caso, andrà semplicemente installata una versione di ReVanced Manager priva dell\'errore.</string>
+    <string name="note">Nota per ReVanced</string>
+    <string name="download_fix">Scarica la versione corretta di ReVanced Manager</string>
+    <string name="cancel_button_label">Annulla</string>
+    <string name="choose_button_label">Seleziona</string>
+    <string name="label_parent_directory">Cartella Superiore</string>
+    <string name="last_edit">Ultima modifica: </string>
+    <string name="error_dir_access">Impossibile accedere alla cartella</string>
+    <string name="label_parent_dir" translatable="false">...</string>
+    <string name="lang" translatable="false">Lingua</string>
+    <string-array name="langs_display">
+        <item>English</item>
+        <item>Bahasa Indonesia</item>
+        <item>Italiano</item>
+        <item>русский язык</item>
+        <item>Türkçe</item>
+        <item>українська мова</item>
+    </string-array>
+    <string-array name="langs">
+        <item>en</item>
+        <item>in</item>
+        <item>it</item>
+        <item>ru</item>
+        <item>tr</item>
+        <item>uk</item>
+    </string-array>
+</resources>
