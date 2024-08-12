@@ -39,20 +39,4 @@
     <string name="error_dir_access">Impossibile accedere alla cartella</string>
     <string name="label_parent_dir" translatable="false">...</string>
     <string name="lang" translatable="false">Lingua</string>
-    <string-array name="langs_display">
-        <item>English</item>
-        <item>Bahasa Indonesia</item>
-        <item>Italiano</item>
-        <item>русский язык</item>
-        <item>Türkçe</item>
-        <item>українська мова</item>
-    </string-array>
-    <string-array name="langs">
-        <item>en</item>
-        <item>in</item>
-        <item>it</item>
-        <item>ru</item>
-        <item>tr</item>
-        <item>uk</item>
-    </string-array>
 </resources>
