@@ -21,7 +21,7 @@ import android.net.Uri;
 import com.abdurazaaqmohammed.AntiSplit.R;
 import com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil;
 import com.abdurazaaqmohammed.AntiSplit.main.MainActivity;
-import com.android.apksig.ApkSigner;
+import com.abdurazaaqmohammed.AntiSplit.main.SignUtil;
 import com.reandroid.apk.ApkBundle;
 import com.reandroid.apk.ApkModule;
 import com.reandroid.apkeditor.common.AndroidManifestHelper;
@@ -42,10 +42,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -219,51 +215,15 @@ public class Merger {
             final File temp = new File(cacheDir, "temp.apk");
             mergedModule.writeApk(temp);
             LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.signing));
+            boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
+            File stupid = new File(noPerm ? (context.getCacheDir() + File.separator + "stupid.apk") : FileUtils.getPath(out, context));
             try {
-                /*final String FILE_NAME_PAST = "testkey.past";
-                final String FILE_NAME_PRIVATE_KEY = "testkey.pk8";
-                File signingEnvironment = new File(context.getFilesDir(), "signing");
-                File pastFile = new File(signingEnvironment, FILE_NAME_PAST);
-                File privateKeyFile = new File(signingEnvironment, FILE_NAME_PRIVATE_KEY);
-
-                if (!pastFile.exists() || !privateKeyFile.exists()) {
-                    signingEnvironment.mkdir();
-                    IOUtils.copyFileFromAssets(context, FILE_NAME_PAST, pastFile);
-                    IOUtils.copyFileFromAssets(context, FILE_NAME_PRIVATE_KEY, privateKeyFile);
-                }
-
-                PseudoApkSigner.sign(fis, out, pastFile, privateKeyFile);*/
-                char[] password = "android".toCharArray();
-
-                KeyStore keystore = KeyStore.getInstance("PKCS12");
-                keystore.load(context.getAssets().open("debug.keystore"), password);
-
-                String alias = keystore.aliases().nextElement();
-                KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keystore.getEntry(alias, new KeyStore.PasswordProtection(password));
-                PrivateKey privateKey = privateKeyEntry.getPrivateKey();
-
-                ApkSigner.SignerConfig signerConfig = new ApkSigner.SignerConfig.Builder("CERT",
-                        privateKey,
-                        Collections.singletonList((X509Certificate) keystore.getCertificate(alias))).build();
-                ApkSigner.Builder builder = new ApkSigner.Builder(Collections.singletonList(signerConfig));
-                builder.setInputApk(temp);
-                boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
-                File stupid = new File(noPerm ? (context.getCacheDir() + File.separator + "stupid.apk") : FileUtils.getPath(out, context));
-                builder.setOutputApk(stupid);
-                builder.setCreatedBy("Android Gradle 8.0.2");
-                builder.setV2SigningEnabled(true);
-                builder.setV3SigningEnabled(true);
-                ApkSigner signer = builder.build();
-                signer.sign();
+                SignUtil.signDebugKey(context, temp, stupid);
                 if(noPerm) {
                     FileUtils.copyFile(stupid, FileUtils.getOutputStream(out, context));
                     stupid.delete();
                 }
-            } catch (Exception e) {
-                LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.sign_failed));
-                FileUtils.copyFile(temp, FileUtils.getOutputStream(out, context));
-                throw(e); // for showError
-            }
+            } catch (Exception e) { SignUtil.signPseudoApkSigner(temp, context, out, e); }
         } else mergedModule.writeApk(FileUtils.getOutputStream(out, context));
         mergedModule.close();
         bundle.close();

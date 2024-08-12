@@ -3,6 +3,8 @@ package com.abdurazaaqmohammed.AntiSplit.main;
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
 import static com.reandroid.apkeditor.merge.LogUtil.logEnabled;
 
+import com.android.apksig.ApkSigner;
+import com.android.apksig.apk.ApkFormatException;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
@@ -52,12 +54,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import ankur035.LocaleHelper;
+import com.github.paul035.LocaleHelper;
 import yuku.ambilwarna.AmbilWarnaDialog;
 
 /** @noinspection deprecation*/
@@ -144,8 +155,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             try {
                 Objects.requireNonNull(getActionBar()).hide();
                 deleteDir(Objects.requireNonNull(getExternalCacheDir()));
-            } catch (NullPointerException ignored) {
-            }
+            } catch (NullPointerException ignored) {}
         }
         deleteDir(getCacheDir());
 
@@ -212,20 +222,18 @@ public class MainActivity extends Activity implements Merger.LogListener {
         findViewById(R.id.langPicker).setOnClickListener(v -> {
             int curr = -1;
 
-            /*
-            for(int i=0; i<langs.length; i++) {
+            String[] langs = rss.getStringArray(R.array.langs);
+            /*for(int i=0; i<langs.length; i++) {
                 if (langs[i].equals(lang)) {
                     curr = i;
                     break;
                 }
-            }
-            Idk why it aint working
-             */
+            }*/
 
             String[] display = rss.getStringArray(R.array.langs_display);
 
             styleAlertDialog(new AlertDialog.Builder(this).setSingleChoiceItems(display, curr, (dialog, which) -> {
-                updateLang(LocaleHelper.setLocale(MainActivity.this, lang = rss.getStringArray(R.array.langs)[which]).getResources());
+                updateLang(LocaleHelper.setLocale(MainActivity.this, lang = langs[which]).getResources());
                 dialog.dismiss();
             }).create(), display);
         });
@@ -538,6 +546,29 @@ public class MainActivity extends Activity implements Merger.LogListener {
         else selectDirToSaveAPKOrSaveNow();
     }
 
+    public static void signApk(InputStream key, String password, File inputApk, File output) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, ApkFormatException, SignatureException, InvalidKeyException, UnrecoverableEntryException {
+        signApk(key, password, inputApk, output, true, true, true);
+    }
+
+    public static void signApk(InputStream key, String password, File inputApk, File output, boolean v1, boolean v2, boolean v3) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, ApkFormatException, SignatureException, InvalidKeyException, UnrecoverableEntryException {
+        char[] pw = password.toCharArray();
+
+        KeyStore keystore = KeyStore.getInstance("PKCS12");
+        keystore.load(key, pw);
+
+        String alias = keystore.aliases().nextElement();
+
+        new ApkSigner.Builder(Collections.singletonList(new ApkSigner.SignerConfig.Builder("CERT",
+                ((KeyStore.PrivateKeyEntry) keystore.getEntry(alias, new KeyStore.PasswordProtection(pw))).getPrivateKey(),
+                Collections.singletonList((X509Certificate) keystore.getCertificate(alias))).build()))
+                .setInputApk(inputApk)
+                .setOutputApk(output)
+                .setCreatedBy("Android Gradle 8.0.2")
+                .setV1SigningEnabled(v1)
+                .setV2SigningEnabled(v2)
+                .setV3SigningEnabled(v3).build().sign();
+    }
+
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -698,8 +729,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
     }
 
     private void showError(Exception e) {
-        errorOccurred = true;
         final String mainErr = e.toString();
+        errorOccurred = !mainErr.equals(rss.getString(R.string.sign_failed));
         StringBuilder stackTrace = new StringBuilder().append(mainErr).append('\n');
         for(StackTraceElement line : e.getStackTrace()) stackTrace.append(line).append('\n');
         runOnUiThread(() -> {
@@ -762,7 +793,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                         getAntisplitMFolder() + File.separator + getOriginalFileName(this, splitAPKUri) // If originalFilePath is null urisAreSplitApks must be true because getNameFromNonSplitApks will always return something
                         : originalFilePath.replaceFirst("\\.(?:xapk|aspk|apk[sm])", "_antisplit.apk");
                 if(TextUtils.isEmpty(newFilePath) ||
-                        newFilePath.startsWith("/data/")  // when a file is shared it in /data/
+                        newFilePath.startsWith("/data/")
                        // || !(f = new File(newFilePath)).createNewFile() || f.canWrite()
                         ) {
                     f = new File(getAntisplitMFolder(), newFilePath.substring(newFilePath.lastIndexOf(File.separator) + 1));

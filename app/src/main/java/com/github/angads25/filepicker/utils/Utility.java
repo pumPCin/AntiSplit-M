@@ -87,8 +87,7 @@ public class Utility {
             Collections.sort(internalList);
         }
         catch (NullPointerException e)
-        {   //Just dont worry, it rarely occurs.
-            e.printStackTrace();
+        {
             internalList=new ArrayList<>();
         }
         return internalList;

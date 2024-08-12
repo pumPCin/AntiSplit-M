@@ -20,6 +20,8 @@ import static com.android.apksig.apk.ApkUtils.SOURCE_STAMP_CERTIFICATE_HASH_ZIP_
 import static com.android.apksig.internal.apk.v3.V3SchemeConstants.MIN_SDK_WITH_V31_SUPPORT;
 import static com.android.apksig.internal.apk.v3.V3SchemeConstants.MIN_SDK_WITH_V3_SUPPORT;
 
+import android.text.TextUtils;
+
 import com.android.apksig.apk.ApkFormatException;
 import com.android.apksig.apk.ApkSigningBlockNotFoundException;
 import com.android.apksig.apk.ApkUtils;
@@ -1091,9 +1093,7 @@ public class ApkSigner {
                     PrivateKey privateKey,
                     List<X509Certificate> certificates,
                     boolean deterministicDsaSigning) {
-                if (name.isEmpty()) {
-                    throw new IllegalArgumentException("Empty name");
-                }
+                if (TextUtils.isEmpty(name)) throw new IllegalArgumentException("Empty name");
                 mName = name;
                 mPrivateKey = privateKey;
                 mCertificates = new ArrayList<>(certificates);
