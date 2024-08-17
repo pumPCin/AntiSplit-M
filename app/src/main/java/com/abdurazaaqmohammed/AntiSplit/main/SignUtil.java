@@ -13,8 +13,6 @@ import com.reandroid.apkeditor.merge.LogUtil;
 import com.starry.FileUtils;
 
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

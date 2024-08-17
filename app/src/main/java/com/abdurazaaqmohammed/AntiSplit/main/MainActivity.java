@@ -3,14 +3,13 @@ package com.abdurazaaqmohammed.AntiSplit.main;
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
 import static com.reandroid.apkeditor.merge.LogUtil.logEnabled;
 
-import com.android.apksig.ApkSigner;
-import com.android.apksig.apk.ApkFormatException;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
@@ -54,16 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
-import java.security.InvalidKeyException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -83,6 +73,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     public static int textColor;
     public static int bgColor;
     public static boolean errorOccurred;
+    public static boolean revanced;
     public static String lang;
 
     private void setButtonBorder(Button button) {
@@ -92,12 +83,13 @@ public class MainActivity extends Activity implements Merger.LogListener {
         paint.setColor(textColor);
         paint.setStrokeWidth(4);
 
+        button.setTextColor(textColor);
         button.setBackgroundDrawable(border);
     }
 
     private void setColor(int color, boolean isTextColor) {
+        final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
         if(isTextColor) {
-            final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
             textColor = color;
             ((TextView) findViewById(R.id.errorField)).setTextColor(color);
             ((TextView) findViewById(R.id.logField)).setTextColor(color);
@@ -106,39 +98,22 @@ public class MainActivity extends Activity implements Merger.LogListener {
             ((TextView) findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setTextColor(color);
             ((TextView) findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setTextColor(color);
             ((TextView) findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setTextColor(color);
-            Button langPicker = findViewById(R.id.langPicker);
-            langPicker.setTextColor(color);
-            setButtonBorder(langPicker);
-            Button revanced = findViewById(R.id.revanced);
-            revanced.setTextColor(color);
-            setButtonBorder(revanced);
-            Button decodeButton = findViewById(R.id.decodeButton);
-            decodeButton.setTextColor(color);
-            setButtonBorder(decodeButton);
-            Button changeTextColor = findViewById(R.id.changeTextColor);
-            changeTextColor.setTextColor(color);
-            setButtonBorder(changeTextColor);
-            Button changeBgColor = findViewById(R.id.changeBgColor);
-            changeBgColor.setTextColor(color);
-            setButtonBorder(changeBgColor);
+            ((TextView) findViewById(supportsSwitch ? R.id.revancedToggle : R.id.revancedText)).setTextColor(color);
         } else {
             bgColor = color;
             findViewById(R.id.main).setBackgroundColor(color);
-            Button langPicker = findViewById(R.id.langPicker);
-            langPicker.setBackgroundColor(color);
-            setButtonBorder(langPicker);
-            Button revanced = findViewById(R.id.revanced);
-            revanced.setBackgroundColor(color);
-            setButtonBorder(revanced);
-            Button decodeButton = findViewById(R.id.decodeButton);
-            decodeButton.setBackgroundColor(color);
-            setButtonBorder(decodeButton);
-            Button changeTextColor = findViewById(R.id.changeTextColor);
-            changeTextColor.setBackgroundColor(color);
-            setButtonBorder(changeTextColor);
-            Button changeBgColor = findViewById(R.id.changeBgColor);
-            changeBgColor.setBackgroundColor(color);
-            setButtonBorder(changeBgColor);
+        }
+        setButtonBorder(findViewById(R.id.langPicker));
+        setButtonBorder(findViewById(R.id.decodeButton));
+        setButtonBorder(findViewById(R.id.changeTextColor));
+        setButtonBorder(findViewById(R.id.changeBgColor));
+        if(!supportsSwitch) {
+            setButtonBorder(findViewById(R.id.revancedToggle));
+            setButtonBorder(findViewById(R.id.logToggle));
+            setButtonBorder(findViewById(R.id.ask));
+            setButtonBorder(findViewById(R.id.showDialogToggle));
+            setButtonBorder(findViewById(R.id.selectSplitsForDeviceToggle));
+            setButtonBorder(findViewById(R.id.signToggle));
         }
     }
 
@@ -151,12 +126,13 @@ public class MainActivity extends Activity implements Merger.LogListener {
         super.onCreate(savedInstanceState);
         handler = new Handler(Looper.getMainLooper());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            try {
-                Objects.requireNonNull(getActionBar()).hide();
-                deleteDir(Objects.requireNonNull(getExternalCacheDir()));
-            } catch (NullPointerException ignored) {}
+        ActionBar ab;
+        File externalCacheDir;
+        if (LegacyUtils.supportsExternalCacheDir) {
+            if((externalCacheDir = getExternalCacheDir()) != null) deleteDir(externalCacheDir);
+            if(Build.VERSION.SDK_INT > 10 && (ab = getActionBar()) != null) ab.hide();
         }
+
         deleteDir(getCacheDir());
 
         setContentView(R.layout.activity_main);
@@ -170,8 +146,13 @@ public class MainActivity extends Activity implements Merger.LogListener {
         LogUtil.setLogListener(this);
 
         lang = settings.getString("lang", "en");
-        if(lang.equals(Locale.getDefault().getLanguage())) rss = getResources();
+        if(Objects.equals(lang, Locale.getDefault().getLanguage())) rss = getResources();
         else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources());
+
+        revanced = settings.getBoolean("revanced", false);
+        CompoundButton revancedSwitch = findViewById(R.id.revancedToggle);
+        revancedSwitch.setChecked(revanced);
+        revancedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> revanced = isChecked);
 
         CompoundButton logSwitch = findViewById(R.id.logToggle);
         logSwitch.setChecked(logEnabled);
@@ -272,7 +253,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         );
         findViewById(R.id.changeBgColor).setOnClickListener(v -> showColorPickerDialog(false, bgColor));
         findViewById(R.id.changeTextColor).setOnClickListener(v -> showColorPickerDialog(true, textColor));
-        findViewById(R.id.revanced).setOnClickListener(v -> {
+        /*findViewById(R.id.revanced).setOnClickListener(v -> {
             TextView title = new TextView(this);
             title.setText(rss.getString(R.string.note));
             title.setTextSize(20);
@@ -288,7 +269,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     .setView(message)
                     .setPositiveButton(rss.getString(R.string.download_fix), (dialog, which) -> startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/revanced-antisplit"))))
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss()).create(), null);
-        });
+        });*/
 
         // Check if user shared or opened file with the app.
         final Intent openIntent = getIntent();
@@ -346,7 +327,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         ((TextView) findViewById(R.id.decodeButton)).setText(res.getString(R.string.merge));
         ((TextView) findViewById(R.id.changeTextColor)).setText(res.getString(R.string.change_text_color));
         ((TextView) findViewById(R.id.changeBgColor)).setText(res.getString(R.string.change_background_color));
-        ((TextView) findViewById(R.id.revanced)).setText(res.getString(R.string.note));
+        //((TextView) findViewById(R.id.revanced)).setText(res.getString(R.string.note));
     }
 
     private void showColorPickerDialog(boolean isTextColor, int currentColor) {
@@ -392,6 +373,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 .putBoolean("showDialog", showDialog)
                 .putBoolean("signApk", signApk)
                 .putBoolean("selectSplitsForDevice", selectSplitsForDevice)
+                .putBoolean("revanced", revanced)
                 .putInt("textColor", textColor)
                 .putInt("backgroundColor", bgColor)
                 .putString("lang", lang);
@@ -417,7 +399,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     private Handler handler;
 
     /** @noinspection ResultOfMethodCallIgnored*/
-    public static void deleteDir(File dir){
+    public static void deleteDir(File dir) {
         // There should never be folders in here.
         for (String child : dir.list()) new File(dir, child).delete();
     }
@@ -432,7 +414,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
 
     private List<String> splitsToUse = null;
-
     private static class ProcessTask extends AsyncTask<Uri, Void, Void> {
         private final WeakReference<MainActivity> activityReference;
 
@@ -454,6 +435,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 if(selectSplitsForDevice) {
                     try {
                         splits = DeviceSpecsUtil.getListOfSplits(activity.splitAPKUri, activity);
+                        List<String> copy = List.copyOf(splits);
                         boolean splitApkContainsArch = false;
                         for (int i = 0; i < splits.size(); i++) {
                             final String thisSplit = splits.get(i);
@@ -464,14 +446,16 @@ public class MainActivity extends Activity implements Merger.LogListener {
                         }
                         if(splitApkContainsArch) {
                             boolean selectedSplitsContainsArch = false;
-                            for (int i = 0; i < splits.size(); i++) {
-                                final String thisSplit = splits.get(i);
-                                if((thisSplit.contains("armeabi") || thisSplit.contains("arm64") || thisSplit.contains("x86") || thisSplit.contains("mips"))) {
+                            for (int i = 0; i < copy.size(); i++) {
+                                final String thisSplit = copy.get(i);
+                                if((thisSplit.contains("armeabi") || thisSplit.contains("arm64") || thisSplit.contains("x86") || thisSplit.contains("mips"))
+                                    && !splits.contains(thisSplit)) {
                                     selectedSplitsContainsArch = true;
                                     break;
                                 }
                             }
                             if(!selectedSplitsContainsArch) {
+                                LogUtil.logMessage("Could not find device architecture, selecting all architectures");
                                 for (int i = 0; i < splits.size(); i++) {
                                     final String thisSplit = splits.get(i);
                                     if((thisSplit.contains("armeabi") || thisSplit.contains("arm64") || thisSplit.contains("x86") || thisSplit.contains("mips"))) {
@@ -500,12 +484,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 }
             }
 
-            Uri xapkUri;
-            try {
-                xapkUri = !activity.urisAreSplitApks || !Objects.requireNonNull(activity.splitAPKUri.getPath()).endsWith("xapk") ? null : activity.splitAPKUri;
-            } catch (NullPointerException ignored) {
-                xapkUri = null;
-            }
+            String path = activity.splitAPKUri.getPath();
+            Uri xapkUri = !activity.urisAreSplitApks || TextUtils.isEmpty(path) || !path.endsWith(".xapk") ? null : activity.splitAPKUri;
 
             try{
                 Merger.run(
@@ -515,7 +495,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
                         xapkUri,
                         activity,
                         splits,
-                        signApk);
+                        signApk,
+                        true);
             } catch (Exception e) {
                 activity.showError(e);
             }
@@ -544,29 +525,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
         splitAPKUri = uri;
         if (showDialog) showApkSelectionDialog();
         else selectDirToSaveAPKOrSaveNow();
-    }
-
-    public static void signApk(InputStream key, String password, File inputApk, File output) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, ApkFormatException, SignatureException, InvalidKeyException, UnrecoverableEntryException {
-        signApk(key, password, inputApk, output, true, true, true);
-    }
-
-    public static void signApk(InputStream key, String password, File inputApk, File output, boolean v1, boolean v2, boolean v3) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, ApkFormatException, SignatureException, InvalidKeyException, UnrecoverableEntryException {
-        char[] pw = password.toCharArray();
-
-        KeyStore keystore = KeyStore.getInstance("PKCS12");
-        keystore.load(key, pw);
-
-        String alias = keystore.aliases().nextElement();
-
-        new ApkSigner.Builder(Collections.singletonList(new ApkSigner.SignerConfig.Builder("CERT",
-                ((KeyStore.PrivateKeyEntry) keystore.getEntry(alias, new KeyStore.PasswordProtection(pw))).getPrivateKey(),
-                Collections.singletonList((X509Certificate) keystore.getCertificate(alias))).build()))
-                .setInputApk(inputApk)
-                .setOutputApk(output)
-                .setCreatedBy("Android Gradle 8.0.2")
-                .setV1SigningEnabled(v1)
-                .setV2SigningEnabled(v2)
-                .setV3SigningEnabled(v3).build().sign();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)

@@ -88,6 +88,13 @@
                 android:textSize="20sp"
                 android:text="@string/sign_apk" />
 
+            <Switch
+                android:id="@+id/revancedToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/fix" />
+
             <Button
                 android:id="@+id/langPicker"
                 android:layout_width="fill_parent"
@@ -95,12 +102,12 @@
                 android:layout_weight="1"
                 android:text="@string/lang" />
 
-            <Button
+            <!-- <Button
                 android:id="@+id/revanced"
                 android:layout_width="fill_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:text="@string/note" />
+                android:text="@string/note" /> -->
 
             <TextView
                 android:id="@+id/errorField"
