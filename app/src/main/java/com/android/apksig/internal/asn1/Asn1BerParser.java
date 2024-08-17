@@ -25,7 +25,9 @@ import com.android.apksig.internal.asn1.ber.ByteBufferBerDataValueReader;
 import com.android.apksig.internal.compat.ClassCompat;
 import com.android.apksig.internal.util.ByteBufferUtils;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -175,9 +177,11 @@ public final class Asn1BerParser {
 
         // Instantiate the container object / result
         T obj;
+
         try {
             obj = containerClass.getConstructor().newInstance();
-        } catch (IllegalArgumentException | ReflectiveOperationException e) {
+        } catch (IllegalArgumentException | NoSuchMethodException | IllegalAccessException |
+                 InstantiationException | InvocationTargetException e) {
             throw new Asn1DecodingException("Failed to instantiate " + containerClass.getName(), e);
         }
         // Set the matching field's value from the data value
@@ -223,7 +227,8 @@ public final class Asn1BerParser {
         T t;
         try {
             t = containerClass.getConstructor().newInstance();
-        } catch (IllegalArgumentException | ReflectiveOperationException e) {
+        } catch (IllegalArgumentException | NoSuchMethodException | IllegalAccessException |
+                 InstantiationException | InvocationTargetException e) {
             throw new Asn1DecodingException("Failed to instantiate " + containerClass.getName(), e);
         }
 
@@ -579,7 +584,12 @@ public final class Asn1BerParser {
                         field.set(obj, convert(type, dataValue, field.getType()));
                         break;
                 }
-            } catch (ReflectiveOperationException e) {
+            } catch (IllegalAccessException e) {
+                throw new Asn1DecodingException(
+                        "Failed to set value of " + obj.getClass().getName()
+                                + "." + field.getName(),
+                        e);
+            } catch (ClassNotFoundException e) {
                 throw new Asn1DecodingException(
                         "Failed to set value of " + obj.getClass().getName()
                                 + "." + field.getName(),

@@ -11,7 +11,7 @@ android {
         minSdk = 4
         targetSdk = 35
         versionCode = 25
-        versionName = "1.6.4.1"
+        versionName = "1.6.4.2"
         multiDexEnabled = true
     }
 
@@ -35,9 +35,6 @@ android {
     }
     dependencies {
         implementation("com.android.support:multidex:1.0.3")
-        //implementation("org.bouncycastle:bcprov-jdk15to18:1.78.1")
-      // implementation("org.bouncycastle:bcpkix-jdk15to18:1.78.1")
-      //  implementation("com.madgag.spongycastle:core:1.58.0.0")
         coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
     }
 }

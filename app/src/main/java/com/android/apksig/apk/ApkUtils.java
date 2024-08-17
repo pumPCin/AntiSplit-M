@@ -16,6 +16,8 @@
 
 package com.android.apksig.apk;
 
+import android.text.TextUtils;
+
 import com.android.apksig.internal.apk.AndroidBinXmlParser;
 import com.android.apksig.internal.apk.stamp.SourceStampConstants;
 import com.android.apksig.internal.apk.v1.V1SchemeVerifier;
@@ -261,7 +263,7 @@ public abstract class ApkUtils {
                 if ((eventType == AndroidBinXmlParser.EVENT_START_ELEMENT)
                         && (parser.getDepth() == 2)
                         && ("uses-sdk".equals(parser.getName()))
-                        && (parser.getNamespace().isEmpty())) {
+                        && (TextUtils.isEmpty(parser.getNamespace()))) {
                     // In each uses-sdk element, minSdkVersion defaults to 1
                     int minSdkVersion = 1;
                     for (int i = 0; i < parser.getAttributeCount(); i++) {
@@ -353,7 +355,7 @@ public abstract class ApkUtils {
      * @throws CodenameMinSdkVersionException if the {@code codename} is not supported
      */
     static int getMinSdkVersionForCodename(String codename) throws CodenameMinSdkVersionException {
-        char firstChar = codename.isEmpty() ? ' ' : codename.charAt(0);
+        char firstChar = TextUtils.isEmpty(codename) ? ' ' : codename.charAt(0);
         // Codenames are case-sensitive. Only codenames starting with A-Z are supported for now.
         // We only look at the first letter of the codename as this is the most important letter.
         if ((firstChar >= 'A') && (firstChar <= 'Z')) {
@@ -417,7 +419,7 @@ public abstract class ApkUtils {
                 if ((eventType == AndroidBinXmlParser.EVENT_START_ELEMENT)
                         && (parser.getDepth() == 2)
                         && ("application".equals(parser.getName()))
-                        && (parser.getNamespace().isEmpty())) {
+                        && (TextUtils.isEmpty(parser.getNamespace()))) {
                     for (int i = 0; i < parser.getAttributeCount(); i++) {
                         if (parser.getAttributeNameResourceId(i) == DEBUGGABLE_ATTR_ID) {
                             int valueType = parser.getAttributeValueType(i);
@@ -492,10 +494,10 @@ public abstract class ApkUtils {
                 if ((eventType == AndroidBinXmlParser.EVENT_START_ELEMENT)
                         && (parser.getDepth() == 1)
                         && ("manifest".equals(parser.getName()))
-                        && (parser.getNamespace().isEmpty())) {
+                        && (TextUtils.isEmpty(parser.getNamespace()))) {
                     for (int i = 0; i < parser.getAttributeCount(); i++) {
                         if ("package".equals(parser.getAttributeName(i))
-                                && (parser.getNamespace().isEmpty())) {
+                                && (TextUtils.isEmpty(parser.getNamespace()))) {
                             return parser.getAttributeStringValue(i);
                         }
                     }

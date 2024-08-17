@@ -71,9 +71,8 @@ public class Merger {
                             if (!canonicalizedPath.startsWith(cacheDir.getCanonicalPath() + File.separator)) {
                                 throw new IOException("Zip entry is outside of the target dir: " + name);
                             }
-                            try (OutputStream os = FileUtils.getOutputStream(file);
-                                 InputStream is = zis.openFileDataInputStream(false)) {
-                                FileUtils.copyFile(is, os);
+                            try (InputStream is = zis.openFileDataInputStream(false)) {
+                                FileUtils.copyFile(is, file);
                             }
                             LogUtil.logMessage("Extracted " + name);
                         }
@@ -181,7 +180,9 @@ public class Merger {
                     // Copying the contents of the zip to a new one works on most JRE implementations of java.util.zip but not on Android,
                     // the exact same problem happens in ReVanced.
                     try (com.j256.simplezip.ZipFileInput zfi = new com.j256.simplezip.ZipFileInput(temp);
-                    com.j256.simplezip.ZipFileOutput zfo = new com.j256.simplezip.ZipFileOutput(signApk ? FileUtils.getOutputStream(temp = new File(cacheDir, "toSign.apk")) : FileUtils.getOutputStream(out, context))) {
+                    com.j256.simplezip.ZipFileOutput zfo = new com.j256.simplezip.ZipFileOutput(signApk ?
+                            FileUtils.getOutputStream(temp = new File(cacheDir, "toSign.apk")) :
+                            FileUtils.getOutputStream(out, context))) {
                         ZipFileHeader header;
                         while((header = zfi.readFileHeader()) != null) {
                             ZipFileHeader.Builder b = ZipFileHeader.builder();
@@ -197,7 +198,6 @@ public class Merger {
                             b.setUncompressedSize(header.getUncompressedSize());
                             zfo.writeFileHeader(b.build());
                             zfo.writeRawFileData(zfi.openFileDataInputStream(true));
-                         //   zfo.finishFileData();
                         }
                     }
                 }

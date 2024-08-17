@@ -17,12 +17,12 @@
 
 package com.android.apksig.internal.apk.v1;
 
-import android.util.Base64;
 
 import static com.android.apksig.Constants.OID_RSA_ENCRYPTION;
 import static com.android.apksig.internal.pkcs7.AlgorithmIdentifier.getSignerInfoDigestAlgorithmOid;
 import static com.android.apksig.internal.pkcs7.AlgorithmIdentifier.getSignerInfoSignatureAlgorithm;
 
+import com.aefyr.pseudoapksigner.Base64;
 import com.android.apksig.apk.ApkFormatException;
 import com.android.apksig.internal.apk.ApkSigningBlockUtils;
 import com.android.apksig.internal.asn1.Asn1EncodingException;

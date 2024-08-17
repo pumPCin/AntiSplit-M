@@ -144,11 +144,11 @@ public class MainActivity extends Activity implements Merger.LogListener {
         setColor(settings.getInt("backgroundColor", 0xff000000), false);
 
         if(Build.VERSION.SDK_INT > 10 && (ab = getActionBar()) != null) {
-            Spannable text = new SpannableString(getString(R.string.app_name));
+            /*Spannable text = new SpannableString(getString(R.string.app_name));
             text.setSpan(new ForegroundColorSpan(textColor), 0, text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
             ab.setTitle(text);
-            ab.setBackgroundDrawable(new ColorDrawable(bgColor));
-            //ab.hide();
+            ab.setBackgroundDrawable(new ColorDrawable(bgColor));*/
+            ab.hide();
         }
 
         logEnabled = settings.getBoolean("logEnabled", true);
