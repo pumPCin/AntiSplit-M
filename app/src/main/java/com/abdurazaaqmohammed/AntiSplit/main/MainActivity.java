@@ -21,6 +21,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -33,7 +34,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.OpenableColumns;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -128,10 +132,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
         ActionBar ab;
         File externalCacheDir;
-        if (LegacyUtils.supportsExternalCacheDir) {
-            if((externalCacheDir = getExternalCacheDir()) != null) deleteDir(externalCacheDir);
-            if(Build.VERSION.SDK_INT > 10 && (ab = getActionBar()) != null) ab.hide();
-        }
+        if (LegacyUtils.supportsExternalCacheDir && ((externalCacheDir = getExternalCacheDir()) != null)) deleteDir(externalCacheDir);
 
         deleteDir(getCacheDir());
 
@@ -141,6 +142,14 @@ public class MainActivity extends Activity implements Merger.LogListener {
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
         setColor(settings.getInt("textColor", 0xffffffff), true);
         setColor(settings.getInt("backgroundColor", 0xff000000), false);
+
+        if(Build.VERSION.SDK_INT > 10 && (ab = getActionBar()) != null) {
+            Spannable text = new SpannableString(getString(R.string.app_name));
+            text.setSpan(new ForegroundColorSpan(textColor), 0, text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            ab.setTitle(text);
+            ab.setBackgroundDrawable(new ColorDrawable(bgColor));
+            //ab.hide();
+        }
 
         logEnabled = settings.getBoolean("logEnabled", true);
         LogUtil.setLogListener(this);
@@ -484,19 +493,15 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 }
             }
 
-            String path = activity.splitAPKUri.getPath();
-            Uri xapkUri = !activity.urisAreSplitApks || TextUtils.isEmpty(path) || !path.endsWith(".xapk") ? null : activity.splitAPKUri;
-
             try{
                 Merger.run(
                         activity.urisAreSplitApks ? FileUtils.getInputStream(activity.splitAPKUri, activity) : null,
                         cacheDir,
                         uris[0],
-                        xapkUri,
                         activity,
                         splits,
                         signApk,
-                        true);
+                        revanced);
             } catch (Exception e) {
                 activity.showError(e);
             }

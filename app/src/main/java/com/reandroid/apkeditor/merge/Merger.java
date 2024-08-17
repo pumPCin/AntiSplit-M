@@ -19,9 +19,9 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
-import com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil;
 import com.abdurazaaqmohammed.AntiSplit.main.MainActivity;
 import com.abdurazaaqmohammed.AntiSplit.main.SignUtil;
+import com.j256.simplezip.ZipFileInput;
 import com.j256.simplezip.format.GeneralPurposeFlag;
 import com.j256.simplezip.format.ZipFileHeader;
 import com.reandroid.apk.ApkBundle;
@@ -44,14 +44,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
-
-/** @noinspection ResultOfMethodCallIgnored*/
 public class Merger {
 
     public interface LogListener {
@@ -60,70 +54,31 @@ public class Merger {
 
     }
 
-    public static void run(InputStream ins, File cacheDir, Uri out, Uri xapkUri, Context context, List<String> splits, boolean signApk, boolean revanced) throws Exception {
+    public static void run(InputStream ins, File cacheDir, Uri out, Context context, List<String> splits, boolean signApk, boolean revanced) throws Exception {
         LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.searching));
 
         if(ins!=null) {
-            if(xapkUri == null) {
-                byte[] buffer = new byte[1024];
-                try (ZipInputStream zis = new ZipInputStream(ins)) {
-                    ZipEntry zipEntry = zis.getNextEntry();
-                    while (zipEntry != null) {
-                        final String name = zipEntry.getName();
-                        if (name.endsWith(".apk")) {
-                            if((splits != null && !splits.isEmpty() && splits.contains(name))) LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.skipping) + name + com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.unselected));
-                            else {
-                                File file = new File(cacheDir, name);
-                                String canonicalizedPath = file.getCanonicalPath();
-                                if (!canonicalizedPath.startsWith(cacheDir.getCanonicalPath() + File.separator)) {
-                                    throw new IOException("Zip entry is outside of the target dir: " + name);
-                                }
-                                OutputStream fos = FileUtils.getOutputStream(file);
-                                int len;
-                                while ((len = zis.read(buffer)) > 0) {
-                                    fos.write(buffer, 0, len);
-                                }
-                                fos.close();
-                                LogUtil.logMessage("Extracted " + name);
+            try (ZipFileInput zis = new ZipFileInput(ins)) {
+                ZipFileHeader header;
+                while ((header = zis.readFileHeader()) != null) {
+                    final String name = header.getFileName();
+                    if (name.endsWith(".apk")) {
+                        if ((splits != null && !splits.isEmpty() && splits.contains(name)))
+                            LogUtil.logMessage(MainActivity.rss.getString(R.string.skipping) + name + MainActivity.rss.getString(R.string.unselected));
+                        else {
+                            File file = new File(cacheDir, name);
+                            String canonicalizedPath = file.getCanonicalPath();
+                            if (!canonicalizedPath.startsWith(cacheDir.getCanonicalPath() + File.separator)) {
+                                throw new IOException("Zip entry is outside of the target dir: " + name);
                             }
-                        } else LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.skipping) + name + com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.not_apk));
-                        zipEntry = zis.getNextEntry();
-                    }
-                    zis.closeEntry();
-                }
-            } else {
-                LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.detected_xapk)); //ZipInputStream is reading XAPK files as if all files inside the splits were in 1 zip which breaks everything
-                File bruh = DeviceSpecsUtil.splitApkPath == null ? new File(FileUtils.getPath(xapkUri, context)) : DeviceSpecsUtil.splitApkPath; // if file was already copied to get splits list do not copy it again
-                final boolean couldNotRead = !bruh.canRead();
-                if (couldNotRead) bruh = FileUtils.copyFileToInternalStorage(xapkUri, context);
-                try (ZipFile zipFile = new ZipFile(bruh)) {
-                    Enumeration<? extends ZipEntry> entries = zipFile.entries();
-
-                    while (entries.hasMoreElements()) {
-                        ZipEntry entry = entries.nextElement();
-                        String fileName = entry.getName();
-
-                        if (fileName.endsWith(".apk")) {
-                            if((splits != null && !splits.isEmpty() && splits.contains(fileName))) LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.skipping) + fileName + com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.unselected));
-                            else {
-                                File outFile = new File(cacheDir, fileName);
-                                File parentDir = outFile.getParentFile();
-                                if (!parentDir.exists()) {
-                                    parentDir.mkdirs();
-                                }
-
-                                try (InputStream is = zipFile.getInputStream(entry);
-                                     OutputStream fos = FileUtils.getOutputStream(outFile)) {
-                                    byte[] buffy = new byte[1024];
-                                    int len;
-                                    while ((len = is.read(buffy)) > 0) {
-                                        fos.write(buffy, 0, len);
-                                    }
-                                }
+                            try (OutputStream os = FileUtils.getOutputStream(file);
+                                 InputStream is = zis.openFileDataInputStream(false)) {
+                                FileUtils.copyFile(is, os);
                             }
-                        } else LogUtil.logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.skipping) + fileName + com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.not_apk));
-                    }
-                    if(couldNotRead) bruh.delete();
+                            LogUtil.logMessage("Extracted " + name);
+                        }
+                    } else
+                        LogUtil.logMessage(MainActivity.rss.getString(R.string.skipping) + name + MainActivity.rss.getString(R.string.not_apk));
                 }
             }
         }

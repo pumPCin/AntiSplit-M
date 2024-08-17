@@ -7,48 +7,28 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
+import com.j256.simplezip.ZipFileInput;
+import com.j256.simplezip.format.ZipFileHeader;
 import com.starry.FileUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 public class DeviceSpecsUtil {
-
-    public static File splitApkPath = null;
 
     public static List<String> getListOfSplits(Uri splitAPKUri, Context context) throws IOException {
         List<String> splits = new ArrayList<>();
 
-        if (splitAPKUri.getPath().endsWith("xapk")) {
-            splitApkPath = new File(FileUtils.getPath(splitAPKUri, context));
-            final boolean couldntRead = !splitApkPath.canRead();
-            if (couldntRead) splitApkPath = FileUtils.copyFileToInternalStorage(splitAPKUri, context);
-            try (ZipFile zipFile = new ZipFile(splitApkPath)) {
-                Enumeration<? extends ZipEntry> entries = zipFile.entries();
-                while (entries.hasMoreElements()) {
-                    String fileName = entries.nextElement().getName();
-                    if (fileName.endsWith(".apk")) splits.add(fileName);
-                }
-                if (couldntRead) splitApkPath.delete();
-            }
-        } else {
-            try (ZipInputStream zis = new ZipInputStream(FileUtils.getInputStream(splitAPKUri, context))) {
-                ZipEntry zipEntry = zis.getNextEntry();
-                while (zipEntry != null) {
-                    final String name = zipEntry.getName();
-                    if (name.endsWith(".apk")) splits.add(name);
-                    zipEntry = zis.getNextEntry();
-                }
-                zis.closeEntry();
+        try (ZipFileInput zis = new ZipFileInput(FileUtils.getInputStream(splitAPKUri, context))) {
+            ZipFileHeader header;
+            while ((header = zis.readFileHeader()) != null) {
+                final String name = header.getFileName();
+                if (name.endsWith(".apk")) splits.add(name);
             }
         }
+
         return splits;
     }
 
