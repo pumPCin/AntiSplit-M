@@ -29,9 +29,6 @@
     <string name="unselected">: Non selezionato</string>
     <string name="detected_xapk">Rilevato file con estensione XAPK, mi assicuro che possa essere estratto correttamente</string>
     <string name="searching">Ricerca file apk…</string>
-    <string name="revanced">ReVanced Manager genera un errore durante la modifica dei file APK uniti. L\'errore non è causato da un problema reale ed è generato dal malfunzionamento di una libreria di terze parti. Nella maggior parte dei casi, per risolvere il problema basterà utilizzare l\'opzione per la selezione delle suddivisioni specifiche del proprio dispositivo. Se il problema dovesse persistere anche in questo caso, andrà semplicemente installata una versione di ReVanced Manager priva dell\'errore.</string>
-    <string name="note">Nota per ReVanced</string>
-    <string name="download_fix">Scarica la versione corretta di ReVanced Manager</string>
     <string name="cancel_button_label">Annulla</string>
     <string name="choose_button_label">Seleziona</string>
     <string name="label_parent_directory">Cartella Superiore</string>
@@ -39,4 +36,6 @@
     <string name="error_dir_access">Impossibile accedere alla cartella</string>
     <string name="label_parent_dir" translatable="false">...</string>
     <string name="lang" translatable="false">Lingua</string>
+    <string name="fixing">Applicazione correzione per ReVanced…</string>
+    <string name="fix">Correzione per ReVanced</string>
 </resources>
