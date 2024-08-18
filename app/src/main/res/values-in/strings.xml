@@ -5,7 +5,7 @@
     <string name="enable_logs" >Aktifkan log</string>
     <string name="ask">Tanyakan terus di mana berkas akan disimpan (jika dinonaktifkan, simpan APK yang dileburkan ke direktori yang sama tempatnya berkas terpisah berasal)</string>
     <string name="grant_storage">Perizinan penyimpanan diperlukan untuk menyimpan ke direktori yang sama dengan berkas yang dipilih</string>
-    <string name="no_filepath">Tidak bisa menuliskan ke jalur berkas </string>
+    <string name="no_filepath">"Tidak bisa menuliskan ke jalur berkas "</string>
     <string name="output">"Direktori keluaran: "</string>
     <string name="show_dialog">Perlihatkan dialog yang memungkinkan pemilihan APK terpisah mana yang akan disertakan</string>
     <string name="nothing">Tidak ada yang dipilih</string>
