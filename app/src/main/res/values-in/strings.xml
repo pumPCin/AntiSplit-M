@@ -1,11 +1,11 @@
 <resources>
-    <string name="app_name">AntiSplit M</string>
+    <string name="app_name" translatable="false">AntiSplit M</string>
     <string name="merge">Pilih APK terpisah yang ingin Dileburkan/Di-AntiSplit</string>
     <string name="success_saved">Berkas berhasil disimpan</string>
     <string name="enable_logs" >Aktifkan log</string>
     <string name="ask">Tanyakan terus di mana berkas akan disimpan (jika dinonaktifkan, simpan APK yang dileburkan ke direktori yang sama tempatnya berkas terpisah berasal)</string>
     <string name="grant_storage">Perizinan penyimpanan diperlukan untuk menyimpan ke direktori yang sama dengan berkas yang dipilih</string>
-    <string name="no_filepath">Tidak bisa menemukan jalur berkas dari berkas yang dipilih</string>
+    <string name="no_filepath">"Tidak bisa menuliskan ke jalur berkas "</string>
     <string name="output">"Direktori keluaran: "</string>
     <string name="show_dialog">Perlihatkan dialog yang memungkinkan pemilihan APK terpisah mana yang akan disertakan</string>
     <string name="nothing">Tidak ada yang dipilih</string>
@@ -37,5 +37,8 @@
     <string name="label_parent_directory">Direktori Induk</string>
     <string name="last_edit">Terakhir kali disunting: </string>
     <string name="error_dir_access">Direktorinya tidak bisa diakses</string>
-    <string name="label_parent_dir" translatable="false">...</string>
+    <string name="label_parent_dir" translatable="false">…</string>
+    <string name="lang" translatable="false">Bahasa</string>
+    <string name="fixing">Memperbaiki untuk ReVanced…</string>
+    <string name="fix">Perbaiki untuk ReVanced</string>
 </resources>
