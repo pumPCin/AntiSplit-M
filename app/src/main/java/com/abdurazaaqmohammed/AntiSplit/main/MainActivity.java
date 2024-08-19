@@ -370,6 +370,16 @@ public class MainActivity extends Activity implements Merger.LogListener {
             ad.show();
             if(display != null) ad.getListView().setAdapter(new CustomArrayAdapter(this, display, textColor));
             Window w = ad.getWindow();
+
+            Button positiveButton = ad.getButton(AlertDialog.BUTTON_POSITIVE);
+            if(positiveButton != null) positiveButton.setTextColor(textColor);
+
+            Button negativeButton = ad.getButton(AlertDialog.BUTTON_NEGATIVE);
+            if(negativeButton != null) negativeButton.setTextColor(textColor);
+
+            Button neutralButton = ad.getButton(AlertDialog.BUTTON_NEUTRAL);
+            if(neutralButton != null) neutralButton.setTextColor(textColor);
+
             if (w != null) {
                 w.setBackgroundDrawable(layerDrawable);
                 View dv = w.getDecorView();
@@ -680,7 +690,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             try {
                 currentVer = ((Context) activity).getPackageManager().getPackageInfo(((Context) activity).getPackageName(), 0).versionName;
             } catch (Exception e) {
-                currentVer = "1.6.4.4";
+                currentVer = "1.6.4.6";
             }
             boolean newVer = false;
             try {
