@@ -41,6 +41,12 @@
     <string name="lang" translatable="false">Language</string>
     <string name="fixing">Fixing for ReVanced…</string>
     <string name="fix">Fix for ReVanced</string>
+    <string name="update">Update available</string>
+    <string name="new_ver">New version of AntiSplit M is available</string>
+    <string name="dl">Download</string>
+    <string name="auto_update">Check for updates automatically</string>
+    <string name="check_update_now">Check for update now</string>
+    <string name="no_update_found">No update found</string>
     <string-array name="langs_display">
         <item>English</item>
         <item>Español</item>

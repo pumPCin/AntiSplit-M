@@ -120,6 +120,24 @@
                 android:id="@+id/revancedToggle"
                 android:layout_height="wrap_content" android:layout_width="match_parent"/>
 
+            <TextView
+                android:id="@+id/updateToggleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/auto_update" />
+
+            <ToggleButton
+                android:id="@+id/updateToggle"
+                android:layout_height="wrap_content" android:layout_width="match_parent"/>
+
+            <Button
+                android:id="@+id/checkUpdateNow"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/check_update_now" />
+
             <Button
                 android:id="@+id/langPicker"
                 android:layout_width="fill_parent"

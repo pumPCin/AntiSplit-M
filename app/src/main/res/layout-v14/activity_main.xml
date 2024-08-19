@@ -96,6 +96,20 @@
                 android:textSize="20sp"
                 android:text="@string/fix" />
 
+            <Switch
+                android:id="@+id/updateToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/auto_update" />
+
+            <Button
+                android:id="@+id/checkUpdateNow"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/check_update_now" />
+
             <Button
                 android:id="@+id/langPicker"
                 android:layout_width="fill_parent"

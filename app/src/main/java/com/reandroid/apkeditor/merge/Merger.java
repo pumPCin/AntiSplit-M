@@ -74,6 +74,25 @@ public class Merger {
                         if (file.getCanonicalPath().startsWith(cacheDir.getCanonicalPath() + File.separator)) zis.readFileDataToFile(file);
                         else throw new IOException("Zip entry is outside of the target dir: " + name);
 
+                        logMessage("Extracted " + name);
+                    }
+                } else logMessage(MainActivity.rss.getString(R.string.skipping) + name + MainActivity.rss.getString(R.string.not_apk));
+            }
+            bundle.loadApkDirectory(cacheDir, false);
+        } catch (Exception e) {
+            // If the above failed it did not copy any files
+            // so might as well do it this way instead of trying unreliable methods to see if we need to do this
+            // and possibly copying the file for no reason
+            if(DeviceSpecsUtil.zipFile == null) {
+                File input = new File(FileUtils.getPath(in, context));
+                boolean couldNotRead = !input.canRead();
+                if(couldNotRead) FileUtils.copyFile(FileUtils.getInputStream(in, context), input = new File(cacheDir, input.getName()));
+                ZipFile zf = new ZipFile(input);
+                extractZipFile(zf, checkSplits, splits, cacheDir);
+                if(couldNotRead) input.delete();
+            } else extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splits, cacheDir);
+            bundle.loadApkDirectory(cacheDir, false);
+        }
     }
 
     private static void extractZipFile(ZipFile zf, boolean checkSplits, List<String> splits, File cacheDir) throws IOException {
@@ -96,10 +115,8 @@ public class Merger {
         logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.searching));
 
         try (ApkBundle bundle = new ApkBundle()) {
-            if(in == null) {
-                // Multiple splits from a split apk, already copied to cache dir
-                bundle.loadApkDirectory(cacheDir, false);
-            } else extractAndLoad(in, cacheDir, context, splits, bundle);
+            if(in == null) bundle.loadApkDirectory(cacheDir, false); // Multiple splits from a split apk, already copied to cache dir
+            else extractAndLoad(in, cacheDir, context, splits, bundle);
             logMessage("Found modules: " + bundle.getApkModuleList().size());
 
             try (ApkModule mergedModule = bundle.mergeModules()) {
