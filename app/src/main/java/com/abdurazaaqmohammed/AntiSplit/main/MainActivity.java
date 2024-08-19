@@ -404,11 +404,11 @@ public class MainActivity extends Activity implements Merger.LogListener {
             ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setText(rss.getString(R.string.show_dialog));
             ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setText(rss.getString(R.string.sign_apk));
             ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setText(rss.getString(R.string.automatically_select));
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.updateToggle : R.id.updateToggleText)).setText(rss.getString(R.string.automatically_select));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.updateToggle : R.id.updateToggleText)).setText(rss.getString(R.string.auto_update));
             ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.revancedToggle : R.id.revancedText)).setText(rss.getString(R.string.fix));
             ((TextView) settingsDialog.findViewById(R.id.changeTextColor)).setText(rss.getString(R.string.change_text_color));
             ((TextView) settingsDialog.findViewById(R.id.changeBgColor)).setText(rss.getString(R.string.change_background_color));
-            ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.auto_update));
+            ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.check_update_now));
         }
     }
 
@@ -685,18 +685,24 @@ public class MainActivity extends Activity implements Merger.LogListener {
         @Override
         protected void onPostExecute(String[] result) {
             MainActivity activity = context.get();
-            String latestVersion = result[0];
-            String currentVer;
-            try {
-                currentVer = ((Context) activity).getPackageManager().getPackageInfo(((Context) activity).getPackageName(), 0).versionName;
-            } catch (Exception e) {
-                currentVer = "1.6.4.6";
+            if(result == null) {
+                if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show());
+                return;
             }
-            boolean newVer = false;
+
             try {
+                String latestVersion = result[0];
+                String currentVer;
+                try {
+                    currentVer = ((Context) activity).getPackageManager().getPackageInfo(((Context) activity).getPackageName(), 0).versionName;
+                } catch (Exception e) {
+                    currentVer = "1.6.4.8";
+                }
+                boolean newVer = false;
                 char[] curr = currentVer.replace(".", "").toCharArray();
                 char[] latest = latestVersion.replace(".", "").toCharArray();
-                for(int i = 0; i < curr.length; i++) {                    if(latest[i] > curr[i]) {
+                for(int i = 0; i < curr.length; i++) {
+                    if(latest[i] > curr[i]) {
                         newVer = true;
                         break;
                     }
