@@ -168,8 +168,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
         signApk = settings.getBoolean("signApk", true);
         showDialog = settings.getBoolean("showDialog", false);
         selectSplitsForDevice = settings.getBoolean("selectSplitsForDevice", false);
-
         logEnabled = settings.getBoolean("logEnabled", true);
+        ask = settings.getBoolean("ask", true);
         LogUtil.setLogListener(this);
 
         lang = settings.getString("lang", "en");
@@ -190,11 +190,11 @@ public class MainActivity extends Activity implements Merger.LogListener {
             ((TextView) l.findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setText(rss.getString(R.string.show_dialog));
             ((TextView) l.findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setText(rss.getString(R.string.sign_apk));
             ((TextView) l.findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setText(rss.getString(R.string.automatically_select));
-            ((TextView) l.findViewById(supportsSwitch ? R.id.updateToggle : R.id.updateToggleText)).setText(rss.getString(R.string.automatically_select));
+            ((TextView) l.findViewById(supportsSwitch ? R.id.updateToggle : R.id.updateToggleText)).setText(rss.getString(R.string.auto_update));
             ((TextView) l.findViewById(supportsSwitch ? R.id.revancedToggle : R.id.revancedText)).setText(rss.getString(R.string.fix));
             ((TextView) l.findViewById(R.id.changeTextColor)).setText(rss.getString(R.string.change_text_color));
             ((TextView) l.findViewById(R.id.changeBgColor)).setText(rss.getString(R.string.change_background_color));
-            ((TextView) l.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.auto_update));
+            ((TextView) l.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.check_update_now));
 
             Button checkUpdateNow = l.findViewById(R.id.checkUpdateNow);
             CompoundButton updateSwitch = l.findViewById(R.id.updateToggle);
