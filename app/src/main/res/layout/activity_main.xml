@@ -5,152 +5,48 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="50dp"
     android:background="#000000"
     tools:context=".main.MainActivity"
     tools:visibility="visible"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:id="@+id/topButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
+        <Button
+            android:id="@+id/decodeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/merge" />
+
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings" />
+
+    </LinearLayout>
+
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:paddingTop="50dp">
+        android:layout_below="@id/topButtons" >
 
         <LinearLayout
             android:id="@+id/linear1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:id="@+id/linear2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="8dp"
-                android:orientation="vertical">
-
-                <Button
-                    android:id="@+id/decodeButton"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/merge" />
-
-                <Button
-                    android:id="@+id/changeTextColor"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/change_text_color" />
-
-                <Button
-                    android:id="@+id/changeBgColor"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/change_background_color" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/logToggleText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/enable_logs" />
-
-            <ToggleButton
-                android:id="@+id/logToggle"
-                android:layout_height="wrap_content" android:layout_width="match_parent"/>
-
-            <TextView
-                android:id="@+id/askText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/ask" />
-
-            <ToggleButton
-                android:id="@+id/ask"
-                 android:layout_height="wrap_content" android:layout_width="match_parent"/>
-
-            <TextView
-                android:id="@+id/showDialogToggleText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/show_dialog" />
-
-            <ToggleButton
-                android:id="@+id/showDialogToggle"
-                android:layout_height="wrap_content" android:layout_width="match_parent"/>
-
-            <TextView
-                android:id="@+id/selectSplitsForDeviceToggleText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/automatically_select" />
-
-            <ToggleButton
-                android:id="@+id/selectSplitsForDeviceToggle"
-                android:layout_height="wrap_content" android:layout_width="match_parent"/>
-
-            <TextView
-                android:id="@+id/signToggleText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/sign_apk" />
-
-            <ToggleButton
-                android:id="@+id/signToggle"
-                android:layout_height="wrap_content" android:layout_width="match_parent"/>
-
-            <TextView
-                android:id="@+id/revancedText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/fix" />
-
-            <ToggleButton
-                android:id="@+id/revancedToggle"
-                android:layout_height="wrap_content" android:layout_width="match_parent"/>
-
-            <TextView
-                android:id="@+id/updateToggleText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/auto_update" />
-
-            <ToggleButton
-                android:id="@+id/updateToggle"
-                android:layout_height="wrap_content" android:layout_width="match_parent"/>
-
-            <Button
-                android:id="@+id/checkUpdateNow"
-                android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:text="@string/check_update_now" />
-
-            <Button
-                android:id="@+id/langPicker"
-                android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:text="@string/lang" />
-
-            <!-- <Button
-                android:id="@+id/revanced"
-                android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:text="@string/note" /> -->
+            android:orientation="vertical"
+            android:padding="8dp">
 
             <TextView
                 android:id="@+id/errorField"

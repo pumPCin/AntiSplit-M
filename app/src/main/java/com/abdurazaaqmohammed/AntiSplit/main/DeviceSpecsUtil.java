@@ -51,6 +51,7 @@ public class DeviceSpecsUtil {
             boolean couldNotRead = !file.canRead();
             if(couldNotRead) FileUtils.copyFile(FileUtils.getInputStream(splitAPKUri, context), file = new File(context.getCacheDir(), file.getName()));
             Enumeration<ZipArchiveEntry> entries = (zipFile = new ZipFile(file)).getEntries();
+            // Do not close this ZipFile it could be used later in merger
             while (entries.hasMoreElements()) {
                 String name = entries.nextElement().getName();
                 if (name.endsWith(".apk")) splits.add(name);

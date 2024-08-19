@@ -47,6 +47,7 @@
     <string name="auto_update">Check for updates automatically</string>
     <string name="check_update_now">Check for update now</string>
     <string name="no_update_found">No update found</string>
+    <string name="settings">Settings</string>
     <string-array name="langs_display">
         <item>English</item>
         <item>Español</item>

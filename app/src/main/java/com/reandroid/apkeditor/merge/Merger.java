@@ -109,6 +109,7 @@ public class Merger {
                 }
             } else logMessage(MainActivity.rss.getString(R.string.skipping) + name + MainActivity.rss.getString(R.string.not_apk));
         }
+        zf.close();
     }
 
     public static void run(Uri in, File cacheDir, Uri out, Context context, List<String> splits, boolean signApk, boolean revanced) throws Exception {

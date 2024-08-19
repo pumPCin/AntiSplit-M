@@ -38,10 +38,12 @@ import android.os.Looper;
 import android.provider.OpenableColumns;
 import android.text.Html;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -96,36 +98,40 @@ public class MainActivity extends Activity implements Merger.LogListener {
         button.setBackgroundDrawable(border);
     }
 
-    private void setColor(int color, boolean isTextColor) {
+    private void setColor(int color, boolean isTextColor, LinearLayout settingsMenu) {
         final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
+        boolean fromSettingsMenu = settingsMenu != null;
+        //if(fromSettingsMenu) settingsMenu.setBackgroundColor(color);
         if(isTextColor) {
             textColor = color;
             ((TextView) findViewById(R.id.errorField)).setTextColor(color);
             ((TextView) findViewById(R.id.logField)).setTextColor(color);
-            ((TextView) findViewById(supportsSwitch ? R.id.logToggle : R.id.logToggleText)).setTextColor(color);
-            ((TextView) findViewById(supportsSwitch ? R.id.ask : R.id.askText)).setTextColor(color);
-            ((TextView) findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setTextColor(color);
-            ((TextView) findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setTextColor(color);
-            ((TextView) findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setTextColor(color);
-            ((TextView) findViewById(supportsSwitch ? R.id.revancedToggle : R.id.revancedText)).setTextColor(color);
-            ((TextView) findViewById(supportsSwitch ? R.id.updateToggle : R.id.updateToggleText)).setTextColor(color);
-        } else {
-            bgColor = color;
-            findViewById(R.id.main).setBackgroundColor(color);
-        }
-        setButtonBorder(findViewById(R.id.langPicker));
+            if(fromSettingsMenu) {
+                ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.logToggle : R.id.logToggleText)).setTextColor(color);
+                ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.ask : R.id.askText)).setTextColor(color);
+                ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setTextColor(color);
+                ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setTextColor(color);
+                ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setTextColor(color);
+                ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.revancedToggle : R.id.revancedText)).setTextColor(color);
+                ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.updateToggle : R.id.updateToggleText)).setTextColor(color);
+            }
+        } else findViewById(R.id.main).setBackgroundColor(bgColor = color);
         setButtonBorder(findViewById(R.id.decodeButton));
-        setButtonBorder(findViewById(R.id.changeTextColor));
-        setButtonBorder(findViewById(R.id.changeBgColor));
-        setButtonBorder(findViewById(R.id.checkUpdateNow));
-        if(!supportsSwitch) {
-            setButtonBorder(findViewById(R.id.revancedToggle));
-            setButtonBorder(findViewById(R.id.logToggle));
-            setButtonBorder(findViewById(R.id.ask));
-            setButtonBorder(findViewById(R.id.showDialogToggle));
-            setButtonBorder(findViewById(R.id.selectSplitsForDeviceToggle));
-            setButtonBorder(findViewById(R.id.signToggle));
-            setButtonBorder(findViewById(R.id.updateToggle));
+        setButtonBorder(findViewById(R.id.settingsButton));
+        if(fromSettingsMenu) {
+            setButtonBorder(settingsMenu.findViewById(R.id.langPicker));
+            setButtonBorder(settingsMenu.findViewById(R.id.changeTextColor));
+            setButtonBorder(settingsMenu.findViewById(R.id.changeBgColor));
+            setButtonBorder(settingsMenu.findViewById(R.id.checkUpdateNow));
+            if(!supportsSwitch) {
+                setButtonBorder(settingsMenu.findViewById(R.id.revancedToggle));
+                setButtonBorder(settingsMenu.findViewById(R.id.logToggle));
+                setButtonBorder(settingsMenu.findViewById(R.id.ask));
+                setButtonBorder(settingsMenu.findViewById(R.id.showDialogToggle));
+                setButtonBorder(settingsMenu.findViewById(R.id.selectSplitsForDeviceToggle));
+                setButtonBorder(settingsMenu.findViewById(R.id.signToggle));
+                setButtonBorder(settingsMenu.findViewById(R.id.updateToggle));
+            }
         }
     }
 
@@ -147,22 +153,11 @@ public class MainActivity extends Activity implements Merger.LogListener {
         setContentView(R.layout.activity_main);
         // Fetch settings from SharedPreferences
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
-        setColor(settings.getInt("textColor", 0xffffffff), true);
-        setColor(settings.getInt("backgroundColor", 0xff000000), false);
+        setColor(settings.getInt("textColor", 0xffffffff), true, null);
+        setColor(settings.getInt("backgroundColor", 0xff000000), false, null);
 
         checkForUpdates = settings.getBoolean("checkForUpdates", true);
-        Button checkUpdateNow = findViewById(R.id.checkUpdateNow);
-        CompoundButton updateSwitch = findViewById(R.id.updateToggle);
-        updateSwitch.setChecked(checkForUpdates);
-        updateSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> checkUpdateNow.setVisibility((checkForUpdates = isChecked) ? View.GONE : View.VISIBLE));
-        if(checkForUpdates) {
-            checkUpdateNow.setVisibility(View.GONE);
-            new CheckForUpdatesTask(this, false).execute();
-        } else {
-            checkUpdateNow.setVisibility(View.VISIBLE);
-        }
 
-        checkUpdateNow.setOnClickListener(v -> new CheckForUpdatesTask(this, true).execute());
 
         if(Build.VERSION.SDK_INT > 10 && (ab = getActionBar()) != null) {
             /*Spannable text = new SpannableString(getString(R.string.app_name));
@@ -172,6 +167,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
             ab.hide();
         }
 
+
+
         DeviceSpecsUtil = new DeviceSpecsUtil(this);
 
         logEnabled = settings.getBoolean("logEnabled", true);
@@ -180,62 +177,83 @@ public class MainActivity extends Activity implements Merger.LogListener {
         lang = settings.getString("lang", "en");
         if(Objects.equals(lang, Locale.getDefault().getLanguage())) rss = getResources();
         else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources());
-
         revanced = settings.getBoolean("revanced", false);
-        CompoundButton revancedSwitch = findViewById(R.id.revancedToggle);
-        revancedSwitch.setChecked(revanced);
-        revancedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> revanced = isChecked);
-
-        CompoundButton logSwitch = findViewById(R.id.logToggle);
-        logSwitch.setChecked(logEnabled);
-        logSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> logEnabled = isChecked);
 
         signApk = settings.getBoolean("signApk", true);
-        CompoundButton signToggle = findViewById(R.id.signToggle);
-        signToggle.setChecked(signApk);
-        signToggle.setOnCheckedChangeListener((buttonView, isChecked) -> signApk = isChecked);
-
-        CompoundButton selectSplitsAutomaticallySwitch = findViewById(R.id.selectSplitsForDeviceToggle);
-        CompoundButton showDialogSwitch = findViewById(R.id.showDialogToggle);
 
         showDialog = settings.getBoolean("showDialog", false);
-        showDialogSwitch.setChecked(showDialog);
-        showDialogSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            showDialog = isChecked;
-            if(isChecked) {
-                selectSplitsForDevice = false;
-                selectSplitsAutomaticallySwitch.setChecked(false);
-            }
-        });
 
         selectSplitsForDevice = settings.getBoolean("selectSplitsForDevice", false);
-        selectSplitsAutomaticallySwitch.setChecked(selectSplitsForDevice);
-        selectSplitsAutomaticallySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            selectSplitsForDevice = isChecked;
-            if(isChecked) {
-                showDialog = false;
-                showDialogSwitch.setChecked(false);
+        findViewById(R.id.settingsButton).setOnClickListener(v -> {
+            LayoutInflater inflater = LayoutInflater.from(this);
+            LinearLayout l = (LinearLayout) inflater.inflate(R.layout.dialog_settings, null);
+            l.setBackgroundColor(bgColor);
+
+            setColor(textColor, true, l);
+
+            Button checkUpdateNow = l.findViewById(R.id.checkUpdateNow);
+            CompoundButton updateSwitch = l.findViewById(R.id.updateToggle);
+            updateSwitch.setChecked(checkForUpdates);
+            updateSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> checkUpdateNow.setVisibility((checkForUpdates = isChecked) ? View.GONE : View.VISIBLE));
+            if(checkForUpdates) {
+                checkUpdateNow.setVisibility(View.GONE);
+                new CheckForUpdatesTask(this, false).execute();
+            } else {
+                checkUpdateNow.setVisibility(View.VISIBLE);
             }
-        });
 
-        CompoundButton askSwitch = findViewById(R.id.ask);
-        if(LegacyUtils.doesNotSupportInbuiltAndroidFilePicker) {
-            ask = false;
-            askSwitch.setVisibility(View.GONE);
-        }
-        else {
-            ask = settings.getBoolean("ask", true);
-            askSwitch.setChecked(ask);
-            askSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                ask = isChecked;
-                if(!isChecked) checkStoragePerm();
+            CompoundButton revancedSwitch = l.findViewById(R.id.revancedToggle);
+            revancedSwitch.setChecked(revanced);
+            revancedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> revanced = isChecked);
+
+            CompoundButton logSwitch = l.findViewById(R.id.logToggle);
+            logSwitch.setChecked(logEnabled);
+            logSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> logEnabled = isChecked);
+
+            CompoundButton signToggle = l.findViewById(R.id.signToggle);
+            signToggle.setChecked(signApk);
+            signToggle.setOnCheckedChangeListener((buttonView, isChecked) -> signApk = isChecked);
+
+            CompoundButton selectSplitsAutomaticallySwitch = l.findViewById(R.id.selectSplitsForDeviceToggle);
+            CompoundButton showDialogSwitch = l.findViewById(R.id.showDialogToggle);
+
+            showDialogSwitch.setChecked(showDialog);
+            showDialogSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                showDialog = isChecked;
+                if(isChecked) {
+                    selectSplitsForDevice = false;
+                    selectSplitsAutomaticallySwitch.setChecked(false);
+                }
             });
-        }
 
-        findViewById(R.id.langPicker).setOnClickListener(v -> {
-            int curr = -1;
+            selectSplitsAutomaticallySwitch.setChecked(selectSplitsForDevice);
+            selectSplitsAutomaticallySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                selectSplitsForDevice = isChecked;
+                if(isChecked) {
+                    showDialog = false;
+                    showDialogSwitch.setChecked(false);
+                }
+            });
 
-            String[] langs = rss.getStringArray(R.array.langs);
+            CompoundButton askSwitch = l.findViewById(R.id.ask);
+            if(LegacyUtils.doesNotSupportInbuiltAndroidFilePicker) {
+                ask = false;
+                askSwitch.setVisibility(View.GONE);
+            }
+            else {
+                askSwitch.setChecked(ask);
+                askSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    ask = isChecked;
+                    if(!isChecked) checkStoragePerm();
+                });
+            }
+
+            Button langPicker = l.findViewById(R.id.langPicker);
+            setButtonBorder(langPicker);
+            langPicker.setOnClickListener(v2 -> {
+                int curr = -1;
+
+                String[] langs = rss.getStringArray(R.array.langs);
             /*for(int i=0; i<langs.length; i++) {
                 if (langs[i].equals(lang)) {
                     curr = i;
@@ -243,12 +261,21 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 }
             }*/
 
-            String[] display = rss.getStringArray(R.array.langs_display);
+                String[] display = rss.getStringArray(R.array.langs_display);
 
-            styleAlertDialog(new AlertDialog.Builder(this).setSingleChoiceItems(display, curr, (dialog, which) -> {
-                updateLang(LocaleHelper.setLocale(MainActivity.this, lang = langs[which]).getResources());
-                dialog.dismiss();
-            }).create(), display);
+                styleAlertDialog(new AlertDialog.Builder(this).setSingleChoiceItems(display, curr, (dialog, which) -> {
+                    updateLang(LocaleHelper.setLocale(MainActivity.this, lang = langs[which]).getResources());
+                    dialog.dismiss();                }).create(), display);
+            });
+
+            l.findViewById(R.id.changeBgColor).setOnClickListener(v3 -> showColorPickerDialog(false, bgColor, l));
+            l.findViewById(R.id.changeTextColor).setOnClickListener(v4 -> showColorPickerDialog(true, textColor, l));
+            TextView title = new TextView(this);
+            title.setText(rss.getString(R.string.settings));
+            title.setTextColor(textColor);
+            title.setTextSize(25);
+            styleAlertDialog(
+                    new AlertDialog.Builder(this).setCustomTitle(title).setView(l).setPositiveButton("Close", (dialog, which) -> dialog.dismiss()).create(), null);
         });
 
         findViewById(R.id.decodeButton).setOnClickListener(v -> {
@@ -283,8 +310,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     , 1);
         } // XAPK is octet-stream
         );
-        findViewById(R.id.changeBgColor).setOnClickListener(v -> showColorPickerDialog(false, bgColor));
-        findViewById(R.id.changeTextColor).setOnClickListener(v -> showColorPickerDialog(true, textColor));
         /*findViewById(R.id.revanced).setOnClickListener(v -> {
             TextView title = new TextView(this);
             title.setText(rss.getString(R.string.note));
@@ -366,11 +391,11 @@ public class MainActivity extends Activity implements Merger.LogListener {
         //((TextView) findViewById(R.id.revanced)).setText(res.getString(R.string.note));
     }
 
-    private void showColorPickerDialog(boolean isTextColor, int currentColor) {
+    private void showColorPickerDialog(boolean isTextColor, int currentColor, LinearLayout from) {
         new AmbilWarnaDialog(this, currentColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
             @Override
             public void onOk(AmbilWarnaDialog dialog1, int color) {
-                setColor(color, isTextColor);
+                setColor(color, isTextColor, from);
             }
 
             @Override
@@ -603,15 +628,14 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
         @Override
         protected String[] doInBackground(Void... voids) {
-            MainActivity activity = context.get();
             HttpURLConnection conn;
             try {
                 conn = (HttpURLConnection) new URL("https://api.github.com/repos/AbdurazaaqMohammed/AntiSplit-M/releases").openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 Edg/128.0.0.0");
                 conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                return null;
             }
             try (BufferedReader reader =
                  new BufferedReader(
@@ -632,7 +656,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
                 return new String[]{ver, changelog, dl};
             } catch (Exception e) {
-                activity.showError(e);
                 return null;
             }
         }
@@ -658,56 +681,56 @@ public class MainActivity extends Activity implements Merger.LogListener {
                         break;
                     }
                 }
-            } catch (Exception ignored) { }
 
-            if(newVer) {
-                String ending = ".apk";
-                String filename = "AntiSplit-M.v" + latestVersion + ending;
-                String link = result[2].endsWith(ending) ? result[2] : result[2] + File.separator + filename;
-                TextView changelogText = new TextView(activity);
-                String linebreak = "<br />";
-                changelogText.setText(Html.fromHtml(rss.getString(R.string.new_ver) + " (" + latestVersion  + ")" + linebreak + "Changelog:" + linebreak + result[1].replace("\\r\\n", linebreak)));
-                changelogText.setTextColor(textColor);
-                TextView title = new TextView(activity);
-                title.setText(rss.getString(R.string.update));
-                title.setTextColor(textColor);
-                boolean supportsDownloadManager = Build.VERSION.SDK_INT > 8;
-                AlertDialog.Builder builder = new AlertDialog.Builder(activity).setCustomTitle(title).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
-                    if (supportsDownloadManager) {
-                        DownloadManager downloadManager = (DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE);
-                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));
-                        request.setTitle(filename);
-                        request.setDescription(filename);
-                        request.setMimeType("application/vnd.android.package-archive");
-                        if (Build.VERSION.SDK_INT < 29) activity.checkStoragePerm();
-                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
-                        if (Build.VERSION.SDK_INT > 10) {
-                            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE |
-                                    DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                            long downloadId = downloadManager.enqueue(request);
-                            BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
-                                @Override
-                                public void onReceive(Context context, Intent intent) {
-                                    long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-                                    if (id == downloadId) {
-                                        Uri uri = ((DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE)).getUriForDownloadedFile(downloadId);
-                                        if (uri != null) {
-                                            context.startActivity(new Intent(Intent.ACTION_VIEW).
-                                                    setDataAndType(uri, "application/vnd.android.package-archive")
-                                                    .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION));
+                if(newVer) {
+                    String ending = ".apk";
+                    String filename = "AntiSplit-M.v" + latestVersion + ending;
+                    String link = result[2].endsWith(ending) ? result[2] : result[2] + File.separator + filename;
+                    TextView changelogText = new TextView(activity);
+                    String linebreak = "<br />";
+                    changelogText.setText(Html.fromHtml(rss.getString(R.string.new_ver) + " (" + latestVersion  + ")" + linebreak + "Changelog:" + linebreak + result[1].replace("\\r\\n", linebreak)));
+                    changelogText.setTextColor(textColor);
+                    TextView title = new TextView(activity);
+                    title.setText(rss.getString(R.string.update));
+                    title.setTextColor(textColor);
+                    boolean supportsDownloadManager = Build.VERSION.SDK_INT > 8;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(activity).setCustomTitle(title).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
+                        if (supportsDownloadManager) {
+                            DownloadManager downloadManager = (DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE);
+                            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));
+                            request.setTitle(filename);
+                            request.setDescription(filename);
+                            request.setMimeType("application/vnd.android.package-archive");
+                            if (Build.VERSION.SDK_INT < 29) activity.checkStoragePerm();
+                            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+                            if (Build.VERSION.SDK_INT > 10) {
+                                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE |
+                                        DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                                long downloadId = downloadManager.enqueue(request);
+                                BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
+                                    @Override
+                                    public void onReceive(Context context, Intent intent) {
+                                        long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+                                        if (id == downloadId) {
+                                            Uri uri = ((DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE)).getUriForDownloadedFile(downloadId);
+                                            if (uri != null) {
+                                                context.startActivity(new Intent(Intent.ACTION_VIEW).
+                                                        setDataAndType(uri, "application/vnd.android.package-archive")
+                                                        .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION));
+                                            }
                                         }
                                     }
-                                }
-                            };
+                                };
 
-                            activity.registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-                        } else downloadManager.enqueue(request);
-                    } else
-                        activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(link)));
-                });
-                if(supportsDownloadManager) builder.setNeutralButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest"))));
-                activity.styleAlertDialog(builder.setNegativeButton(rss.getString(R.string.cancel_button_label), (dialog, which) -> dialog.dismiss()).create(), null);
-            } else if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show());
+                                activity.registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+                            } else downloadManager.enqueue(request);
+                        } else
+                            activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(link)));
+                    });
+                    if(supportsDownloadManager) builder.setNeutralButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest"))));
+                    activity.styleAlertDialog(builder.setNegativeButton(rss.getString(R.string.cancel_button_label), (dialog, which) -> dialog.dismiss()).create(), null);
+                } else if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show());
+            } catch (Exception ignored) { }
         }
     }
 
