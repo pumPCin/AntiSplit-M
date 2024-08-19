@@ -174,7 +174,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
         lang = settings.getString("lang", "en");
         if(Objects.equals(lang, Locale.getDefault().getLanguage())) rss = getResources();
-        else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources());
+        else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources(), null);
 
         findViewById(R.id.settingsButton).setOnClickListener(v -> {
             LayoutInflater inflater = LayoutInflater.from(this);
@@ -270,8 +270,9 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 String[] display = rss.getStringArray(R.array.langs_display);
 
                 styleAlertDialog(new AlertDialog.Builder(this).setSingleChoiceItems(display, curr, (dialog, which) -> {
-                    updateLang(LocaleHelper.setLocale(MainActivity.this, lang = langs[which]).getResources());
-                    dialog.dismiss();                }).create(), display);
+                    updateLang(LocaleHelper.setLocale(MainActivity.this, lang = langs[which]).getResources(), l);
+                    dialog.dismiss();
+                }).create(), display);
             });
 
             l.findViewById(R.id.changeBgColor).setOnClickListener(v3 -> showColorPickerDialog(false, bgColor, l));
@@ -382,10 +383,23 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
     public static Resources rss;
 
-    private void updateLang(Resources res) {
+    private void updateLang(Resources res, LinearLayout settingsDialog) {
         rss = res;
         ((TextView) findViewById(R.id.decodeButton)).setText(res.getString(R.string.merge));
-        //((TextView) findViewById(R.id.revanced)).setText(res.getString(R.string.note));
+        if(settingsDialog != null) {
+            ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(rss.getString(R.string.lang));
+            final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.logToggle : R.id.logToggleText)).setText(rss.getString(R.string.enable_logs));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.ask : R.id.askText)).setText(rss.getString(R.string.ask));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setText(rss.getString(R.string.show_dialog));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setText(rss.getString(R.string.sign_apk));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setText(rss.getString(R.string.automatically_select));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.updateToggle : R.id.updateToggleText)).setText(rss.getString(R.string.automatically_select));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.revancedToggle : R.id.revancedText)).setText(rss.getString(R.string.fix));
+            ((TextView) settingsDialog.findViewById(R.id.changeTextColor)).setText(rss.getString(R.string.change_text_color));
+            ((TextView) settingsDialog.findViewById(R.id.changeBgColor)).setText(rss.getString(R.string.change_background_color));
+            ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.auto_update));
+        }
     }
 
     private void showColorPickerDialog(boolean isTextColor, int currentColor, LinearLayout from) {
