@@ -16,6 +16,7 @@
 package com.reandroid.archive;
 
 import com.reandroid.archive.block.ApkSignatureBlock;
+import com.reandroid.archive.block.CentralEntryHeader;
 import com.reandroid.archive.block.EndRecord;
 import com.reandroid.archive.io.ZipInput;
 import com.reandroid.archive.model.CentralFileDirectory;
@@ -24,11 +25,14 @@ import com.reandroid.utils.ObjectsUtil;
 import com.reandroid.utils.collection.ArrayIterator;
 import com.reandroid.utils.collection.CollectionUtil;
 import com.reandroid.utils.collection.ComputeIterator;
+import com.reandroid.utils.io.IOUtil;
+import com.starry.FileUtils;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -45,6 +49,61 @@ public abstract class Archive<T extends ZipInput> implements Closeable {
     private final ArchiveEntry[] entryList;
     private final EndRecord endRecord;
     private final ApkSignatureBlock apkSignatureBlock;
+
+    public int extractAll(File dir) throws IOException {
+        return extractAll(dir, null);
+    }
+
+    public int extractAll(File dir, Predicate<ArchiveEntry> filter) throws IOException {
+        Iterator<ArchiveEntry> iterator = iterator(filter);
+        int result = 0;
+        while (iterator.hasNext()){
+            ArchiveEntry archiveEntry = iterator.next();
+            extract(toFile(dir, archiveEntry), archiveEntry);
+            result ++;
+        }
+        return result;
+    }
+    private File toFile(File dir, ArchiveEntry archiveEntry){
+        String name = archiveEntry.getName().replace('/', File.separatorChar);
+        return new File(dir, name);
+    }
+
+    public void extract(File file, ArchiveEntry archiveEntry) throws IOException {
+        if(archiveEntry.isDirectory()) {
+            // TODO: make directories considering file collision
+            return;
+        }
+
+        if(archiveEntry.getMethod() != Archive.STORED){
+            extractCompressed(file, archiveEntry);
+        }else {
+            extractStored(file, archiveEntry);
+        }
+        //applyAttributes(archiveEntry, file);
+    }
+    private void extractCompressed(File file, ArchiveEntry archiveEntry) throws IOException {
+        OutputStream outputStream = FileUtils.getOutputStream(file);
+        IOUtil.writeAll(openInputStream(archiveEntry), outputStream);
+    }
+    private void applyAttributes(ArchiveEntry archiveEntry, File file) {
+        CentralEntryHeader ceh = archiveEntry.getCentralEntryHeader();
+ //       ceh.getFilePermissions().apply(file);
+        long time = Archive.dosToJavaDate(ceh.getDosTime()).getTime();
+        file.setLastModified(time);
+    }
+
+    public static Date dosToJavaDate(long dosTime) {
+        final Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, (int) ((dosTime >> 25) & 0x7f) + 1980);
+        cal.set(Calendar.MONTH, (int) ((dosTime >> 21) & 0x0f) - 1);
+        cal.set(Calendar.DATE, (int) (dosTime >> 16) & 0x1f);
+        cal.set(Calendar.HOUR_OF_DAY, (int) (dosTime >> 11) & 0x1f);
+        cal.set(Calendar.MINUTE, (int) (dosTime >> 5) & 0x3f);
+        cal.set(Calendar.SECOND, (int) (dosTime << 1) & 0x3e);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
 
     public Archive(T zipInput) throws IOException {
         this.zipInput = zipInput;

@@ -3,8 +3,6 @@ package com.j256.simplezip;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,6 +25,7 @@ import com.j256.simplezip.format.ZipCentralDirectoryFileEntry;
 import com.j256.simplezip.format.ZipCentralDirectoryFileInfo;
 import com.j256.simplezip.format.ZipDataDescriptor;
 import com.j256.simplezip.format.ZipFileHeader;
+import com.starry.FileUtils;
 
 /**
  * Write out a Zip-file to either a {@link File} or an {@link OutputStream}.
@@ -53,15 +52,15 @@ public class ZipFileOutput implements Closeable {
 	/**
 	 * Start writing a Zip-file to a file-path. You must call {@link #close()} to close the stream when you are done.
 	 */
-	public ZipFileOutput(String filePath) throws FileNotFoundException {
+	public ZipFileOutput(String filePath) throws IOException {
 		this(new File(filePath));
 	}
 
 	/**
 	 * Start writing a Zip-file to a file. You must call {@link #close()} to close the stream when you are done.
 	 */
-	public ZipFileOutput(File file) throws FileNotFoundException {
-		this(new FileOutputStream(file));
+	public ZipFileOutput(File file) throws IOException {
+		this(FileUtils.getOutputStream(file));
 	}
 
 	/**

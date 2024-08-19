@@ -2,9 +2,6 @@ package com.j256.simplezip;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,6 +22,7 @@ import com.j256.simplezip.format.ZipCentralDirectoryEnd;
 import com.j256.simplezip.format.ZipCentralDirectoryFileEntry;
 import com.j256.simplezip.format.ZipDataDescriptor;
 import com.j256.simplezip.format.ZipFileHeader;
+import com.starry.FileUtils;
 
 /**
  * Read in a Zip-file either from a {@link File} or an {@link InputStream}.
@@ -49,15 +47,15 @@ public class ZipFileInput implements Closeable {
 	 * Start reading a Zip-file from the file-path. You must call {@link #close()} to close the stream when you are
 	 * done.
 	 */
-	public ZipFileInput(String path) throws FileNotFoundException {
+	public ZipFileInput(String path) throws IOException {
 		this(new File(path));
 	}
 
 	/**
 	 * Read a Zip-file from a file. You must call {@link #close()} to close the stream when you are done.
 	 */
-	public ZipFileInput(File file) throws FileNotFoundException {
-		this(new FileInputStream(file));
+	public ZipFileInput(File file) throws IOException {
+		this(FileUtils.getInputStream(file));
 	}
 
 	/**
@@ -133,7 +131,7 @@ public class ZipFileInput implements Closeable {
 	 * @return THe number of bytes written into the output-stream.
 	 */
 	public long readFileDataToFile(File outputFile) throws IOException {
-		long numBytes = readFileData(new FileOutputStream(outputFile));
+		long numBytes = readFileData(FileUtils.getOutputStream(outputFile));
 		if (outputFileMap == null) {
 			outputFileMap = new HashMap<>();
 		}
@@ -229,7 +227,7 @@ public class ZipFileInput implements Closeable {
 	 * @return THe number of bytes written into the output-stream.
 	 */
 	public long readRawFileDataToFile(File outputFile) throws IOException {
-		long numBytes = readRawFileData(new FileOutputStream(outputFile));
+		long numBytes = readRawFileData(FileUtils.getOutputStream(outputFile));
 		if (outputFileMap == null) {
 			outputFileMap = new HashMap<>();
 		}

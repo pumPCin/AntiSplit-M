@@ -14,6 +14,7 @@ import com.j256.simplezip.format.GeneralPurposeFlag;
 import com.j256.simplezip.format.ZipDataDescriptor;
 import com.j256.simplezip.format.ZipFileHeader;
 import com.j256.simplezip.format.ZipFileHeader.Builder;
+import com.starry.FileUtils;
 
 /**
  * Class which helps the writer by absorbing the encoded (compressed) stream information so that we can annotate the
@@ -91,7 +92,7 @@ public class BufferedOutputStream extends OutputStream {
 			tmpFile = File.createTempFile(getClass().getSimpleName(), ".ztf");
 			tmpFile.deleteOnExit();
 			// NOTE: no buffered output stream here because we are dealing with buffers externally
-			tmpFileOutputStream = new FileOutputStream(tmpFile);
+			tmpFileOutputStream = (FileOutputStream) FileUtils.getOutputStream(tmpFile);
 		}
 		tmpFileOutputStream.write(buffer, offset, length);
 		encodedSize += length;
@@ -197,7 +198,7 @@ public class BufferedOutputStream extends OutputStream {
 	/**
 	 * Write the temp file if any to disk.
 	 */
-	private void writeAnyTmpFileToDelegate() throws IOException, FileNotFoundException {
+	private void writeAnyTmpFileToDelegate() throws IOException {
 		if (tmpFileOutputStream == null) {
 			return;
 		}

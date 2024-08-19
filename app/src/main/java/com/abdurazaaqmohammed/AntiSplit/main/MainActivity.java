@@ -21,7 +21,6 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -34,10 +33,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.OpenableColumns;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -55,7 +51,6 @@ import com.starry.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +74,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     public static boolean errorOccurred;
     public static boolean revanced;
     public static String lang;
+    public DeviceSpecsUtil DeviceSpecsUtil;
 
     private void setButtonBorder(Button button) {
         ShapeDrawable border = new ShapeDrawable(new RectShape());
@@ -150,6 +146,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
             ab.setBackgroundDrawable(new ColorDrawable(bgColor));*/
             ab.hide();
         }
+
+        DeviceSpecsUtil = new DeviceSpecsUtil(this);
 
         logEnabled = settings.getBoolean("logEnabled", true);
         LogUtil.setLogListener(this);
@@ -425,40 +423,39 @@ public class MainActivity extends Activity implements Merger.LogListener {
     private List<String> splitsToUse = null;
     private static class ProcessTask extends AsyncTask<Uri, Void, Void> {
         private final WeakReference<MainActivity> activityReference;
+        private final DeviceSpecsUtil DeviceSpecsUtil;
 
         // only retain a weak reference to the activity
-        ProcessTask(MainActivity context) {
+        ProcessTask(MainActivity context, com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil deviceSpecsUtil) {
             activityReference = new WeakReference<>(context);
+            DeviceSpecsUtil = deviceSpecsUtil;
         }
 
         @Override
         protected Void doInBackground(Uri... uris) {
             MainActivity activity = activityReference.get();
             final File cacheDir = LegacyUtils.supportsExternalCacheDir ? activity.getExternalCacheDir() : activity.getCacheDir();
-            if (cacheDir != null && activity.urisAreSplitApks) {
-                deleteDir(cacheDir);
-            }
+            if (cacheDir != null && activity.urisAreSplitApks) deleteDir(cacheDir);
 
             List<String> splits = activity.splitsToUse;
             if(activity.urisAreSplitApks) {
                 if(selectSplitsForDevice) {
                     try {
-                        splits = DeviceSpecsUtil.getListOfSplits(activity.splitAPKUri, activity);
+                        splits = DeviceSpecsUtil.getListOfSplits(activity.splitAPKUri);
                         List<String> copy = List.copyOf(splits);
                         boolean splitApkContainsArch = false;
                         for (int i = 0; i < splits.size(); i++) {
                             final String thisSplit = splits.get(i);
-                            if(!splitApkContainsArch && (thisSplit.contains("armeabi") || thisSplit.contains("arm64") || thisSplit.contains("x86") || thisSplit.contains("mips"))) {
+                            if(!splitApkContainsArch && DeviceSpecsUtil.isArch(thisSplit)) {
                                 splitApkContainsArch = true;
                             }
-                            if (DeviceSpecsUtil.shouldIncludeSplit(thisSplit, activity)) splits.remove(thisSplit);
+                            if (DeviceSpecsUtil.shouldIncludeSplit(thisSplit)) splits.remove(thisSplit);
                         }
                         if(splitApkContainsArch) {
                             boolean selectedSplitsContainsArch = false;
                             for (int i = 0; i < copy.size(); i++) {
                                 final String thisSplit = copy.get(i);
-                                if((thisSplit.contains("armeabi") || thisSplit.contains("arm64") || thisSplit.contains("x86") || thisSplit.contains("mips"))
-                                    && !splits.contains(thisSplit)) {
+                                if (DeviceSpecsUtil.isArch(thisSplit) && !splits.contains(thisSplit)) {
                                     selectedSplitsContainsArch = true;
                                     break;
                                 }
@@ -467,9 +464,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                                 LogUtil.logMessage("Could not find device architecture, selecting all architectures");
                                 for (int i = 0; i < splits.size(); i++) {
                                     final String thisSplit = splits.get(i);
-                                    if((thisSplit.contains("armeabi") || thisSplit.contains("arm64") || thisSplit.contains("x86") || thisSplit.contains("mips"))) {
-                                        splits.remove(thisSplit); // select all to be sure
-                                    }
+                                    if(DeviceSpecsUtil.isArch(thisSplit)) splits.remove(thisSplit); // select all to be sure
                                 }
                             }
                         }
@@ -480,22 +475,17 @@ public class MainActivity extends Activity implements Merger.LogListener {
             } else {
                 // These are the splits from inside the APK, just copy the splits to cache folder then merger will load it
                 for(Uri uri : activity.uris) {
-                    try(InputStream is = FileUtils.getInputStream(uri, activity);
-                        OutputStream fos = FileUtils.getOutputStream(cacheDir + File.separator + getOriginalFileName(activity, uri))) {
-                        byte[] buffer = new byte[4096];
-                        int length;
-                        while ((length = is.read(buffer)) > 0) {
-                            fos.write(buffer, 0, length);
-                        }
+                    try(InputStream is = FileUtils.getInputStream(uri, activity)) {
+                        FileUtils.copyFile(is, new File(cacheDir, getOriginalFileName(activity, uri)));
                     } catch (IOException e) {
                         activity.showError(e);
                     }
                 }
             }
 
-            try{
+            try {
                 Merger.run(
-                        activity.urisAreSplitApks ? FileUtils.getInputStream(activity.splitAPKUri, activity) : null,
+                        activity.urisAreSplitApks ? activity.splitAPKUri : null,
                         cacheDir,
                         uris[0],
                         activity,
@@ -567,14 +557,14 @@ public class MainActivity extends Activity implements Merger.LogListener {
             case 2:
                 // going to process and save a file now
                 ((TextView) findViewById(R.id.logField)).setText("");
-                new ProcessTask(this).execute(data.getData());
+                new ProcessTask(this, DeviceSpecsUtil).execute(data.getData());
                 break;
         }
     }
 
     public void showApkSelectionDialog() {
         try {
-            List<String> splits = DeviceSpecsUtil.getListOfSplits(splitAPKUri, this);
+            List<String> splits = DeviceSpecsUtil.getListOfSplits(splitAPKUri);
             final int initialSize = splits.size();
             String[] apkNames = new String[initialSize + 5];
             boolean[] checkedItems = new boolean[initialSize + 5];
@@ -604,7 +594,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     case 1:
                         // device specs option
                         for (int i = 5; i < checkedItems.length; i++) {
-                            ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = (isChecked && DeviceSpecsUtil.shouldIncludeSplit(apkNames[i], this)));
+                            ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = (isChecked && DeviceSpecsUtil.shouldIncludeSplit(apkNames[i])));
                         }
                         boolean didNotFindAppropriateDpi = true;
                         for (int i = 5; i < checkedItems.length; i++) {
@@ -631,7 +621,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     case 3:
                         //dpi for device
                         for (int i = 5; i < checkedItems.length; i++) {
-                            if(DeviceSpecsUtil.shouldIncludeDpi(apkNames[i], this)) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                            if(DeviceSpecsUtil.shouldIncludeDpi(apkNames[i])) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
                         }
                         boolean didNotFoundAppropriateDpi = true;
                         for (int i = 5; i < checkedItems.length; i++) {
@@ -659,7 +649,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                         ListView listView = ((AlertDialog) dialog).getListView();
                         if (!isChecked) listView.setItemChecked(0, checkedItems[0] = false); // Uncheck "Select All" if any individual item is unchecked
                         for (int i = 1; i <= 4; i++) {
-                            if (checkedItems[i] && !DeviceSpecsUtil.shouldIncludeSplit(apkNames[which], this)) {
+                            if (checkedItems[i] && !DeviceSpecsUtil.shouldIncludeSplit(apkNames[which])) {
                                 listView.setItemChecked(i, checkedItems[i] = false); // uncheck device arch if non device arch selected
                             }
                         }
@@ -765,7 +755,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 ((TextView) findViewById(R.id.logField)).setText("");
                 LogUtil.logMessage(rss.getString(R.string.output) + f);
 
-                new ProcessTask(this).execute(Uri.fromFile(f));
+                new ProcessTask(this, DeviceSpecsUtil).execute(Uri.fromFile(f));
             } catch (IOException e) {
                 showError(e);
             }
