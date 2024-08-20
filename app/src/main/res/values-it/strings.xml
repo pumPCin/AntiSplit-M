@@ -38,4 +38,11 @@
     <string name="lang" translatable="false">Lingua</string>
     <string name="fixing">Applicazione correzione per ReVanced…</string>
     <string name="fix">Correzione per ReVanced</string>
+    <string name="update">Aggiornamento disponibile</string>
+    <string name="new_ver">È disponibile una nuova versione di AntiSplit M</string>
+    <string name="dl">Scarica</string>
+    <string name="auto_update">Verifica automaticamente la disponibilità degli aggiornamenti</string>
+    <string name="check_update_now">Verifica aggiornamenti ora</string>
+    <string name="no_update_found">Nessun aggiornamento disponibile</string>
+    <string name="settings">Impostazioni</string>
 </resources>
