@@ -5,12 +5,11 @@
     <string name="arch_for_device">Выбор архитектуру для вашего устройства</string>
     <string name="ask">Спрашивать где сохранить файл (если отключено, сохраняет APK в том же каталоге, из которого был Splits APK файл)</string>
     <string name="automatically_select">Автоматический выбор в соответствии вашей архитектуры устройства</string>
-    <string name="cancel_button_label">Отмена</string>
+    <string name="cancel">Отмена</string>
     <string name="change_background_color">Изменить цвет фона</string>
     <string name="change_text_color">Изменить цвет текста</string>
-    <string name="choose_button_label">Выбрать</string>
+    <string name="select">Выбрать</string>
     <string name="detected_xapk">Обнаружен файл XAPK, что гарантирует его правильное извлечение</string>
-    <string name="download_fix">Скачать исправленный ReVanced Manager</string>
     <string name="dpi_for_device">Выбор ширину экрана для вашего устройства</string>
     <string name="enable_logs">Включить журналы</string>
     <string name="error_dir_access">Доступ к каталогу невозможен</string>
@@ -24,11 +23,9 @@
     <string name="merge">Выберите (Split APK) для объединения/антиразделения</string>
     <string name="no_filepath">Не удалось найти путь к выбранному файлу</string>
     <string name="not_apk">: Не APK-файл</string>
-    <string name="note">Примечание для ReVanced</string>
     <string name="nothing">Ничего не выбрано</string>
     <string name="output">"Выходной каталог: "</string>
     <string name="removed_table_entry">"Удалена запись в таблице : "</string>
-    <string name="revanced">ReVanced Manager выдает ошибку при попытке исправить объединенные APKs. Эта ошибка не является реальной проблемой и неправильно создается сторонней библиотекой. Для большинства людей использование опции выбора разделения в соответствии со спецификациями вашего устройства решит проблему. Если по-прежнему не работает, проще всего загрузить версию ReVanced Manager с устраненной ошибкой.</string>
     <string name="sanitizing_manifest">Санитарная обработка манифеста…</string>
     <string name="saving">Сохранение…</string>
     <string name="searching">Поиск apk-файлов…</string>

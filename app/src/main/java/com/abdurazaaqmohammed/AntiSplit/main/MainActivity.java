@@ -70,7 +70,7 @@ import yuku.ambilwarna.AmbilWarnaDialog;
 
 /** @noinspection deprecation*/
 public class MainActivity extends Activity implements Merger.LogListener {
-    private static boolean ask;
+    private static boolean ask = true;
     private static boolean showDialog;
     private static boolean signApk;
     private static boolean selectSplitsForDevice;
@@ -282,7 +282,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             title.setTextColor(textColor);
             title.setTextSize(25);
             styleAlertDialog(
-                    new AlertDialog.Builder(this).setCustomTitle(title).setView(l).setPositiveButton("Close", (dialog, which) -> dialog.dismiss()).create(), null);
+                    new AlertDialog.Builder(this).setCustomTitle(title).setView(l).setPositiveButton(R.string.close, (dialog, which) -> dialog.dismiss()).create(), null);
         });
 
         findViewById(R.id.decodeButton).setOnClickListener(v -> {
@@ -295,7 +295,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 properties.offset = new File(DialogConfigs.DEFAULT_DIR);
                 properties.extensions = new String[] {"apk", "zip", "apks", "aspk", "apks", "xapk", "apkm"};
                 FilePickerDialog dialog = new FilePickerDialog(MainActivity.this, properties, textColor, bgColor);
-                dialog.setTitle(rss.getString(R.string.choose_button_label));
+                dialog.setTitle(rss.getString(R.string.select));
                 dialog.setDialogSelectionListener(files -> {
                     urisAreSplitApks = !files[0].endsWith(".apk");
                     uris = new ArrayList<>();
@@ -522,7 +522,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                         boolean splitApkContainsArch = false;
                         for (int i = 0; i < splits.size(); i++) {
                             final String thisSplit = splits.get(i);
-                            if(!splitApkContainsArch && DeviceSpecsUtil.isArch(thisSplit)) {
+                            if(!splitApkContainsArch && com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isArch(thisSplit)) {
                                 splitApkContainsArch = true;
                             }
                             if (DeviceSpecsUtil.shouldIncludeSplit(thisSplit)) splits.remove(thisSplit);
@@ -531,7 +531,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                             boolean selectedSplitsContainsArch = false;
                             for (int i = 0; i < copy.size(); i++) {
                                 final String thisSplit = copy.get(i);
-                                if (DeviceSpecsUtil.isArch(thisSplit) && !splits.contains(thisSplit)) {
+                                if (com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isArch(thisSplit) && !splits.contains(thisSplit)) {
                                     selectedSplitsContainsArch = true;
                                     break;
                                 }
@@ -540,7 +540,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                                 LogUtil.logMessage("Could not find device architecture, selecting all architectures");
                                 for (int i = 0; i < splits.size(); i++) {
                                     final String thisSplit = splits.get(i);
-                                    if(DeviceSpecsUtil.isArch(thisSplit)) splits.remove(thisSplit); // select all to be sure
+                                    if(com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isArch(thisSplit)) splits.remove(thisSplit); // select all to be sure
                                 }
                             }
                         }
@@ -732,7 +732,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                         } else activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(link)));
                     });
                     if(supportsDownloadManager) builder.setNeutralButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest"))));
-                    activity.styleAlertDialog(builder.setNegativeButton(rss.getString(R.string.cancel_button_label), (dialog, which) -> dialog.dismiss()).create(), null);
+                    activity.styleAlertDialog(builder.setNegativeButton(rss.getString(R.string.cancel), (dialog, which) -> dialog.dismiss()).create(), null);
                 } else if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show());
             } catch (Exception ignored) { }
         }

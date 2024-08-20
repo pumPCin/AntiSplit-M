@@ -29,11 +29,8 @@
     <string name="unselected">: Unselected</string>
     <string name="detected_xapk">XAPK file detected, ensuring it can be extracted properly</string>
     <string name="searching">Searching apk files…</string>
-    <string name="revanced">ReVanced Manager produces an error when attempting to patch merged APKs. The error is not an actual problem and is produced incorrectly by a third party library. For most people, using the option to select splits for your device specifications will fix it. If it still doesn\'t work, the easiest thing to do is download a version of ReVanced Manager with the error removed.</string>
-    <string name="note">Note for ReVanced</string>
-    <string name="download_fix">Go to fixed ReVanced Manager</string>
-    <string name="cancel_button_label">Cancel</string>
-    <string name="choose_button_label">Select</string>
+    <string name="cancel">Cancel</string>
+    <string name="select">Select</string>
     <string name="label_parent_directory">Parent Directory</string>
     <string name="last_edit">Last edited: </string>
     <string name="error_dir_access">Directory cannot be accessed</string>
@@ -48,6 +45,10 @@
     <string name="check_update_now">Check for update now</string>
     <string name="no_update_found">No update found</string>
     <string name="settings">Settings</string>
+    <string name="close">Close</string>
+    <string name="mismatch">The following splits (%1$s) have mismatched version codes. They are only language codes, so the app can run without them, but these languages will not work in the app. Do you want to continue with merging anyway?</string>
+    <string name="warning">Warning</string>
+    <string name="mismatch_base">" version code does not match that of base.apk"</string>
     <string-array name="langs_display">
         <item>English</item>
         <item>Español</item>

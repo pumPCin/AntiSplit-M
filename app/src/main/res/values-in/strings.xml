@@ -29,11 +29,8 @@
     <string name="unselected">: Tidak dipilih</string>
     <string name="detected_xapk">File XAPK terdeteksi, sedang memastikan agar berkasnya bisa diekstraksi dengan baik</string>
     <string name="searching">Mencari berkas APK…</string>
-    <string name="revanced">ReVanced Manager menghasilkan galat saat mencoba melakukan patch APK-APK yang dileburkan. Galat tersebut sebenarnya bukan masalah dan dihasilkan secara tidak benar oleh pustaka pihak ketiga. Bagi kebanyakan orang, menggunakan opsi untuk memilih berkas terpisah sesuai spesifikasi perangkat akan memperbaikinya. Jika masih tidak berhasil, hal termudah yang dapat dilakukan adalah mengunduh versi ReVanced Manager dengan galat yang telah diberantas.</string>
-    <string name="note">Catatan untuk ReVanced</string>
-    <string name="download_fix">Unduh ReVanced Manager yang sudah diperbaiki</string>
-    <string name="cancel_button_label">Batalkan</string>
-    <string name="choose_button_label">Pilih</string>
+    <string name="cancel">Batalkan</string>
+    <string name="select">Pilih</string>
     <string name="label_parent_directory">Direktori Induk</string>
     <string name="last_edit">Terakhir kali disunting: </string>
     <string name="error_dir_access">Direktorinya tidak bisa diakses</string>

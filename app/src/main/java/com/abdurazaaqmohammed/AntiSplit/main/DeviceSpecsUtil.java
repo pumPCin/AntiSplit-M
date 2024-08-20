@@ -61,15 +61,17 @@ public class DeviceSpecsUtil {
         return splits;
     }
 
-    public boolean isArch(String thisSplit) {
+    public static boolean isArch(String thisSplit) {
         return thisSplit.contains("armeabi") || thisSplit.contains("arm64") || thisSplit.contains("x86") || thisSplit.contains("mips");
     }
 
+    public static boolean isBaseApk(String name) {
+        return name.equals("base.apk")
+                || !name.startsWith("config") && !name.startsWith("split"); // this is base.apk hopefully
+    }
 
     public boolean shouldIncludeSplit(String name) {
-        return name.equals("base.apk")
-                || !name.startsWith("config") && !name.startsWith("split") // this is base.apk hopefully
-                || shouldIncludeLang(name) || shouldIncludeArch(name) || shouldIncludeDpi(name);
+        return isBaseApk(name) || shouldIncludeLang(name) || shouldIncludeArch(name) || shouldIncludeDpi(name);
     }
 
     public boolean shouldIncludeLang(String name) {

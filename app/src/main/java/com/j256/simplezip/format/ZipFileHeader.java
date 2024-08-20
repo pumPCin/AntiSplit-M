@@ -89,7 +89,7 @@ public class ZipFileHeader {
 		int fileNameLength = IoUtils.readShort(inputStream, "ZipFileHeader.fileNameLength");
 		int extraLength = IoUtils.readShort(inputStream, "ZipFileHeader.extraLength");
 		builder.fileNameBytes = IoUtils.readBytes(inputStream, fileNameLength, "ZipFileHeader.fileName");
-		//builder.extraFieldBytes =
+		builder.extraFieldBytes =
 				IoUtils.readBytes(inputStream, extraLength, "ZipFileHeader.extra");
 		return builder.build();
 	}

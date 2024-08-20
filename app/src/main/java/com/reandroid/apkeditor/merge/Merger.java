@@ -23,6 +23,7 @@ import android.net.Uri;
 import com.abdurazaaqmohammed.AntiSplit.R;
 import com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil;
 import com.abdurazaaqmohammed.AntiSplit.main.MainActivity;
+import com.abdurazaaqmohammed.AntiSplit.main.MismatchedSplitsException;
 import com.abdurazaaqmohammed.AntiSplit.main.SignUtil;
 import com.j256.simplezip.ZipFileInput;
 import com.j256.simplezip.format.GeneralPurposeFlag;
@@ -57,10 +58,11 @@ public class Merger {
 
     public interface LogListener {
         void onLog(String log);
+
         void onLog(int resID);
     }
 
-    private static void extractAndLoad(Uri in, File cacheDir, Context context, List<String> splits, ApkBundle bundle) throws IOException {
+    private static void extractAndLoad(Uri in, File cacheDir, Context context, List<String> splits, ApkBundle bundle) throws IOException, MismatchedSplitsException, InterruptedException {
         boolean checkSplits = splits != null && !splits.isEmpty();
         try (ZipFileInput zis = new ZipFileInput(FileUtils.getInputStream(in, context))) {
             ZipFileHeader header;
@@ -71,43 +73,49 @@ public class Merger {
                         logMessage(MainActivity.rss.getString(R.string.skipping) + name + MainActivity.rss.getString(R.string.unselected));
                     else {
                         File file = new File(cacheDir, name);
-                        if (file.getCanonicalPath().startsWith(cacheDir.getCanonicalPath() + File.separator)) zis.readFileDataToFile(file);
-                        else throw new IOException("Zip entry is outside of the target dir: " + name);
+                        if (file.getCanonicalPath().startsWith(cacheDir.getCanonicalPath() + File.separator))
+                            zis.readFileDataToFile(file);
+                        else
+                            throw new IOException("Zip entry is outside of the target dir: " + name);
 
                         logMessage("Extracted " + name);
                     }
-                } else logMessage(MainActivity.rss.getString(R.string.skipping) + name + MainActivity.rss.getString(R.string.not_apk));
+                } else
+                    logMessage(MainActivity.rss.getString(R.string.skipping) + name + MainActivity.rss.getString(R.string.not_apk));
             }
-            bundle.loadApkDirectory(cacheDir, false);
+            bundle.loadApkDirectory(cacheDir, false, context);
+        } catch (MismatchedSplitsException ignored) {
         } catch (Exception e) {
-            // If the above failed it did not copy any files
+            // If the above failed it probably did not copy any files
             // so might as well do it this way instead of trying unreliable methods to see if we need to do this
             // and possibly copying the file for no reason
-            if(DeviceSpecsUtil.zipFile == null) {
+            if (DeviceSpecsUtil.zipFile == null) {
                 File input = new File(FileUtils.getPath(in, context));
                 boolean couldNotRead = !input.canRead();
-                if(couldNotRead) FileUtils.copyFile(FileUtils.getInputStream(in, context), input = new File(cacheDir, input.getName()));
+                if (couldNotRead)
+                    FileUtils.copyFile(FileUtils.getInputStream(in, context), input = new File(cacheDir, input.getName()));
                 ZipFile zf = new ZipFile(input);
                 extractZipFile(zf, checkSplits, splits, cacheDir);
-                if(couldNotRead) input.delete();
+                if (couldNotRead) input.delete();
             } else extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splits, cacheDir);
-            bundle.loadApkDirectory(cacheDir, false);
+            bundle.loadApkDirectory(cacheDir, false, context);
         }
     }
 
     private static void extractZipFile(ZipFile zf, boolean checkSplits, List<String> splits, File cacheDir) throws IOException {
         Enumeration<ZipArchiveEntry> entries = zf.getEntries();
-        while(entries.hasMoreElements()) {
+        while (entries.hasMoreElements()) {
             ZipArchiveEntry zae = entries.nextElement();
             String name = zae.getName();
             if (name.endsWith(".apk")) {
                 if ((checkSplits && splits.contains(name)))
                     logMessage(MainActivity.rss.getString(R.string.skipping) + name + MainActivity.rss.getString(R.string.unselected));
-                else try(OutputStream os = FileUtils.getOutputStream(new File(cacheDir, name));
-                         InputStream is = zf.getInputStream(zae)) {
+                else try (OutputStream os = FileUtils.getOutputStream(new File(cacheDir, name));
+                          InputStream is = zf.getInputStream(zae)) {
                     FileUtils.copyFile(is, os);
                 }
-            } else logMessage(MainActivity.rss.getString(R.string.skipping) + name + MainActivity.rss.getString(R.string.not_apk));
+            } else
+                logMessage(MainActivity.rss.getString(R.string.skipping) + name + MainActivity.rss.getString(R.string.not_apk));
         }
         zf.close();
     }
@@ -116,7 +124,8 @@ public class Merger {
         logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.searching));
 
         try (ApkBundle bundle = new ApkBundle()) {
-            if(in == null) bundle.loadApkDirectory(cacheDir, false); // Multiple splits from a split apk, already copied to cache dir
+            if (in == null)
+                bundle.loadApkDirectory(cacheDir, false, context); // Multiple splits from a split apk, already copied to cache dir
             else extractAndLoad(in, cacheDir, context, splits, bundle);
             logMessage("Found modules: " + bundle.getApkModuleList().size());
 
@@ -226,7 +235,7 @@ public class Merger {
                                 b.setFileName(header.getFileName());
                                 b.setGeneralPurposeFlags(header.getGeneralPurposeFlags());
                                 b.clearGeneralPurposeFlag(GeneralPurposeFlag.DATA_DESCRIPTOR);
-                                // b.setExtraFieldBytes(header.getExtraFieldBytes());
+                                b.setExtraFieldBytes(header.getExtraFieldBytes());
                                 b.setLastModifiedDate(header.getLastModifiedDate());
                                 b.setVersionNeeded(header.getVersionNeeded());
                                 b.setUncompressedSize(header.getUncompressedSize());
@@ -234,20 +243,20 @@ public class Merger {
                                 zfo.writeRawFileData(zfi.openFileDataInputStream(true));
                             }
                         }
-                    }
-                    if (signApk) {
-                        logMessage(MainActivity.rss.getString(R.string.signing));
-                        boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
-                        File stupid = new File(noPerm ? (cacheDir + File.separator + "stupid.apk") : FileUtils.getPath(out, context));
-                        try {
-                            SignUtil.signDebugKey(context, temp, stupid);
-                            if (noPerm)
-                                FileUtils.copyFile(stupid, FileUtils.getOutputStream(out, context));
-                        } catch (Exception e) {
-                            SignUtil.signPseudoApkSigner(temp, context, out, e);
+                        if (signApk) {
+                            logMessage(MainActivity.rss.getString(R.string.signing));
+                            boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
+                            File stupid = new File(noPerm ? (cacheDir + File.separator + "stupid.apk") : FileUtils.getPath(out, context));
+                            try {
+                                SignUtil.signDebugKey(context, temp, stupid);
+                                if (noPerm)
+                                    FileUtils.copyFile(stupid, FileUtils.getOutputStream(out, context));
+                            } catch (Exception e) {
+                                SignUtil.signPseudoApkSigner(temp, context, out, e);
+                            }
                         }
-                    }
-                } else mergedModule.writeApk(FileUtils.getOutputStream(out, context));
+                    } else mergedModule.writeApk(FileUtils.getOutputStream(out, context));
+                }
             }
         }
     }

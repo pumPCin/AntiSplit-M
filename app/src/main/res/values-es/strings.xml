@@ -30,11 +30,8 @@
     <string name="unselected">: No seleccionado</string>
     <string name="detected_xapk">Archivo XAPK detectado, asegurándose de que pueda extraerse correctamente</string>
     <string name="searching">Buscando archivos apk…</string>
-    <string name="revanced">ReVanced Manager produce un error al intentar parchear APKs fusionados. El error no es un problema real y es producido incorrectamente por una biblioteca de terceros. Para la mayoría, usar la opción para seleccionar splits para las especificaciones de tu dispositivo lo solucionará. Si aún no funciona, lo más fácil es descargar una versión de ReVanced Manager con el error corregido.</string>
-    <string name="note">Nota para ReVanced</string>
-    <string name="download_fix">Descargar ReVanced Manager corregido</string>
-    <string name="cancel_button_label">Cancelar</string>
-    <string name="choose_button_label">Seleccionar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="select">Seleccionar</string>
     <string name="label_parent_directory">Directorio padre</string>
     <string name="last_edit">Última edición:</string>
     <string name="error_dir_access">No se puede acceder al directorio</string>

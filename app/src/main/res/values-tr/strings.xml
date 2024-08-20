@@ -29,11 +29,8 @@
     <string name="unselected">Seçilmedi </string>
     <string name="detected_xapk">XAPK dosyası tespit edildi, düzgün bir şekilde çıkarılabilmesi sağlanacak</string>
     <string name="searching">APK dosyası aranıyor…</string>
-    <string name="revanced">ReVanced Manager, split APK\'ları patchlemeye çalışırken bir hata ortaya çıkıyor. Bu hata gerçek bir sorun değil ve üçüncü taraf bir kütüphaneden dolayı kaynaklanıyor. Çoğu kişi için, cihaz özellikleriniz için seçme seçeneğini kullanmak sorunu çözecektir. Yine de çalışmazsa yapılacak en kolay şey ReVanced Manager\'ın hatanın kaldırıldığı sürümü indirmektir.</string>
-    <string name="note">ReVanced için not</string>
-    <string name="download_fix">Hatanın düzeltildiği ReVanced Manager\'ı indir</string>
-    <string name="cancel_button_label">İptal et</string>
-    <string name="choose_button_label">Seç</string>
+    <string name="cancel">İptal et</string>
+    <string name="select">Seç</string>
     <string name="label_parent_directory">Ana Klasör</string>
     <string name="last_edit">Son düzenlenme: </string>
     <string name="error_dir_access">Klasöre erişilemedi</string>

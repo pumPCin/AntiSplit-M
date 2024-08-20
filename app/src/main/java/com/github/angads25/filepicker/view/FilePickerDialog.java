@@ -149,7 +149,7 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
              *  selected.
              */
             positiveBtnNameStr = positiveBtnNameStr == null ?
-                    com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.choose_button_label) : positiveBtnNameStr;
+                    com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.select) : positiveBtnNameStr;
             int size1 = MarkedItemList.getFileCount();
             if (size1 == 0) {
                 select.setEnabled(false);
@@ -215,7 +215,7 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
         super.onStart();
         positiveBtnNameStr = (
                 positiveBtnNameStr == null ?
-                com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.choose_button_label) :
+                com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.select) :
                 positiveBtnNameStr
         );
         select.setText(positiveBtnNameStr);
@@ -417,7 +417,7 @@ public class FilePickerDialog extends Dialog implements AdapterView.OnItemClickL
         } else {
             super.show();
             positiveBtnNameStr = positiveBtnNameStr == null ?
-                    com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.choose_button_label) : positiveBtnNameStr;
+                    com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.select) : positiveBtnNameStr;
             select.setText(positiveBtnNameStr);
             int size = MarkedItemList.getFileCount();
             if (size == 0) {
