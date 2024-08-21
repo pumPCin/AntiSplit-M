@@ -23,7 +23,7 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 public class DeviceSpecsUtil {
 
     private final Context context;
-    private final String lang;
+    public final String lang;
     private final String arch;
     private final String densityType;
     public static ZipFile zipFile = null;
@@ -31,7 +31,7 @@ public class DeviceSpecsUtil {
     public DeviceSpecsUtil(Context context) {
         this.context = context;
         this.lang = Locale.getDefault().getLanguage();
-        this.arch = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) ? Build.SUPPORTED_ABIS[0] : Build.CPU_ABI;
+        this.arch = Build.CPU_ABI;
         this.densityType = getDeviceDpi();
     }
 
@@ -54,7 +54,7 @@ public class DeviceSpecsUtil {
             // Do not close this ZipFile it could be used later in merger
             while (entries.hasMoreElements()) {
                 String name = entries.nextElement().getName();
-                if (name.endsWith(".apk")) splits.add(name);
+                if (name.endsWith(".apk"))  splits.add(name);
             }
         }
 

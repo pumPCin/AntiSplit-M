@@ -500,32 +500,54 @@ public class MainActivity extends Activity implements Merger.LogListener {
             if(activity.urisAreSplitApks) {
                 if(selectSplitsForDevice) {
                     try {
+                        //LogUtil.logMessage(Build.CPU_ABI);
                         splits = DeviceSpecsUtil.getListOfSplits(activity.splitAPKUri);
-                        List<String> copy = List.copyOf(splits);
-                        boolean splitApkContainsArch = false;
-                        for (int i = 0; i < splits.size(); i++) {
-                            final String thisSplit = splits.get(i);
-                            if(!splitApkContainsArch && com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isArch(thisSplit)) {
-                                splitApkContainsArch = true;
+                        if(splits.size() == 4 || splits.size() == 3) splits.clear(); // This very likely already contains splits only for device.
+                        else {
+                            List<String> copy = List.copyOf(splits);
+                            List<String> toRemove = new ArrayList<>();
+                            boolean splitApkContainsArch = false;
+                            for (int i = 0; i < splits.size(); i++) {
+                                final String thisSplit = splits.get(i);
+                                if(!splitApkContainsArch && com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isArch(thisSplit)) {
+                                    splitApkContainsArch = true;
+                                }
+                                if (DeviceSpecsUtil.shouldIncludeSplit(thisSplit)) toRemove.add(thisSplit);
                             }
-                            if (DeviceSpecsUtil.shouldIncludeSplit(thisSplit)) splits.remove(thisSplit);
-                        }
-                        if(splitApkContainsArch) {
-                            boolean selectedSplitsContainsArch = false;
+                            if(splitApkContainsArch) {
+                                boolean selectedSplitsContainsArch = false;
+                                for (int i = 0; i < copy.size(); i++) {
+                                    final String thisSplit = copy.get(i);
+                                    if (com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isArch(thisSplit) && toRemove.contains(thisSplit)) {
+                                        selectedSplitsContainsArch = true;
+                                        break;
+                                    }
+                                }
+                                if(!selectedSplitsContainsArch) {
+                                    LogUtil.logMessage("Could not find device architecture, selecting all architectures");
+                                    for (int i = 0; i < splits.size(); i++) {
+                                        final String thisSplit = splits.get(i);
+                                        if(com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isArch(thisSplit)) toRemove.add(thisSplit); // select all to be sure
+                                    }
+                                }
+                            }
+
+                            boolean didNotFindDpi = true;
                             for (int i = 0; i < copy.size(); i++) {
-                                final String thisSplit = copy.get(i);
-                                if (com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isArch(thisSplit) && !splits.contains(thisSplit)) {
-                                    selectedSplitsContainsArch = true;
+                                String thisSplit = copy.get(i);
+                                if (thisSplit.contains("dpi") && toRemove.contains(thisSplit)) {
+                                    didNotFindDpi = false;
                                     break;
                                 }
                             }
-                            if(!selectedSplitsContainsArch) {
-                                LogUtil.logMessage("Could not find device architecture, selecting all architectures");
+                            if (didNotFindDpi) {
                                 for (int i = 0; i < splits.size(); i++) {
-                                    final String thisSplit = splits.get(i);
-                                    if(com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isArch(thisSplit)) splits.remove(thisSplit); // select all to be sure
+                                    String thisSplit = splits.get(i);
+                                    if (thisSplit.contains("hdpi")) toRemove.add(thisSplit);
                                 }
                             }
+                            //if((toRemove.size() == 3 && !toRemove.contains(lang)) || toRemove.size() == 4);
+                            splits.removeAll(toRemove);
                         }
                     } catch (IOException e) {
                         activity.showError(e);

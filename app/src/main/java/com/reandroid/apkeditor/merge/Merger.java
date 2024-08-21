@@ -19,6 +19,7 @@ import static com.reandroid.apkeditor.merge.LogUtil.logMessage;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
 import com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil;
@@ -210,10 +211,9 @@ public class Merger {
                     manifest.refresh();
                 }
                 logMessage(MainActivity.rss.getString(R.string.saving));
-
+                File temp;
                 if (revanced || signApk) {
-                    File temp = new File(cacheDir, "temp.apk");
-                    mergedModule.writeApk(temp);
+                    mergedModule.writeApk(temp = new File(cacheDir, "temp.apk"));
                     // The apk does not need to be signed to patch with ReVanced and it will make this already long crap take even more time
                     // but someone is probably going to try to install it before patching and complain
                     // and to avoid confusion/mistakes the sign apk option in the app should not be toggled off when revanced option is on
@@ -255,7 +255,9 @@ public class Merger {
                             SignUtil.signPseudoApkSigner(temp, context, out, e);
                         }
                     }
-                } else mergedModule.writeApk(FileUtils.getOutputStream(out, context));
+                } else {
+                    mergedModule.writeApk(FileUtils.getOutputStream(out, context));
+                }
             }
         }
     }
