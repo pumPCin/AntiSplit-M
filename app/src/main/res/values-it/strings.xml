@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">AntiSplit M</string>
     <string name="merge">Seleziona l\'APK suddiviso da unire</string>
     <string name="success_saved">Esportazione file APK unito completata</string>
     <string name="enable_logs" >Attiva registro eventi</string>
@@ -34,7 +33,6 @@
     <string name="label_parent_directory">Cartella Superiore</string>
     <string name="last_edit">Ultima modifica: </string>
     <string name="error_dir_access">Impossibile accedere alla cartella</string>
-    <string name="label_parent_dir" translatable="false">...</string>
     <string name="lang" translatable="false">Lingua</string>
     <string name="fixing">Applicazione correzione per ReVanced…</string>
     <string name="fix">Correzione per ReVanced</string>

@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">AntiSplit M</string>
     <string name="merge">Pilih APK terpisah yang ingin Dileburkan/Di-AntiSplit</string>
     <string name="success_saved">Berkas berhasil disimpan</string>
     <string name="enable_logs" >Aktifkan log</string>
@@ -34,7 +33,6 @@
     <string name="label_parent_directory">Direktori Induk</string>
     <string name="last_edit">Terakhir kali disunting: </string>
     <string name="error_dir_access">Direktorinya tidak bisa diakses</string>
-    <string name="label_parent_dir" translatable="false">…</string>
     <string name="lang" translatable="false">Bahasa</string>
     <string name="fixing">Memperbaiki untuk ReVanced…</string>
     <string name="fix">Perbaiki untuk ReVanced</string>

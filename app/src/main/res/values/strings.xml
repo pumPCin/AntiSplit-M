@@ -34,7 +34,6 @@
     <string name="label_parent_directory">Parent Directory</string>
     <string name="last_edit">Last edited: </string>
     <string name="error_dir_access">Directory cannot be accessed</string>
-    <string name="label_parent_dir" translatable="false">…</string>
     <string name="lang" translatable="false">Language</string>
     <string name="fixing">Fixing for ReVanced…</string>
     <string name="fix">Fix for ReVanced</string>
@@ -52,6 +51,7 @@
     <string-array name="langs_display">
         <item>English</item>
         <item>Español</item>
+        <item>Français</item>
         <item>Bahasa Indonesia</item>
         <item>Italiano</item>
         <item>русский язык</item>
@@ -61,10 +61,12 @@
     <string-array name="langs">
         <item>en</item>
         <item>es</item>
+        <item>fr</item>
         <item>in</item>
         <item>it</item>
         <item>ru</item>
         <item>tr</item>
         <item>uk</item>
     </string-array>
+    <string name="label_parent_dir" translatable="false">…</string>
 </resources>

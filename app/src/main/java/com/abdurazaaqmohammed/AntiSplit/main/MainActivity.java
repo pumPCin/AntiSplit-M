@@ -41,7 +41,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -96,7 +95,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         button.setBackgroundDrawable(border);
     }
 
-    private void setColor(int color, boolean isTextColor, LinearLayout settingsMenu) {
+    private void setColor(int color, boolean isTextColor, ScrollView settingsMenu) {
         final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
         boolean fromSettingsMenu = settingsMenu != null;
         //if(fromSettingsMenu) settingsMenu.setBackgroundColor(color);
@@ -178,7 +177,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
         findViewById(R.id.settingsButton).setOnClickListener(v -> {
             LayoutInflater inflater = LayoutInflater.from(this);
-            LinearLayout l = (LinearLayout) inflater.inflate(R.layout.dialog_settings, null);
+            ScrollView l = (ScrollView) inflater.inflate(R.layout.dialog_settings, null);
             l.setBackgroundColor(bgColor);
 
             setColor(textColor, true, l);
@@ -272,7 +271,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 styleAlertDialog(new AlertDialog.Builder(this).setSingleChoiceItems(display, curr, (dialog, which) -> {
                     updateLang(LocaleHelper.setLocale(MainActivity.this, lang = langs[which]).getResources(), l);
                     dialog.dismiss();
-                }).create(), display);
+                }).create(), display, true);
             });
 
             l.findViewById(R.id.changeBgColor).setOnClickListener(v3 -> showColorPickerDialog(false, bgColor, l));
@@ -282,7 +281,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
             title.setTextColor(textColor);
             title.setTextSize(25);
             styleAlertDialog(
-                    new AlertDialog.Builder(this).setCustomTitle(title).setView(l).setPositiveButton(R.string.close, (dialog, which) -> dialog.dismiss()).create(), null);
+                    new AlertDialog.Builder(this).setCustomTitle(title).setView(l)
+                            .setPositiveButton(R.string.close, (dialog, which) -> dialog.dismiss()).create(), null, false);
         });
 
         findViewById(R.id.decodeButton).setOnClickListener(v -> {
@@ -317,23 +317,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     , 1);
         } // XAPK is octet-stream
         );
-        /*findViewById(R.id.revanced).setOnClickListener(v -> {
-            TextView title = new TextView(this);
-            title.setText(rss.getString(R.string.note));
-            title.setTextSize(20);
-            title.setTextColor(textColor);
-            title.setPadding(15,15,15,15);
-            TextView message = new TextView(this);
-            message.setText(rss.getString(R.string.revanced));
-            message.setTextSize(15);
-            message.setTextColor(textColor);
-            message.setPadding(15,15,15,15);
-            styleAlertDialog(new AlertDialog.Builder(this)
-                    .setCustomTitle(title)
-                    .setView(message)
-                    .setPositiveButton(rss.getString(R.string.download_fix), (dialog, which) -> startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/revanced-antisplit"))))
-                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss()).create(), null);
-        });*/
 
         // Check if user shared or opened file with the app.
         final Intent openIntent = getIntent();
@@ -358,7 +341,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         }
     }
 
-    public void styleAlertDialog(AlertDialog ad, String[] display) {
+    public void styleAlertDialog(AlertDialog ad, String[] display, boolean isLang) {
         GradientDrawable border = new GradientDrawable();
         border.setColor(bgColor); // Background color
         border.setStroke(5, textColor); // Border width and color
@@ -368,7 +351,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
         runOnUiThread(() -> {
             ad.show();
-            if(display != null) ad.getListView().setAdapter(new CustomArrayAdapter(this, display, textColor));
+            if(display != null) ad.getListView().setAdapter(new CustomArrayAdapter(this, display, textColor, isLang));
             Window w = ad.getWindow();
 
             Button positiveButton = ad.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -393,7 +376,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
     public static Resources rss;
 
-    private void updateLang(Resources res, LinearLayout settingsDialog) {
+    private void updateLang(Resources res, ScrollView settingsDialog) {
         rss = res;
         ((TextView) findViewById(R.id.decodeButton)).setText(res.getString(R.string.merge));
         if(settingsDialog != null) {
@@ -412,7 +395,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         }
     }
 
-    private void showColorPickerDialog(boolean isTextColor, int currentColor, LinearLayout from) {
+    private void showColorPickerDialog(boolean isTextColor, int currentColor, ScrollView from) {
         new AmbilWarnaDialog(this, currentColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
             @Override
             public void onOk(AmbilWarnaDialog dialog1, int color) {
@@ -732,7 +715,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
                         } else activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(link)));
                     });
                     if(supportsDownloadManager) builder.setNeutralButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest"))));
-                    activity.styleAlertDialog(builder.setNegativeButton(rss.getString(R.string.cancel), (dialog, which) -> dialog.dismiss()).create(), null);
+                    activity.styleAlertDialog(builder.setNegativeButton(rss.getString(R.string.cancel), (dialog, which) -> dialog.dismiss()).create(),
+                            null, false);
                 } else if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show());
             } catch (Exception ignored) { }
         }
@@ -843,7 +827,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     splitsToUse = splits;
                     selectDirToSaveAPKOrSaveNow();
                 }
-            }).setNegativeButton("Cancel", null).create(), apkNames);
+            }).setNegativeButton("Cancel", null).create(), apkNames, false);
         } catch (IOException e) {
             showError(e);
         }

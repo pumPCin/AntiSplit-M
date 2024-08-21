@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">AntiSplit M</string>
     <string name="merge">Birleştirmek/Ayrıştırmak için split APK\'yı seçin.</string>
     <string name="success_saved">Dosya başarıyla kaydedildi.</string>
     <string name="enable_logs">Kayıtları etkinleştir</string>
@@ -34,5 +33,4 @@
     <string name="label_parent_directory">Ana Klasör</string>
     <string name="last_edit">Son düzenlenme: </string>
     <string name="error_dir_access">Klasöre erişilemedi</string>
-    <string name="label_parent_dir" translatable="false">...</string>
 </resources>

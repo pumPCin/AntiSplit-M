@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="all">Выбрать все</string>
-    <string name="app_name">AntiSplit M</string>
     <string name="arch_for_device">Выбор архитектуру для вашего устройства</string>
     <string name="ask">Спрашивать где сохранить файл (если отключено, сохраняет APK в том же каталоге, из которого был Splits APK файл)</string>
     <string name="automatically_select">Автоматический выбор в соответствии вашей архитектуры устройства</string>
@@ -15,7 +14,6 @@
     <string name="error_dir_access">Доступ к каталогу невозможен</string>
     <string name="for_device">Выбор все в соответствии вашей архитектуры устройства</string>
     <string name="grant_storage">Необходимо разрешение на хранение для сохранения в той же папке, что и выбранный файл</string>
-    <string name="label_parent_dir">…</string>
     <string name="label_parent_directory">Родительский каталог</string>
 	<string name="lang">Язык</string>								 
     <string name="lang_for_device">Выбор язык для вашего устройства</string>
