@@ -16,24 +16,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:padding="8dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true">
 
         <Button
             android:id="@+id/decodeButton"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/merge" />
 
         <Button
             android:id="@+id/settingsButton"
-            android:layout_width="match_parent"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:text="@string/settings" />
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="⚙️" />
 
     </LinearLayout>
+
 
     <ScrollView
         android:id="@+id/scrollView"

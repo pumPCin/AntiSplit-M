@@ -175,7 +175,10 @@ public class MainActivity extends Activity implements Merger.LogListener {
         if(Objects.equals(lang, Locale.getDefault().getLanguage())) rss = getResources();
         else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources(), null);
 
-        findViewById(R.id.settingsButton).setOnClickListener(v -> {
+        Button settingsButton = findViewById(R.id.settingsButton);
+        Button decodeButton = findViewById(R.id.decodeButton);
+        settingsButton.setHeight(decodeButton.getHeight());
+        settingsButton.setOnClickListener(v -> {
             LayoutInflater inflater = LayoutInflater.from(this);
             ScrollView l = (ScrollView) inflater.inflate(R.layout.dialog_settings, null);
             l.setBackgroundColor(bgColor);
@@ -285,7 +288,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                             .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create(), null, false);
         });
 
-        findViewById(R.id.decodeButton).setOnClickListener(v -> {
+        decodeButton.setOnClickListener(v -> {
             if(LegacyUtils.doesNotSupportInbuiltAndroidFilePicker) {
                 DialogProperties properties = new DialogProperties();
                 properties.selection_mode = DialogConfigs.MULTI_MODE;
