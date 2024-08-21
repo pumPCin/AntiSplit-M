@@ -63,6 +63,7 @@ public class Merger {
     }
 
     private static void extractAndLoad(Uri in, File cacheDir, Context context, List<String> splits, ApkBundle bundle) throws IOException, MismatchedSplitsException, InterruptedException {
+        logMessage(in.getPath());
         boolean checkSplits = splits != null && !splits.isEmpty();
         try (ZipFileInput zis = new ZipFileInput(FileUtils.getInputStream(in, context))) {
             ZipFileHeader header;
@@ -75,8 +76,7 @@ public class Merger {
                         File file = new File(cacheDir, name);
                         if (file.getCanonicalPath().startsWith(cacheDir.getCanonicalPath() + File.separator))
                             zis.readFileDataToFile(file);
-                        else
-                            throw new IOException("Zip entry is outside of the target dir: " + name);
+                        else throw new IOException("Zip entry is outside of the target dir: " + name);
 
                         logMessage("Extracted " + name);
                     }
@@ -122,7 +122,6 @@ public class Merger {
 
     public static void run(Uri in, File cacheDir, Uri out, Context context, List<String> splits, boolean signApk, boolean revanced) throws Exception {
         logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.searching));
-
         try (ApkBundle bundle = new ApkBundle()) {
             if (in == null)
                 bundle.loadApkDirectory(cacheDir, false, context); // Multiple splits from a split apk, already copied to cache dir
@@ -243,20 +242,20 @@ public class Merger {
                                 zfo.writeRawFileData(zfi.openFileDataInputStream(true));
                             }
                         }
-                        if (signApk) {
-                            logMessage(MainActivity.rss.getString(R.string.signing));
-                            boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
-                            File stupid = new File(noPerm ? (cacheDir + File.separator + "stupid.apk") : FileUtils.getPath(out, context));
-                            try {
-                                SignUtil.signDebugKey(context, temp, stupid);
-                                if (noPerm)
-                                    FileUtils.copyFile(stupid, FileUtils.getOutputStream(out, context));
-                            } catch (Exception e) {
-                                SignUtil.signPseudoApkSigner(temp, context, out, e);
-                            }
+                    }
+                    if (signApk) {
+                        logMessage(MainActivity.rss.getString(R.string.signing));
+                        boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
+                        File stupid = new File(noPerm ? (cacheDir + File.separator + "stupid.apk") : FileUtils.getPath(out, context));
+                        try {
+                            SignUtil.signDebugKey(context, temp, stupid);
+                            if (noPerm)
+                                FileUtils.copyFile(stupid, FileUtils.getOutputStream(out, context));
+                        } catch (Exception e) {
+                            SignUtil.signPseudoApkSigner(temp, context, out, e);
                         }
-                    } else mergedModule.writeApk(FileUtils.getOutputStream(out, context));
-                }
+                    }
+                } else mergedModule.writeApk(FileUtils.getOutputStream(out, context));
             }
         }
     }

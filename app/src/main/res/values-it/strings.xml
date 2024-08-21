@@ -45,4 +45,8 @@
     <string name="check_update_now">Verifica aggiornamenti ora</string>
     <string name="no_update_found">Nessun aggiornamento disponibile</string>
     <string name="settings">Impostazioni</string>
+    <string name="close">Chiudi</string>
+    <string name="mismatch">Le seguenti suddivisioni (%1$s) hanno un codice di versione non corrispondente. Queste contengono solo traduzioni per altre lingue, quindi l\'app potrà essere comunque eseguita, ma non risulterà tradotta. Intendi procedere ugualmente con l\'unione?</string>
+    <string name="warning">Avviso</string>
+    <string name="mismatch_base">" il codice di versione non corrisponde a quello del file apk base."</string>
 </resources>
