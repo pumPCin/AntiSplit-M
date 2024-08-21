@@ -19,7 +19,6 @@ import static com.reandroid.apkeditor.merge.LogUtil.logMessage;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Build;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
 import com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil;
@@ -85,7 +84,8 @@ public class Merger {
                     logMessage(MainActivity.rss.getString(R.string.skipping) + name + MainActivity.rss.getString(R.string.not_apk));
             }
             bundle.loadApkDirectory(cacheDir, false, context);
-        } catch (MismatchedSplitsException ignored) {
+        } catch (MismatchedSplitsException m) {
+            throw new RuntimeException(m);
         } catch (Exception e) {
             // If the above failed it probably did not copy any files
             // so might as well do it this way instead of trying unreliable methods to see if we need to do this

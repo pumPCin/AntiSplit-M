@@ -209,7 +209,7 @@ public class ApkBundle implements Closeable {
                 break;
             }
         }
-        if(!hasDpi) throw new MismatchedSplitsException("Error: All DPI/resource splits selected have a mismatched version code.");
+        if(!hasDpi && !mismatchedDpis.isEmpty()) throw new MismatchedSplitsException("Error: All DPI/resource splits selected have a mismatched version code.");
         String s = mismatchedLangs.toString();
         if(!TextUtils.isEmpty(s)) {
             final CountDownLatch latch = new CountDownLatch(1);
