@@ -1,6 +1,7 @@
 package com.abdurazaaqmohammed.AntiSplit.main;
 
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
+import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsArraysCopyOfAndDownloadManager;
 import static com.reandroid.apkeditor.merge.LogUtil.logEnabled;
 
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -36,11 +37,13 @@ import android.os.Looper;
 import android.provider.OpenableColumns;
 import android.text.Html;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -146,7 +149,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         if (LegacyUtils.supportsExternalCacheDir && ((externalCacheDir = getExternalCacheDir()) != null)) deleteDir(externalCacheDir);
 
         deleteDir(getCacheDir());
-        if(Build.VERSION.SDK_INT > 10 && (ab = getActionBar()) != null) {
+        if(LegacyUtils.supportsActionBar && (ab = getActionBar()) != null) {
             /*Spannable text = new SpannableString(getString(R.string.app_name));
             text.setSpan(new ForegroundColorSpan(textColor), 0, text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
             ab.setTitle(text);
@@ -178,6 +181,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         Button settingsButton = findViewById(R.id.settingsButton);
         Button decodeButton = findViewById(R.id.decodeButton);
         settingsButton.setHeight(decodeButton.getHeight());
+        ((LinearLayout) findViewById(R.id.topButtons)).setGravity(Gravity.CENTER_VERTICAL);
         settingsButton.setOnClickListener(v -> {
             LayoutInflater inflater = LayoutInflater.from(this);
             ScrollView l = (ScrollView) inflater.inflate(R.layout.dialog_settings, null);
@@ -381,8 +385,11 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
     private void updateLang(Resources res, ScrollView settingsDialog) {
         rss = res;
-        ((TextView) findViewById(R.id.decodeButton)).setText(res.getString(R.string.merge));
-        // ((TextView) findViewById(R.id.settingsButton)).setText(res.getString(R.string.settings));
+        Button decodeButton = findViewById(R.id.decodeButton);
+        decodeButton.setText(res.getString(R.string.merge));
+        setButtonBorder(decodeButton);
+        ((LinearLayout) findViewById(R.id.topButtons)).setGravity(Gravity.CENTER_VERTICAL);
+
         if(settingsDialog != null) {
             ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(rss.getString(R.string.lang));
             final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
@@ -447,7 +454,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 .putInt("textColor", textColor)
                 .putInt("backgroundColor", bgColor)
                 .putString("lang", lang);
-        if (LegacyUtils.supportsArraysCopyOf) e.apply();
+        if (supportsArraysCopyOfAndDownloadManager) e.apply();
         else e.commit();
         super.onPause();
     }
@@ -728,19 +735,18 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     TextView title = new TextView(activity);
                     title.setText(rss.getString(R.string.update));
                     title.setTextColor(textColor);
-                    boolean supportsDownloadManager = Build.VERSION.SDK_INT > 8;
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity).setCustomTitle(title).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
-                        if (supportsDownloadManager) {
+                        if (supportsArraysCopyOfAndDownloadManager) {
                             DownloadManager downloadManager = (DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE);
                             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link))
                             .setTitle(filename).setDescription(filename).setMimeType("application/vnd.android.package-archive");
                             if (Build.VERSION.SDK_INT < 29) activity.checkStoragePerm();
                             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
-                            if (Build.VERSION.SDK_INT > 10) request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                            if (LegacyUtils.supportsActionBar) request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                             downloadManager.enqueue(request);
                         } else activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(link)));
                     });
-                    if(supportsDownloadManager) builder.setNeutralButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest"))));
+                    if(supportsArraysCopyOfAndDownloadManager) builder.setNeutralButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest"))));
                     activity.styleAlertDialog(builder.setNegativeButton(rss.getString(R.string.cancel), (dialog, which) -> dialog.dismiss()).create(),
                             null, false);
                 } else if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show());

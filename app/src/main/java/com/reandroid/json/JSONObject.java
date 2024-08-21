@@ -765,9 +765,9 @@ public class JSONObject extends JSONItem {
             return null;
         }
         if (key.length() == 1) {
-            key = key.toLowerCase(LegacyUtils.supportsArraysCopyOf ? Locale.ROOT : Locale.getDefault());
+            key = key.toLowerCase(LegacyUtils.supportsArraysCopyOfAndDownloadManager ? Locale.ROOT : Locale.getDefault());
         } else if (!Character.isUpperCase(key.charAt(1))) {
-            key = key.substring(0, 1).toLowerCase(LegacyUtils.supportsArraysCopyOf ? Locale.ROOT : Locale.getDefault()) + key.substring(1);
+            key = key.substring(0, 1).toLowerCase(LegacyUtils.supportsArraysCopyOfAndDownloadManager ? Locale.ROOT : Locale.getDefault()) + key.substring(1);
         }
         return key;
     }

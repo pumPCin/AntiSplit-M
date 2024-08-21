@@ -5,7 +5,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="50dp"
     android:background="#000000"
     tools:context=".main.MainActivity"
     tools:visibility="visible"
@@ -14,12 +13,8 @@
     <LinearLayout
         android:id="@+id/topButtons"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
+        android:layout_height="150dp"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/decodeButton"
@@ -32,7 +27,6 @@
             android:id="@+id/settingsButton"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:text="⚙️" />
 

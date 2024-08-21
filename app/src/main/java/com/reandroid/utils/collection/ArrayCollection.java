@@ -15,7 +15,7 @@
  */
 package com.reandroid.utils.collection;
 
-import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsArraysCopyOf;
+import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsArraysCopyOfAndDownloadManager;
 
 import com.reandroid.common.ArraySupplier;
 
@@ -340,7 +340,7 @@ public class ArrayCollection<T> implements ArraySupplier<T>, List<T>, Set<T> {
             }
             return out;
         }
-        if (supportsArraysCopyOf) {
+        if (supportsArraysCopyOfAndDownloadManager) {
             return (T1[]) Arrays.copyOf(elements, size, out.getClass());
         } else {
             T[] copy = ((Object)size == (Object)Object[].class)

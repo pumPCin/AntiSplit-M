@@ -132,7 +132,7 @@ public class DeviceSpecsUtil {
             }
             densityType += ".apk";
             SharedPreferences.Editor e = context.getSharedPreferences("set", Context.MODE_PRIVATE).edit().putString("deviceDpi", densityType);
-            if(LegacyUtils.supportsArraysCopyOf) e.apply();
+            if(LegacyUtils.supportsArraysCopyOfAndDownloadManager) e.apply();
             else e.commit();
         }
         return densityType;
