@@ -382,7 +382,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     private void updateLang(Resources res, ScrollView settingsDialog) {
         rss = res;
         ((TextView) findViewById(R.id.decodeButton)).setText(res.getString(R.string.merge));
-        ((TextView) findViewById(R.id.settingsButton)).setText(res.getString(R.string.settings));
+        // ((TextView) findViewById(R.id.settingsButton)).setText(res.getString(R.string.settings));
         if(settingsDialog != null) {
             ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(rss.getString(R.string.lang));
             final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
