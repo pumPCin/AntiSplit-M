@@ -24,14 +24,12 @@ public class DeviceSpecsUtil {
 
     private final Context context;
     public final String lang;
-    private final String arch;
     private final String densityType;
     public static ZipFile zipFile = null;
 
     public DeviceSpecsUtil(Context context) {
         this.context = context;
         this.lang = Locale.getDefault().getLanguage();
-        this.arch = Build.CPU_ABI;
         this.densityType = getDeviceDpi();
     }
 
@@ -79,7 +77,7 @@ public class DeviceSpecsUtil {
     }
 
     public boolean shouldIncludeArch(String name) {
-        return name.contains(arch) || name.replace('-', '_').contains(arch.replace('-', '_'));
+        return name.contains(Build.CPU_ABI) || name.replace('-', '_').contains(Build.CPU_ABI.replace('-', '_'));
     }
 
     public boolean shouldIncludeDpi(String name) {

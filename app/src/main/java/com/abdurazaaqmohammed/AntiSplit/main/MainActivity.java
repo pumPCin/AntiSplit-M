@@ -23,6 +23,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -117,7 +118,14 @@ public class MainActivity extends Activity implements Merger.LogListener {
             }
         } else findViewById(R.id.main).setBackgroundColor(bgColor = color);
         setButtonBorder(findViewById(R.id.decodeButton));
-        setButtonBorder(findViewById(R.id.settingsButton));
+        //setButtonBorder(findViewById(R.id.settingsButton));
+        TextView settingsButton = findViewById(R.id.settingsButton);
+        settingsButton.setBackgroundColor(bgColor);
+        Drawable d;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && (d = getDrawable(R.drawable.settings)) != null) {
+            d.setTint(textColor);
+            settingsButton.setBackgroundDrawable(d);
+        } else settingsButton.setText("⚙️");
         if(fromSettingsMenu) {
             setButtonBorder(settingsMenu.findViewById(R.id.langPicker));
             setButtonBorder(settingsMenu.findViewById(R.id.changeTextColor));
@@ -139,6 +147,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         return handler;
     }
 
+    /** @noinspection AssignmentUsedAsCondition*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -180,7 +189,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
         Button settingsButton = findViewById(R.id.settingsButton);
         Button decodeButton = findViewById(R.id.decodeButton);
-        settingsButton.setHeight(decodeButton.getHeight());
+        settingsButton.setHeight((int) (decodeButton.getHeight() * 0.8));
         ((LinearLayout) findViewById(R.id.topButtons)).setGravity(Gravity.CENTER_VERTICAL);
         settingsButton.setOnClickListener(v -> {
             LayoutInflater inflater = LayoutInflater.from(this);
@@ -266,12 +275,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 int curr = -1;
 
                 String[] langs = rss.getStringArray(R.array.langs);
-            /*for(int i=0; i<langs.length; i++) {
-                if (langs[i].equals(lang)) {
-                    curr = i;
-                    break;
-                }
-            }*/
 
                 String[] display = rss.getStringArray(R.array.langs_display);
 
@@ -475,7 +478,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
 
     private Handler handler;
 
-    /** @noinspection ResultOfMethodCallIgnored*/
+    /** @noinspection ResultOfMethodCallIgnored, DataFlowIssue */
     public static void deleteDir(File dir) {
         // There should never be folders in here.
         for (String child : dir.list()) new File(dir, child).delete();
@@ -488,7 +491,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
         if (LegacyUtils.supportsExternalCacheDir && (dir = getExternalCacheDir()) != null) deleteDir(dir);
         super.onDestroy();
     }
-
 
     private List<String> splitsToUse = null;
     private static class ProcessTask extends AsyncTask<Uri, Void, Void> {
@@ -674,9 +676,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             } catch (Exception e) {
                 return null;
             }
-            try (BufferedReader reader =
-                 new BufferedReader(
-                 new InputStreamReader(conn.getInputStream()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
                 String line;
                 String ver = "";
                 String changelog = "";
@@ -702,20 +702,17 @@ public class MainActivity extends Activity implements Merger.LogListener {
         protected void onPostExecute(String[] result) {
             MainActivity activity = context.get();
             if(result == null) {
-                if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show());
-                return;
-            }
-
-            try {
+                if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, "Failed to check for update", Toast.LENGTH_SHORT).show());
+            } else try {
                 String latestVersion = result[0];
                 String currentVer;
                 try {
                     currentVer = ((Context) activity).getPackageManager().getPackageInfo(((Context) activity).getPackageName(), 0).versionName;
                 } catch (Exception e) {
-                    currentVer = "1.6.4.8";
+                    currentVer = "1.6.5.6";
                 }
                 boolean newVer = false;
-                char[] curr = currentVer.replace(".", "").toCharArray();
+                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {1, 6, 5, 6} : currentVer.replace(".", "").toCharArray();
                 char[] latest = latestVersion.replace(".", "").toCharArray();
                 for(int i = 0; i < curr.length; i++) {
                     if(latest[i] > curr[i]) {
@@ -750,7 +747,9 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     activity.styleAlertDialog(builder.setNegativeButton(rss.getString(R.string.cancel), (dialog, which) -> dialog.dismiss()).create(),
                             null, false);
                 } else if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show());
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+                if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, "Failed to check for update", Toast.LENGTH_SHORT).show());
+            }
         }
     }
 
@@ -908,9 +907,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             if (result == null) {
                 result = uri.getPath();
                 int cut = Objects.requireNonNull(result).lastIndexOf('/'); // Ensure it throw the NullPointerException here to be caught
-                if (cut != -1) {
-                    result = result.substring(cut + 1);
-                }
+                if (cut != -1) result = result.substring(cut + 1);
             }
             return result.replaceFirst("\\.(?:xapk|aspk|apk[sm])", "_antisplit.apk");
         } catch (Exception ignored) {
