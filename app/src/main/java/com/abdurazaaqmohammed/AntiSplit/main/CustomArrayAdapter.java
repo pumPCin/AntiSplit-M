@@ -1,16 +1,23 @@
 package com.abdurazaaqmohammed.AntiSplit.main;
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.abdurazaaqmohammed.AntiSplit.R;
+
+import java.util.Locale;
+import java.util.Objects;
+
 public class CustomArrayAdapter extends ArrayAdapter<String> {
     private final Context context;
     private final String[] values;
     private final int textColor;
     private final boolean lang;
+    private String langCode;
 
     public CustomArrayAdapter(Context context, String[] values, int textColor, boolean lang) {
         super(context, android.R.layout.simple_list_item_multiple_choice, values);
@@ -18,6 +25,15 @@ public class CustomArrayAdapter extends ArrayAdapter<String> {
         this.values = values;
         this.textColor = textColor;
         this.lang = lang;
+        if(lang) {
+            String[] langCodes = MainActivity.rss.getStringArray(R.array.langs);
+            for(int i = 0; i < langCodes.length; i++) {
+                if(Objects.equals(MainActivity.lang, langCodes[i])) {
+                    this.langCode = MainActivity.rss.getStringArray(R.array.langs_display)[i];
+                    break;
+                }
+            }
+        }
     }
 
     @Override
@@ -27,7 +43,8 @@ public class CustomArrayAdapter extends ArrayAdapter<String> {
         }
 
         TextView textView = convertView.findViewById(android.R.id.text1);
-        textView.setText(values[position]);
+        String curr = values[position];
+        textView.setText(lang && Objects.equals(curr, langCode) ? Html.fromHtml("<b>" + curr + "</b>") : curr);
         textView.setTextColor(textColor);
 
         return convertView;

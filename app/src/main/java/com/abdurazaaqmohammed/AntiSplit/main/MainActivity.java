@@ -282,7 +282,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             title.setTextSize(25);
             styleAlertDialog(
                     new AlertDialog.Builder(this).setCustomTitle(title).setView(l)
-                            .setPositiveButton(R.string.close, (dialog, which) -> dialog.dismiss()).create(), null, false);
+                            .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create(), null, false);
         });
 
         findViewById(R.id.decodeButton).setOnClickListener(v -> {
@@ -379,6 +379,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     private void updateLang(Resources res, ScrollView settingsDialog) {
         rss = res;
         ((TextView) findViewById(R.id.decodeButton)).setText(res.getString(R.string.merge));
+        ((TextView) findViewById(R.id.settingsButton)).setText(res.getString(R.string.settings));
         if(settingsDialog != null) {
             ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(rss.getString(R.string.lang));
             final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
