@@ -1,11 +1,13 @@
 package yuku.ambilwarna;
 
 import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.bgColor;
+import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.textColor;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.view.Gravity;
@@ -14,12 +16,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
+import com.abdurazaaqmohammed.AntiSplit.main.MainActivity;
 
 public class AmbilWarnaDialog {
 	public interface OnAmbilWarnaListener {
@@ -211,6 +215,9 @@ public class AmbilWarnaDialog {
 		));
 		buttonLayout.setBackgroundColor(bgColor);
 
+		MainActivity ma= (MainActivity) context;
+		ma.setButtonBorder(buttonOk);
+		ma.setButtonBorder(buttonCancel);
 		buttonLayout.addView(buttonOk);
 		buttonLayout.addView(buttonCancel);
 
@@ -322,6 +329,20 @@ public class AmbilWarnaDialog {
 
 	public void show() {
 		dialog.show();
+		Window w = dialog.getWindow();
+		if (w != null) {
+			View dv = w.getDecorView();
+			dv.getBackground().setColorFilter(new LightingColorFilter(0xFF000000, bgColor));
+			GradientDrawable border = new GradientDrawable();
+			border.setColor(bgColor); // Background color
+			border.setStroke(5, textColor); // Border width and color
+			int padding = 16;
+			border.setCornerRadius(padding);
+
+			w.setBackgroundDrawable(border);
+
+			dv.setPadding(padding, padding, padding, padding);
+		}
 	}
 
 	private void updateAlphaView() {

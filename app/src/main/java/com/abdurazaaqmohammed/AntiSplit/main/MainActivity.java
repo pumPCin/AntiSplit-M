@@ -23,9 +23,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.net.Uri;
@@ -41,6 +39,7 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -90,7 +89,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     public static String lang;
     public DeviceSpecsUtil DeviceSpecsUtil;
 
-    private void setButtonBorder(Button button) {
+    public void setButtonBorder(Button button) {
         ShapeDrawable border = new ShapeDrawable(new RectShape());
         Paint paint = border.getPaint();
         paint.setStyle(Paint.Style.STROKE);
@@ -119,17 +118,13 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.updateToggle : R.id.updateToggleText)).setTextColor(color);
             }
         } else findViewById(R.id.main).setBackgroundColor(bgColor = color);
-        setButtonBorder(findViewById(R.id.decodeButton));
-        //setButtonBorder(findViewById(R.id.settingsButton));
-        TextView settingsButton = findViewById(R.id.settingsButton);
-        settingsButton.setBackgroundColor(bgColor);
-        Drawable d;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && (d = getDrawable(R.drawable.settings)) != null) {
-            d.setTint(textColor);
-            settingsButton.setBackgroundDrawable(d);
-        } else settingsButton.setText("⚙️");
-        ImageView loadingImage = findViewById(R.id.loadingImage);
-        loadingImage.setColorFilter(new LightingColorFilter(0xFF000000, textColor));
+        Button decodeButton = findViewById(R.id.decodeButton);
+        setButtonBorder(decodeButton);
+        LightingColorFilter themeColor = new LightingColorFilter(0xFF000000, textColor);
+        ImageView settingsButton = findViewById(R.id.settingsButton);
+        settingsButton.setColorFilter(themeColor);
+
+        ((ImageView) findViewById(R.id.loadingImage)).setColorFilter(themeColor);
         if(fromSettingsMenu) {
             setButtonBorder(settingsMenu.findViewById(R.id.langPicker));
             setButtonBorder(settingsMenu.findViewById(R.id.changeTextColor));
@@ -191,13 +186,12 @@ public class MainActivity extends Activity implements Merger.LogListener {
         if(Objects.equals(lang, Locale.getDefault().getLanguage())) rss = getResources();
         else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources(), null);
 
-        Button settingsButton = findViewById(R.id.settingsButton);
+        ImageView settingsButton = findViewById(R.id.settingsButton);
         Button decodeButton = findViewById(R.id.decodeButton);
-        settingsButton.setHeight((int) (decodeButton.getHeight() * 0.8));
         ((LinearLayout) findViewById(R.id.topButtons)).setGravity(Gravity.CENTER_VERTICAL);
+
         settingsButton.setOnClickListener(v -> {
-            LayoutInflater inflater = LayoutInflater.from(this);
-            ScrollView l = (ScrollView) inflater.inflate(R.layout.dialog_settings, null);
+            ScrollView l = (ScrollView) LayoutInflater.from(this).inflate(R.layout.dialog_settings, null);
             l.setBackgroundColor(bgColor);
 
             setColor(textColor, true, l);
@@ -331,7 +325,14 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     , 1);
         } // XAPK is octet-stream
         );
-
+        decodeButton.post(() -> {
+            int buttonHeight = decodeButton.getHeight();
+            int size = (int) (buttonHeight * 0.75);
+            ViewGroup.LayoutParams params = settingsButton.getLayoutParams();
+            params.height = size;
+            params.width = size;
+            settingsButton.setLayoutParams(params);
+        });
         // Check if user shared or opened file with the app.
         final Intent openIntent = getIntent();
         final String action = openIntent.getAction();
@@ -361,8 +362,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
         border.setStroke(5, textColor); // Border width and color
         border.setCornerRadius(16);
 
-        LayerDrawable layerDrawable = new LayerDrawable(new GradientDrawable[]{border});
-
         runOnUiThread(() -> {
             ad.show();
             if(display != null) ad.getListView().setAdapter(new CustomArrayAdapter(this, display, textColor, isLang));
@@ -378,9 +377,9 @@ public class MainActivity extends Activity implements Merger.LogListener {
             if(neutralButton != null) neutralButton.setTextColor(textColor);
 
             if (w != null) {
-                w.setBackgroundDrawable(layerDrawable);
                 View dv = w.getDecorView();
                 dv.getBackground().setColorFilter(new LightingColorFilter(0xFF000000, bgColor));
+                w.setBackgroundDrawable(border);
 
                 int padding = 16;
                 dv.setPadding(padding, padding, padding, padding);
@@ -395,21 +394,31 @@ public class MainActivity extends Activity implements Merger.LogListener {
         Button decodeButton = findViewById(R.id.decodeButton);
         decodeButton.setText(res.getString(R.string.merge));
         setButtonBorder(decodeButton);
+        ImageView settingsButton = findViewById(R.id.settingsButton);
+        settingsButton.setContentDescription(res.getString(R.string.settings));
+        decodeButton.post(() -> {
+            int buttonHeight = decodeButton.getHeight();
+            int size = (int) (buttonHeight * 0.75);
+            ViewGroup.LayoutParams params = settingsButton.getLayoutParams();
+            params.height = size;
+            params.width = size;
+            settingsButton.setLayoutParams(params);
+        });
         ((LinearLayout) findViewById(R.id.topButtons)).setGravity(Gravity.CENTER_VERTICAL);
 
         if(settingsDialog != null) {
-            ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(rss.getString(R.string.lang));
+            ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(res.getString(R.string.lang));
             final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.logToggle : R.id.logToggleText)).setText(rss.getString(R.string.enable_logs));
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.ask : R.id.askText)).setText(rss.getString(R.string.ask));
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setText(rss.getString(R.string.show_dialog));
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setText(rss.getString(R.string.sign_apk));
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setText(rss.getString(R.string.automatically_select));
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.updateToggle : R.id.updateToggleText)).setText(rss.getString(R.string.auto_update));
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.revancedToggle : R.id.revancedText)).setText(rss.getString(R.string.fix));
-            ((TextView) settingsDialog.findViewById(R.id.changeTextColor)).setText(rss.getString(R.string.change_text_color));
-            ((TextView) settingsDialog.findViewById(R.id.changeBgColor)).setText(rss.getString(R.string.change_background_color));
-            ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.check_update_now));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.logToggle : R.id.logToggleText)).setText(res.getString(R.string.enable_logs));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.ask : R.id.askText)).setText(res.getString(R.string.ask));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setText(res.getString(R.string.show_dialog));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setText(res.getString(R.string.sign_apk));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setText(res.getString(R.string.automatically_select));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.updateToggle : R.id.updateToggleText)).setText(res.getString(R.string.auto_update));
+            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.revancedToggle : R.id.revancedText)).setText(res.getString(R.string.fix));
+            ((TextView) settingsDialog.findViewById(R.id.changeTextColor)).setText(res.getString(R.string.change_text_color));
+            ((TextView) settingsDialog.findViewById(R.id.changeBgColor)).setText(res.getString(R.string.change_background_color));
+            ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(res.getString(R.string.check_update_now));
         }
     }
 
@@ -620,6 +629,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         ImageView loadingImage = context.findViewById(R.id.loadingImage);
         context.runOnUiThread(() -> {
             if(on) {
+                ((LinearLayout) context.findViewById(R.id.wrapImg)).setGravity(Gravity.CENTER);
                 loadingImage.setVisibility(View.VISIBLE);
                 loadingImage.startAnimation(AnimationUtils.loadAnimation(context, R.anim.loading));
             }
