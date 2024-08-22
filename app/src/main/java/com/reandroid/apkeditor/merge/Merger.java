@@ -15,6 +15,7 @@
  */
 package com.reandroid.apkeditor.merge;
 
+import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.toggleAnimation;
 import static com.reandroid.apkeditor.merge.LogUtil.logMessage;
 
 import android.content.Context;
@@ -62,6 +63,7 @@ public class Merger {
         void onLog(int resID);
     }
 
+    /** @noinspection ResultOfMethodCallIgnored*/
     private static void extractAndLoad(Uri in, File cacheDir, Context context, List<String> splits, ApkBundle bundle) throws IOException, MismatchedSplitsException, InterruptedException {
         logMessage(in.getPath());
         boolean checkSplits = splits != null && !splits.isEmpty();

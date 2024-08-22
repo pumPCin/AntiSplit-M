@@ -42,8 +42,10 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -126,6 +128,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
             d.setTint(textColor);
             settingsButton.setBackgroundDrawable(d);
         } else settingsButton.setText("⚙️");
+        ImageView loadingImage = findViewById(R.id.loadingImage);
+        loadingImage.setColorFilter(new LightingColorFilter(0xFF000000, textColor));
         if(fromSettingsMenu) {
             setButtonBorder(settingsMenu.findViewById(R.id.langPicker));
             setButtonBorder(settingsMenu.findViewById(R.id.changeTextColor));
@@ -501,6 +505,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         ProcessTask(MainActivity context, com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil deviceSpecsUtil) {
             activityReference = new WeakReference<>(context);
             DeviceSpecsUtil = deviceSpecsUtil;
+            toggleAnimation(context, true);
         }
 
         @Override
@@ -595,6 +600,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         @Override
         protected void onPostExecute(Void result) {
             MainActivity activity = activityReference.get();
+            toggleAnimation(activity, false);
             if(activity.urisAreSplitApks) activity.getHandler().post(() -> {
                 try {
                     activity.uris.remove(0);
@@ -608,6 +614,20 @@ public class MainActivity extends Activity implements Merger.LogListener {
             });
             else activity.showSuccess();
         }
+    }
+
+    public static void toggleAnimation(MainActivity context, boolean on) {
+        ImageView loadingImage = context.findViewById(R.id.loadingImage);
+        context.runOnUiThread(() -> {
+            if(on) {
+                loadingImage.setVisibility(View.VISIBLE);
+                loadingImage.startAnimation(AnimationUtils.loadAnimation(context, R.anim.loading));
+            }
+            else {
+                loadingImage.setVisibility(View.GONE);
+                loadingImage.clearAnimation();
+            }
+        });
     }
 
     private void processOneSplitApkUri(Uri uri) {
@@ -875,6 +895,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     private void showError(Exception e) {
         final String mainErr = e.toString();
         errorOccurred = !mainErr.equals(rss.getString(R.string.sign_failed));
+        toggleAnimation(this, false);
         StringBuilder stackTrace = new StringBuilder().append(mainErr).append('\n');
         for(StackTraceElement line : e.getStackTrace()) stackTrace.append(line).append('\n');
         runOnUiThread(() -> {
@@ -886,6 +907,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     }
 
     private void showError(String err) {
+        toggleAnimation(this, false);
         runOnUiThread(() -> {
             TextView errorBox = findViewById(R.id.errorField);
             errorBox.setVisibility(View.VISIBLE);
