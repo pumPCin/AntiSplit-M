@@ -34,8 +34,6 @@
     <string name="last_edit">Ultima modifica: </string>
     <string name="error_dir_access">Impossibile accedere alla cartella</string>
     <string name="lang" translatable="false">Lingua</string>
-    <string name="fixing">Applicazione correzione per ReVanced…</string>
-    <string name="fix">Correzione per ReVanced</string>
     <string name="update">Aggiornamento disponibile</string>
     <string name="new_ver">È disponibile una nuova versione di AntiSplit M</string>
     <string name="dl">Scarica</string>
