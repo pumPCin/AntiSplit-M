@@ -45,4 +45,9 @@
     <string name="mismatch">Le seguenti suddivisioni (%1$s) hanno un codice di versione non corrispondente. Queste contengono solo traduzioni per altre lingue, quindi l\'app potrà essere comunque eseguita, ma non risulterà tradotta. Intendi procedere ugualmente con l\'unione?</string>
     <string name="warning">Avviso</string>
     <string name="mismatch_base">" il codice di versione non corrisponde a quello del file apk base."</string>
+    <string name="create_issue">Segnala un problema su GitHub</string>
+    <string name="copy_log">Copia registro eventi</string>
+    <string name="pause">Pulsante pausa</string>
+    <string name="resume">Pulsante riprendi</string>
+    <string name="copied_log">Registro eventi copiato</string>
 </resources>
