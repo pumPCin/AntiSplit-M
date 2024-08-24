@@ -83,7 +83,7 @@ class OutputSource {
         ceh.writeBytes(zipOutput.getOutputStream());
     }
     void writeDD(ZipOutput apkFileWriter) throws IOException{
-        DataDescriptor dataDescriptor = getLocalFileHeader().getDataDescriptor();
+        DataDescriptor dataDescriptor = null;//getLocalFileHeader().getDataDescriptor();
         if(dataDescriptor == null){
             return;
         }

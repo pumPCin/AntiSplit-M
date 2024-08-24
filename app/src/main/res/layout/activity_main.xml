@@ -53,7 +53,8 @@
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/wrapImg" >
+        android:layout_below="@id/wrapImg"
+        android:layout_above="@id/viewSwitcher">
 
         <LinearLayout
             android:id="@+id/linear1"
@@ -80,4 +81,27 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <ViewSwitcher
+        android:id="@+id/viewSwitcher"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/cancelButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:contentDescription="@string/cancel" />
+
+        <ImageView
+            android:id="@+id/copyLog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/copy"
+            android:contentDescription="@string/pause" />
+
+    </ViewSwitcher>
 </RelativeLayout>

@@ -69,4 +69,9 @@
         <item>uk</item>
     </string-array>
     <string name="label_parent_dir" translatable="false">…</string>
+    <string name="create_issue">Create GitHub Issue</string>
+    <string name="copy_log">Copy log</string>
+    <string name="pause">Pause button</string>
+    <string name="resume">Resume button</string>
+    <string name="copied_log">Copied log</string>
 </resources>

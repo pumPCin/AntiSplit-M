@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"/>
 
-        <TextView
+        <!--<TextView
             android:id="@+id/revancedText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -101,7 +101,7 @@
         <ToggleButton
             android:id="@+id/revancedToggle"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"/>
+            android:layout_width="match_parent"/>-->
 
         <Button
             android:id="@+id/langPicker"

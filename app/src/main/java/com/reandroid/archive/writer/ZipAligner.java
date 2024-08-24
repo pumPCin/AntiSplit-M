@@ -74,7 +74,7 @@ public class ZipAligner {
     }
     private void createDataDescriptor(LocalFileHeader lfh){
         DataDescriptor dataDescriptor;
-        if(enableDataDescriptor){
+        if(false){
             dataDescriptor = DataDescriptor.fromLocalFile(lfh);
         }else {
             dataDescriptor = null;
@@ -96,7 +96,7 @@ public class ZipAligner {
         zipAligner.setDefaultAlignment(ALIGNMENT_4);
         Pattern patternNativeLib = Pattern.compile("^lib/.+\\.so$");
         zipAligner.setFileAlignment(patternNativeLib, ALIGNMENT_PAGE);
-        zipAligner.setEnableDataDescriptor(true);
+        zipAligner.setEnableDataDescriptor(false);
         return zipAligner;
     }
 

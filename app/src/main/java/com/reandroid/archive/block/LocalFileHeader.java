@@ -52,7 +52,7 @@ public class LocalFileHeader extends CommonHeader {
         lfh.setCrc(getCrc());
         DataDescriptor dd = getDataDescriptor();
         if(dd != null){
-            lfh.setDataDescriptor(dd.copy());
+            //lfh.setDataDescriptor(dd.copy());
         }
         lfh.setDosTime(getDosTime());
         lfh.setPlatform(getPlatform());

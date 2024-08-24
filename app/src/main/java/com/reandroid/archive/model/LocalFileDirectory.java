@@ -70,7 +70,7 @@ public class LocalFileDirectory {
                     dataDescriptor = null;
                 }
             }
-            lfh.setDataDescriptor(dataDescriptor);
+            //lfh.setDataDescriptor(dataDescriptor);
             lfh.setIndex(index);
 
             headerList.add(lfh);

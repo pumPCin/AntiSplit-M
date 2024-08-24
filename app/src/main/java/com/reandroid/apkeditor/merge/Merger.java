@@ -15,7 +15,6 @@
  */
 package com.reandroid.apkeditor.merge;
 
-import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.toggleAnimation;
 import static com.reandroid.apkeditor.merge.LogUtil.logMessage;
 
 import android.content.Context;
@@ -27,7 +26,6 @@ import com.abdurazaaqmohammed.AntiSplit.main.MainActivity;
 import com.abdurazaaqmohammed.AntiSplit.main.MismatchedSplitsException;
 import com.abdurazaaqmohammed.AntiSplit.main.SignUtil;
 import com.j256.simplezip.ZipFileInput;
-import com.j256.simplezip.format.GeneralPurposeFlag;
 import com.j256.simplezip.format.ZipFileHeader;
 import com.reandroid.apk.ApkBundle;
 import com.reandroid.apk.ApkModule;
@@ -92,6 +90,8 @@ public class Merger {
             // If the above failed it probably did not copy any files
             // so might as well do it this way instead of trying unreliable methods to see if we need to do this
             // and possibly copying the file for no reason
+
+            // Check if already copied the file earlier to get list of splits.
             if (DeviceSpecsUtil.zipFile == null) {
                 File input = new File(FileUtils.getPath(in, context));
                 boolean couldNotRead = !input.canRead();
@@ -123,7 +123,7 @@ public class Merger {
         zf.close();
     }
 
-    public static void run(Uri in, File cacheDir, Uri out, Context context, List<String> splits, boolean signApk, boolean revanced) throws Exception {
+    public static void run(Uri in, File cacheDir, Uri out, Context context, List<String> splits, boolean signApk) throws Exception {
         logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.searching));
         try (ApkBundle bundle = new ApkBundle()) {
             if (in == null)
@@ -213,14 +213,25 @@ public class Merger {
                     manifest.refresh();
                 }
                 logMessage(MainActivity.rss.getString(R.string.saving));
+
                 File temp;
-                if (revanced || signApk) {
+                if (signApk) {
                     mergedModule.writeApk(temp = new File(cacheDir, "temp.apk"));
-                    // The apk does not need to be signed to patch with ReVanced and it will make this already long crap take even more time
+                    logMessage(MainActivity.rss.getString(R.string.signing));
+                    boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
+                    File stupid = new File(noPerm ? (cacheDir + File.separator + "stupid.apk") : FileUtils.getPath(out, context));
+                    try {
+                        SignUtil.signDebugKey(context, temp, stupid);
+                        if (noPerm) FileUtils.copyFile(stupid, FileUtils.getOutputStream(out, context));
+                    } catch (Exception e) {
+                        SignUtil.signPseudoApkSigner(temp, context, out, e);
+                    }
+                    // Below no longer necessary
+                    /*if (revanced) {
+                       // The apk does not need to be signed to patch with ReVanced and it will make this already long crap take even more time
                     // but someone is probably going to try to install it before patching and complain
                     // and to avoid confusion/mistakes the sign apk option in the app should not be toggled off when revanced option is on
-                    if (revanced) {
-                        logMessage(MainActivity.rss.getString(R.string.fixing));
+                     logMessage(MainActivity.rss.getString(R.string.fixing));
                         // Copying the contents of the zip to a new one works on most JRE implementations of java.util.zip but not on Android,
                         // the exact same problem happens in ReVanced.
                         try (ZipFileInput zfi = new ZipFileInput(temp);
@@ -244,19 +255,7 @@ public class Merger {
                                 zfo.writeRawFileData(zfi.openFileDataInputStream(true));
                             }
                         }
-                    }
-                    if (signApk) {
-                        logMessage(MainActivity.rss.getString(R.string.signing));
-                        boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
-                        File stupid = new File(noPerm ? (cacheDir + File.separator + "stupid.apk") : FileUtils.getPath(out, context));
-                        try {
-                            SignUtil.signDebugKey(context, temp, stupid);
-                            if (noPerm)
-                                FileUtils.copyFile(stupid, FileUtils.getOutputStream(out, context));
-                        } catch (Exception e) {
-                            SignUtil.signPseudoApkSigner(temp, context, out, e);
-                        }
-                    }
+                    }*/
                 } else {
                     mergedModule.writeApk(FileUtils.getOutputStream(out, context));
                 }
