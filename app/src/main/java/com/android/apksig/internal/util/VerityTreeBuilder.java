@@ -20,6 +20,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import android.os.Build;
 
+import com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils;
 import com.android.apksig.internal.zip.ZipUtils;
 import com.android.apksig.util.DataSink;
 import com.android.apksig.util.DataSource;
@@ -231,7 +232,7 @@ public class VerityTreeBuilder implements Closeable {
 
         final byte[][] hashes = new byte[chunks][];
 
-        if (Build.VERSION.SDK_INT > 20) {
+        if (LegacyUtils.canSetNotificationBarTransparent) {
             Phaser tasks = new Phaser(1);
             // Reading the input file as fast as we can.
             final long maxReadSize = ioSizeChunks * CHUNK_SIZE;

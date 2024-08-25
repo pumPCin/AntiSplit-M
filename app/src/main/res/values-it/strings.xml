@@ -26,7 +26,6 @@
     <string name="skipping">"Escludo "</string>
     <string name="not_apk">: Non è un file APK</string>
     <string name="unselected">: Non selezionato</string>
-    <string name="detected_xapk">Rilevato file con estensione XAPK, mi assicuro che possa essere estratto correttamente</string>
     <string name="searching">Ricerca file apk…</string>
     <string name="cancel">Annulla</string>
     <string name="select">Seleziona</string>
@@ -48,6 +47,5 @@
     <string name="create_issue">Segnala un problema su GitHub</string>
     <string name="copy_log">Copia registro eventi</string>
     <string name="pause">Pulsante pausa</string>
-    <string name="resume">Pulsante riprendi</string>
     <string name="copied_log">Registro eventi copiato</string>
 </resources>

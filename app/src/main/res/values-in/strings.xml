@@ -26,7 +26,6 @@
     <string name="skipping">"Meloncati "</string>
     <string name="not_apk">: Bukan sebuah berkas APK</string>
     <string name="unselected">: Tidak dipilih</string>
-    <string name="detected_xapk">File XAPK terdeteksi, sedang memastikan agar berkasnya bisa diekstraksi dengan baik</string>
     <string name="searching">Mencari berkas APK…</string>
     <string name="cancel">Batalkan</string>
     <string name="select">Pilih</string>
@@ -34,6 +33,4 @@
     <string name="last_edit">Terakhir kali disunting: </string>
     <string name="error_dir_access">Direktorinya tidak bisa diakses</string>
     <string name="lang" translatable="false">Bahasa</string>
-    <string name="fixing">Memperbaiki untuk ReVanced…</string>
-    <string name="fix">Perbaiki untuk ReVanced</string>
 </resources>

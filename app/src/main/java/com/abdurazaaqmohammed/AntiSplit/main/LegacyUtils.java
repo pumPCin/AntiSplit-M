@@ -10,5 +10,6 @@ public class LegacyUtils {
     public static final boolean supportsExternalCacheDir = Build.VERSION.SDK_INT > 7;
     public final static boolean doesNotSupportInbuiltAndroidFilePicker = Build.VERSION.SDK_INT < 19;
     public final static boolean supportsActionBar = Build.VERSION.SDK_INT > 10;
+    public final static boolean canSetNotificationBarTransparent = Build.VERSION.SDK_INT > 20;
 
 }

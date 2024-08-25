@@ -27,7 +27,6 @@
     <string name="skipping">"Pulando "</string>
     <string name="not_apk">: Não é um arquivo APK</string>
     <string name="unselected">: Não selecionado</string>
-    <string name="detected_xapk">Arquivo XAPK detectado, garantindo que ele possa ser extraído corretamente</string>
     <string name="searching">Procurando arquivos apk…</string>
     <string name="cancel">Cancelar</string>
     <string name="select">Selecione</string>
@@ -35,8 +34,6 @@
     <string name="last_edit">Última edição: </string>
     <string name="error_dir_access">O diretório não pode ser acessado</string>
     <string name="lang" translatable="false">Idioma</string>
-    <string name="fixing">Corrigindo para ReVanced…</string>
-    <string name="fix">Correção para ReVanced</string>
     <string name="update">Atualização disponível</string>
     <string name="new_ver">Nova versão do AntiSplit M está disponível</string>
     <string name="dl">Download</string>
@@ -48,32 +45,9 @@
     <string name="mismatch">Os seguintes splits (%1$s) têm códigos de versão incompatíveis. Eles são apenas códigos de idioma, então o aplicativo pode ser executado sem eles, mas esses idiomas não funcionarão no aplicativo. Você quer continuar com a mesclagem mesmo assim?</string>
     <string name="warning">Aviso</string>
     <string name="mismatch_base">" o código da versão não corresponde ao do base.apk"</string>
-    <string-array name="langs_display">
-        <item>English</item>
-        <item>Español</item>
-        <item>Français</item>
-        <item>Bahasa Indonesia</item>
-        <item>Italiano</item>
-        <item>русский язык</item>
-        <item>Türkçe</item>
-        <item>українська мова</item>
-        <item>Português</item>
-    </string-array>
-    <string-array name="langs">
-        <item>en</item>
-        <item>es</item>
-        <item>fr</item>
-        <item>in</item>
-        <item>it</item>
-        <item>ru</item>
-        <item>tr</item>
-        <item>uk</item>
-        <item>pt-rBR</item>
-    </string-array>
     <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">Criar problema no GitHub</string>
     <string name="copy_log">Copiar log</string>
     <string name="pause">Botão de pausa</string>
-    <string name="resume">Botão de retomar</string>
     <string name="copied_log">Log copiado</string>
 </resources>

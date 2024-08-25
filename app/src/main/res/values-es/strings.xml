@@ -27,7 +27,6 @@
     <string name="skipping">"Excluyendo "</string>
     <string name="not_apk">: No es un archivo APK</string>
     <string name="unselected">: No seleccionado</string>
-    <string name="detected_xapk">Archivo XAPK detectado, asegurándose de que pueda extraerse correctamente</string>
     <string name="searching">Buscando archivos apk…</string>
     <string name="cancel">Cancelar</string>
     <string name="select">Seleccionar</string>
@@ -35,8 +34,6 @@
     <string name="last_edit">Última edición:</string>
     <string name="error_dir_access">No se puede acceder al directorio</string>
     <string name="lang" translatable="false">Idioma</string>
-    <string name="fixing">Corrigiendo para ReVanced…</string>
-    <string name="fix">Corrección para ReVanced.</string>
     <string name="update">Actualización disponible</string>
     <string name="new_ver">Nueva versión de AntiSplit M disponible</string>
     <string name="dl">Descargar</string>

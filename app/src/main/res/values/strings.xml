@@ -27,7 +27,6 @@
     <string name="skipping">"Skipping "</string>
     <string name="not_apk">: Not an APK file</string>
     <string name="unselected">: Unselected</string>
-    <string name="detected_xapk">XAPK file detected, ensuring it can be extracted properly</string>
     <string name="searching">Searching apk files…</string>
     <string name="cancel">Cancel</string>
     <string name="select">Select</string>
@@ -35,8 +34,6 @@
     <string name="last_edit">Last edited: </string>
     <string name="error_dir_access">Directory cannot be accessed</string>
     <string name="lang" translatable="false">Language</string>
-    <string name="fixing">Fixing for ReVanced…</string>
-    <string name="fix">Fix for ReVanced</string>
     <string name="update">Update available</string>
     <string name="new_ver">New version of AntiSplit M is available</string>
     <string name="dl">Download</string>
@@ -57,6 +54,7 @@
         <item>русский язык</item>
         <item>Türkçe</item>
         <item>українська мова</item>
+        <item>Português</item>
     </string-array>
     <string-array name="langs">
         <item>en</item>
@@ -67,11 +65,11 @@
         <item>ru</item>
         <item>tr</item>
         <item>uk</item>
+        <item>pt-BR</item>
     </string-array>
     <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">Create GitHub Issue</string>
     <string name="copy_log">Copy log</string>
     <string name="pause">Pause button</string>
-    <string name="resume">Resume button</string>
     <string name="copied_log">Copied log</string>
 </resources>

@@ -26,7 +26,6 @@
     <string name="skipping">Geçiliyor</string>
     <string name="not_apk">Bu bir APK dosyası değil.</string>
     <string name="unselected">Seçilmedi </string>
-    <string name="detected_xapk">XAPK dosyası tespit edildi, düzgün bir şekilde çıkarılabilmesi sağlanacak</string>
     <string name="searching">APK dosyası aranıyor…</string>
     <string name="cancel">İptal et</string>
     <string name="select">Seç</string>

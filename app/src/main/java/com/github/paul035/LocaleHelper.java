@@ -37,7 +37,8 @@ public class LocaleHelper {
     // an object of the inbuilt Locale class and passing the language argument to it
     @TargetApi(Build.VERSION_CODES.N)
     private static Context updateResources(Context context, String language) {
-        Locale locale = new Locale(language);
+        String[] codes = language.split("-");
+        Locale locale = codes.length > 1 ? new Locale(codes[0], codes[1]) : new Locale(language);
         Locale.setDefault(locale);
 
         Configuration configuration = context.getResources().getConfiguration();
@@ -48,7 +49,8 @@ public class LocaleHelper {
     }
 
     private static Context updateResourcesLegacy(Context context, String language) {
-        Locale locale = new Locale(language);
+        String[] codes = language.split("-");
+        Locale locale = codes.length > 1 ? new Locale(codes[0], codes[1]) : new Locale(language);
         Locale.setDefault(locale);
 
         Resources resources = context.getResources();

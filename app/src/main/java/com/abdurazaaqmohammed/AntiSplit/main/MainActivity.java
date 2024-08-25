@@ -765,10 +765,10 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 try {
                     currentVer = ((Context) activity).getPackageManager().getPackageInfo(((Context) activity).getPackageName(), 0).versionName;
                 } catch (Exception e) {
-                    currentVer = "1.6.5.9";
+                    currentVer = "1.6.6";
                 }
                 boolean newVer = false;
-                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {1, 6, 5, 9} : currentVer.replace(".", "").toCharArray();
+                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {1, 6, 6} : currentVer.replace(".", "").toCharArray();
                 char[] latest = latestVersion.replace(".", "").toCharArray();
                 for(int i = 0; i < curr.length; i++) {
                     if(latest[i] > curr[i]) {

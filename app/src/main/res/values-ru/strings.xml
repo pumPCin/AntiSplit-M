@@ -8,7 +8,6 @@
     <string name="change_background_color">Изменить цвет фона</string>
     <string name="change_text_color">Изменить цвет текста</string>
     <string name="select">Выбрать</string>
-    <string name="detected_xapk">Обнаружен файл XAPK, что гарантирует его правильное извлечение</string>
     <string name="dpi_for_device">Выбор ширину экрана для вашего устройства</string>
     <string name="enable_logs">Включить журналы</string>
     <string name="error_dir_access">Доступ к каталогу невозможен</string>
