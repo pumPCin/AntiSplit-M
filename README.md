@@ -1,8 +1,6 @@
 # AntiSplit M
 Android app to merge/"AntiSplit" split APKs (APKS/XAPK/APKM) to a regular .APK file
 
-**Note: If you are using this app to get an APK to patch in ReVanced Manager, you should enable the option "Fix for ReVanced" (see screenshots below)**
-
 This project is a simple GUI implementation of Merge utilities from [REAndroid APKEditor](https://github.com/REAndroid/APKEditor).
 
 There are already some apps that can perform this task like Apktool M, AntiSplit G2, NP Manager, but they are all closed source. 
