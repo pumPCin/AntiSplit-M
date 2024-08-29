@@ -123,110 +123,105 @@ public class Merger {
         zf.close();
     }
 
-    public static void run(Uri in, File cacheDir, Uri out, Context context, List<String> splits, boolean signApk) throws Exception {
-        logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.searching));
-        try (ApkBundle bundle = new ApkBundle()) {
-            if (in == null)
-                bundle.loadApkDirectory(cacheDir, false, context); // Multiple splits from a split apk, already copied to cache dir
-            else extractAndLoad(in, cacheDir, context, splits, bundle);
-            logMessage("Found modules: " + bundle.getApkModuleList().size());
+    public static void run(ApkBundle bundle, File cacheDir, Uri out, Context context, boolean signApk) throws IOException {
+        logMessage("Found modules: " + bundle.getApkModuleList().size());
 
-            try (ApkModule mergedModule = bundle.mergeModules()) {
-                if (mergedModule.hasAndroidManifest()) {
-                    AndroidManifestBlock manifest = mergedModule.getAndroidManifest();
-                    logMessage(MainActivity.rss.getString(R.string.sanitizing_manifest));
-                    int ID_requiredSplitTypes = 0x0101064e;
-                    int ID_splitTypes = 0x0101064f;
+        try (ApkModule mergedModule = bundle.mergeModules()) {
+            if (mergedModule.hasAndroidManifest()) {
+                AndroidManifestBlock manifest = mergedModule.getAndroidManifest();
+                logMessage(MainActivity.rss.getString(R.string.sanitizing_manifest));
+                int ID_requiredSplitTypes = 0x0101064e;
+                int ID_splitTypes = 0x0101064f;
 
-                    AndroidManifestHelper.removeAttributeFromManifestById(manifest,
-                            ID_requiredSplitTypes);
-                    AndroidManifestHelper.removeAttributeFromManifestById(manifest,
-                            ID_splitTypes);
-                    AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
-                            AndroidManifest.NAME_splitTypes);
+                AndroidManifestHelper.removeAttributeFromManifestById(manifest,
+                        ID_requiredSplitTypes);
+                AndroidManifestHelper.removeAttributeFromManifestById(manifest,
+                        ID_splitTypes);
+                AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
+                        AndroidManifest.NAME_splitTypes);
 
-                    AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
-                            AndroidManifest.NAME_requiredSplitTypes);
-                    AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
-                            AndroidManifest.NAME_splitTypes);
-                    AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
-                            AndroidManifest.ID_extractNativeLibs
-                    );
-                    AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
-                            AndroidManifest.ID_isSplitRequired
-                    );
+                AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
+                        AndroidManifest.NAME_requiredSplitTypes);
+                AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
+                        AndroidManifest.NAME_splitTypes);
+                AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
+                        AndroidManifest.ID_extractNativeLibs
+                );
+                AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
+                        AndroidManifest.ID_isSplitRequired
+                );
 
-                    ResXmlElement application = manifest.getApplicationElement();
-                    List<ResXmlElement> splitMetaDataElements =
-                            AndroidManifestHelper.listSplitRequired(application);
-                    boolean splits_removed = false;
-                    for (ResXmlElement meta : splitMetaDataElements) {
-                        if (!splits_removed) {
-                            boolean result = false;
-                            ResXmlAttribute nameAttribute = meta.searchAttributeByResourceId(AndroidManifest.ID_name);
-                            if (nameAttribute != null) {
-                                if ("com.android.vending.splits".equals(nameAttribute.getValueAsString())) {
-                                    ResXmlAttribute valueAttribute = meta.searchAttributeByResourceId(
-                                            AndroidManifest.ID_value);
-                                    if (valueAttribute == null) {
-                                        valueAttribute = meta.searchAttributeByResourceId(
-                                                AndroidManifest.ID_resource);
-                                    }
-                                    if (valueAttribute != null
-                                            && valueAttribute.getValueType() == ValueType.REFERENCE) {
-                                        if (mergedModule.hasTableBlock()) {
-                                            TableBlock tableBlock = mergedModule.getTableBlock();
-                                            ResourceEntry resourceEntry = tableBlock.getResource(valueAttribute.getData());
-                                            if (resourceEntry != null) {
-                                                ZipEntryMap zipEntryMap = mergedModule.getZipEntryMap();
-                                                for (Entry entry : resourceEntry) {
-                                                    if (entry == null) {
-                                                        continue;
-                                                    }
-                                                    ResValue resValue = entry.getResValue();
-                                                    if (resValue == null) {
-                                                        continue;
-                                                    }
-                                                    String path = resValue.getValueAsString();
-                                                    logMessage(MainActivity.rss.getString(R.string.removed_table_entry) + " " + path);
-                                                    //Remove file entry
-                                                    zipEntryMap.remove(path);
-                                                    // It's not safe to destroy entry, resource id might be used in dex code.
-                                                    // Better replace it with boolean value.
-                                                    entry.setNull(true);
-                                                    SpecTypePair specTypePair = entry.getTypeBlock()
-                                                            .getParentSpecTypePair();
-                                                    specTypePair.removeNullEntries(entry.getId());
+                ResXmlElement application = manifest.getApplicationElement();
+                List<ResXmlElement> splitMetaDataElements =
+                        AndroidManifestHelper.listSplitRequired(application);
+                boolean splits_removed = false;
+                for (ResXmlElement meta : splitMetaDataElements) {
+                    if (!splits_removed) {
+                        boolean result = false;
+                        ResXmlAttribute nameAttribute = meta.searchAttributeByResourceId(AndroidManifest.ID_name);
+                        if (nameAttribute != null) {
+                            if ("com.android.vending.splits".equals(nameAttribute.getValueAsString())) {
+                                ResXmlAttribute valueAttribute = meta.searchAttributeByResourceId(
+                                        AndroidManifest.ID_value);
+                                if (valueAttribute == null) {
+                                    valueAttribute = meta.searchAttributeByResourceId(
+                                            AndroidManifest.ID_resource);
+                                }
+                                if (valueAttribute != null
+                                        && valueAttribute.getValueType() == ValueType.REFERENCE) {
+                                    if (mergedModule.hasTableBlock()) {
+                                        TableBlock tableBlock = mergedModule.getTableBlock();
+                                        ResourceEntry resourceEntry = tableBlock.getResource(valueAttribute.getData());
+                                        if (resourceEntry != null) {
+                                            ZipEntryMap zipEntryMap = mergedModule.getZipEntryMap();
+                                            for (Entry entry : resourceEntry) {
+                                                if (entry == null) {
+                                                    continue;
                                                 }
-                                                result = true;
+                                                ResValue resValue = entry.getResValue();
+                                                if (resValue == null) {
+                                                    continue;
+                                                }
+                                                String path = resValue.getValueAsString();
+                                                logMessage(MainActivity.rss.getString(R.string.removed_table_entry) + " " + path);
+                                                //Remove file entry
+                                                zipEntryMap.remove(path);
+                                                // It's not safe to destroy entry, resource id might be used in dex code.
+                                                // Better replace it with boolean value.
+                                                entry.setNull(true);
+                                                SpecTypePair specTypePair = entry.getTypeBlock()
+                                                        .getParentSpecTypePair();
+                                                specTypePair.removeNullEntries(entry.getId());
                                             }
+                                            result = true;
                                         }
                                     }
                                 }
                             }
-                            splits_removed = result;
                         }
-                        logMessage("Removed-element : <" + meta.getName() + "> name=\""
-                                + AndroidManifestHelper.getNamedValue(meta) + "\"");
-                        application.remove(meta);
+                        splits_removed = result;
                     }
-                    manifest.refresh();
+                    logMessage("Removed-element : <" + meta.getName() + "> name=\""
+                            + AndroidManifestHelper.getNamedValue(meta) + "\"");
+                    application.remove(meta);
                 }
-                logMessage(MainActivity.rss.getString(R.string.saving));
+                manifest.refresh();
+            }
+            logMessage(MainActivity.rss.getString(R.string.saving));
 
-                File temp;
-                if (signApk) {
-                    mergedModule.writeApk(temp = new File(cacheDir, "temp.apk"));
-                    logMessage(MainActivity.rss.getString(R.string.signing));
-                    boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
-                    File stupid = new File(noPerm ? (cacheDir + File.separator + "stupid.apk") : FileUtils.getPath(out, context));
-                    try {
-                        SignUtil.signDebugKey(context, temp, stupid);
-                        if (noPerm) FileUtils.copyFile(stupid, FileUtils.getOutputStream(out, context));
-                    } catch (Exception e) {
-                        SignUtil.signPseudoApkSigner(temp, context, out, e);
-                    }
-                    // Below no longer necessary
+            File temp;
+            if (signApk) {
+                mergedModule.writeApk(temp = new File(cacheDir, "temp.apk"));
+                logMessage(MainActivity.rss.getString(R.string.signing));
+                boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
+                File stupid = new File(noPerm ? (cacheDir + File.separator + "stupid.apk") : FileUtils.getPath(out, context));
+                try {
+                    SignUtil.signDebugKey(context, temp, stupid);
+                    if (noPerm) FileUtils.copyFile(stupid, FileUtils.getOutputStream(out, context));
+                } catch (Exception e) {
+                    SignUtil.signPseudoApkSigner(temp, context, out, e);
+                }
+                // Below no longer necessary
                     /*if (revanced) {
                        // The apk does not need to be signed to patch with ReVanced and it will make this already long crap take even more time
                     // but someone is probably going to try to install it before patching and complain
@@ -256,10 +251,19 @@ public class Merger {
                             }
                         }
                     }*/
-                } else {
-                    mergedModule.writeApk(FileUtils.getOutputStream(out, context));
-                }
+            } else {
+                mergedModule.writeApk(FileUtils.getOutputStream(out, context));
             }
+        }
+    }
+
+    public static void run(Uri in, File cacheDir, Uri out, Context context, List<String> splits, boolean signApk) throws Exception {
+        logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.searching));
+        try (ApkBundle bundle = new ApkBundle()) {
+            if (in == null)
+                bundle.loadApkDirectory(cacheDir, false, context); // Multiple splits from a split apk, already copied to cache dir
+            else extractAndLoad(in, cacheDir, context, splits, bundle);
+            run(bundle, cacheDir, out, context, signApk);
         }
     }
 }
