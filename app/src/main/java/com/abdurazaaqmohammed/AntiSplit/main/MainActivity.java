@@ -420,6 +420,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         setButtonBorder(fromAppsButton);
         ImageView settingsButton = findViewById(R.id.settingsButton);
         settingsButton.setContentDescription(res.getString(R.string.settings));
+        findViewById(R.id.installButton).setContentDescription(res.getString(R.string.install));
         decodeButton.post(() -> {
             int buttonHeight = decodeButton.getHeight();
             int size = (int) (buttonHeight * 0.75);
@@ -549,7 +550,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             } catch (PackageManager.NameNotFoundException ignored) {}
         }
 
-        Collections.sort(appInfoList, Comparator.comparing(p -> p.name));
+        Collections.sort(appInfoList, Comparator.comparing((AppInfo p) -> p.name.toLowerCase(Locale.ROOT)));
 
         LinearLayout dialogView = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.dialog_search, null);
 
@@ -1096,6 +1097,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 int cut = Objects.requireNonNull(result).lastIndexOf('/'); // Ensure it throw the NullPointerException here to be caught
                 if (cut != -1) result = result.substring(cut + 1);
             }
+            LogUtil.logMessage(result);
             return result.replaceFirst("\\.(?:xapk|aspk|apk[sm])", "_antisplit.apk");
         } catch (Exception ignored) {
             return "filename_not_found";

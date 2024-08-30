@@ -58,6 +58,7 @@ public class AppListArrayAdapter extends ArrayAdapter<AppInfo> implements Filter
         if (showIcon) {
             iconView.setImageDrawable(appInfo.icon);
             iconView.setVisibility(View.VISIBLE);
+            iconView.setContentDescription(MainActivity.rss.getString(R.string.app_icon_list_label));
         } else {
             iconView.setVisibility(View.GONE);
         }
