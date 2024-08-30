@@ -20,7 +20,7 @@ Note: if you are planning to further modify the APK, you only need to sign it af
 Note: Some apps verify the signature of the APK or take other measures to check if the app was modified, which may cause it to crash on startup.
 
 # Screenshots
-<img src="/images/1.6.5.4 mainscreen.jpg" title="Main screen" height="25%" width="25%" /> <img src="/images/1.6.5.4 dialog.jpg" title="Dialog allowing selection of splits in a split APK" height="25%" width="25%" /> <img src="/images/1.6.5.4 result.jpg" title="Result of merging split APK" height="25%" width="25%" /> <img src="/images/1.6.5.4 settings.jpg" title="Settings menu of the app" height="25%" width="25%" />
+<img src="/images/1.6.6.2 mainscreen.jpg" title="Main screen" height="25%" width="25%" /> <img src="/images/1.6.5.4 dialog.jpg" title="Dialog allowing selection of splits in a split APK" height="25%" width="25%" /> <img src="/images/1.6.6.2 result.jpg" title="Result of merging split APK" height="25%" width="25%" /> <img src="/images/1.6.5.4 settings.jpg" title="Settings menu of the app" height="25%" width="25%" /> <img src="/images/1.6.6.2 list.jpg" title="Menu allowing selection from apps installed on the device" height="25%" width="25%" />
 
 # Used projects
 
