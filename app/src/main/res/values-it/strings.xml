@@ -48,4 +48,7 @@
     <string name="copy_log">Copia registro eventi</string>
     <string name="pause">Pulsante pausa</string>
     <string name="copied_log">Registro eventi copiato</string>
+    <string name="select_from_installed_apps">Scegli dalle App Installate</string>
+    <string name="app_icon_list_label">Icona app</string>
+    <string name="install">Installa</string>
 </resources>
