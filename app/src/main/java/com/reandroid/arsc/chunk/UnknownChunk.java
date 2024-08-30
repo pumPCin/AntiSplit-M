@@ -86,10 +86,9 @@ public class UnknownChunk extends Chunk<HeaderBlock> implements HeaderBlock.Head
                 throw new IOException("Can not create directory: "+dir);
             }
         }
-        OutputStream outputStream= FileUtils.getOutputStream(file);
-        int length = super.writeBytes(outputStream);
-        outputStream.close();
-        return length;
+        try (OutputStream outputStream= FileUtils.getOutputStream(file)) {
+            return super.writeBytes(outputStream);
+        }
     }
     @Override
     public String toString(){

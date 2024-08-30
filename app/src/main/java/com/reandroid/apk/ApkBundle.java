@@ -233,7 +233,7 @@ public class ApkBundle implements Closeable {
                 if(Build.VERSION.SDK_INT > 15) act.finishAffinity();
                 else act.finish();
                 latch.countDown();
-            }).create(), null, false));
+            }).create(), null, false, null));
             latch.await();
         }
         load(apkList);

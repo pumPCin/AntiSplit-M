@@ -40,9 +40,9 @@ public abstract class JSONItem {
         if(dir != null && !dir.exists()){
             dir.mkdirs();
         }
-        OutputStream outputStream= FileUtils.getOutputStream(file);
-        write(outputStream, indentFactor);
-        outputStream.close();
+        try(OutputStream outputStream= FileUtils.getOutputStream(file)) {
+            write(outputStream, indentFactor);
+        }
     }
     public void write(OutputStream outputStream) throws IOException {
         write(outputStream, INDENT_FACTOR);

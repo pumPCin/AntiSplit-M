@@ -73,4 +73,6 @@
     <string name="pause">Pause button</string>
     <string name="copied_log">Copied log</string>
     <string name="select_from_installed_apps">Select from Installed Apps</string>
+    <string name="app_icon_list_label">App icon</string>
+    <string name="install">Install</string>
 </resources>

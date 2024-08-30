@@ -65,7 +65,8 @@ public class Merger {
     private static void extractAndLoad(Uri in, File cacheDir, Context context, List<String> splits, ApkBundle bundle) throws IOException, MismatchedSplitsException, InterruptedException {
         logMessage(in.getPath());
         boolean checkSplits = splits != null && !splits.isEmpty();
-        try (ZipFileInput zis = new ZipFileInput(FileUtils.getInputStream(in, context))) {
+        try (InputStream is = FileUtils.getInputStream(in, context);
+                ZipFileInput zis = new ZipFileInput(is)) {
             ZipFileHeader header;
             while ((header = zis.readFileHeader()) != null) {
                 String name = header.getFileName();
@@ -95,8 +96,9 @@ public class Merger {
             if (DeviceSpecsUtil.zipFile == null) {
                 File input = new File(FileUtils.getPath(in, context));
                 boolean couldNotRead = !input.canRead();
-                if (couldNotRead)
-                    FileUtils.copyFile(FileUtils.getInputStream(in, context), input = new File(cacheDir, input.getName()));
+                if (couldNotRead) try(InputStream is = FileUtils.getInputStream(in, context)) {
+                    FileUtils.copyFile(is, input = new File(cacheDir, input.getName()));
+                }
                 ZipFile zf = new ZipFile(input);
                 extractZipFile(zf, checkSplits, splits, cacheDir);
                 if (couldNotRead) input.delete();
@@ -214,10 +216,12 @@ public class Merger {
                 mergedModule.writeApk(temp = new File(cacheDir, "temp.apk"));
                 logMessage(MainActivity.rss.getString(R.string.signing));
                 boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
-                File stupid = new File(noPerm ? (cacheDir + File.separator + "stupid.apk") : FileUtils.getPath(out, context));
+                File stupid = signedApk = new File(noPerm ? (cacheDir + File.separator + "stupid.apk") : FileUtils.getPath(out, context));
                 try {
                     SignUtil.signDebugKey(context, temp, stupid);
-                    if (noPerm) FileUtils.copyFile(stupid, FileUtils.getOutputStream(out, context));
+                        if (noPerm) try(OutputStream os = FileUtils.getOutputStream(out, context)) {
+                            FileUtils.copyFile(stupid, os);
+                    }
                 } catch (Exception e) {
                     SignUtil.signPseudoApkSigner(temp, context, out, e);
                 }
@@ -256,6 +260,8 @@ public class Merger {
             }
         }
     }
+
+    public static File signedApk;
 
     public static void run(Uri in, File cacheDir, Uri out, Context context, List<String> splits, boolean signApk) throws Exception {
         logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.searching));

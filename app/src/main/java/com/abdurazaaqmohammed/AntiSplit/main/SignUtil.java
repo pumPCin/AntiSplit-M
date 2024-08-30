@@ -16,6 +16,7 @@ import com.starry.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -63,7 +64,7 @@ public class SignUtil {
         if(Build.VERSION.SDK_INT < 30) {
             // When I tried signing with apksig in AVD with sdk 10 java.security is throwing some error saying something not found
             // Apparently 11 is the last version that supports v1 signing alone.
-            try (InputStream fis = FileUtils.getInputStream(temp)) {
+            try (InputStream is = FileUtils.getInputStream(temp)) {
                 final String FILE_NAME_PAST = "testkey.past";
                 final String FILE_NAME_PRIVATE_KEY = "testkey.pk8";
                 File signingEnvironment = new File(context.getFilesDir(), "signing");
@@ -76,15 +77,21 @@ public class SignUtil {
                     IOUtils.copyFileFromAssets(context, FILE_NAME_PRIVATE_KEY, privateKeyFile);
                 }
 
-                PseudoApkSigner.sign(fis, FileUtils.getOutputStream(out, context), pastFile, privateKeyFile);
+                try(OutputStream os = FileUtils.getOutputStream(out, context)) {
+                    PseudoApkSigner.sign(is, os, pastFile, privateKeyFile);
+                }
             } catch (Exception e2) {
                 LogUtil.logMessage(msg);
-                FileUtils.copyFile(temp, FileUtils.getOutputStream(out, context));
+                try(OutputStream os = FileUtils.getOutputStream(out, context)) {
+                    FileUtils.copyFile(temp, os);
+                }
                 throw(new RuntimeException(msg, e)); // for showError
             }
         } else {
             LogUtil.logMessage(msg);
-            FileUtils.copyFile(temp, FileUtils.getOutputStream(out, context));
+            try(OutputStream os = FileUtils.getOutputStream(out, context)) {
+                FileUtils.copyFile(temp, os);
+            }
             throw(new RuntimeException(msg, e)); // for showError
         }
     }

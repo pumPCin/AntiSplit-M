@@ -509,10 +509,9 @@ public class TableBlock extends Chunk<TableHeader>
         if(dir!=null && !dir.exists()){
             dir.mkdirs();
         }
-        OutputStream outputStream = FileUtils.getOutputStream(file);
-        int length = super.writeBytes(outputStream);
-        outputStream.close();
-        return length;
+        try(OutputStream outputStream = FileUtils.getOutputStream(file)) {
+            return super.writeBytes(outputStream);
+        }
     }
     public int resolveStagedAlias(int stagedResId, int def){
         StagedAliasEntry stagedAliasEntry = getStagedAlias(stagedResId);

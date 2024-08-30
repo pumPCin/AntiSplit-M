@@ -83,8 +83,9 @@ public abstract class Archive<T extends ZipInput> implements Closeable {
         //applyAttributes(archiveEntry, file);
     }
     private void extractCompressed(File file, ArchiveEntry archiveEntry) throws IOException {
-        OutputStream outputStream = FileUtils.getOutputStream(file);
-        IOUtil.writeAll(openInputStream(archiveEntry), outputStream);
+        try(OutputStream outputStream = FileUtils.getOutputStream(file)) {
+            IOUtil.writeAll(openInputStream(archiveEntry), outputStream);
+        }
     }
     private void applyAttributes(ArchiveEntry archiveEntry, File file) {
         CentralEntryHeader ceh = archiveEntry.getCentralEntryHeader();

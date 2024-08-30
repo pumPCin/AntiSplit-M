@@ -449,10 +449,9 @@ public class ResXmlDocument extends Chunk<HeaderBlock>
         if(dir!=null && !dir.exists()){
             dir.mkdirs();
         }
-        OutputStream outputStream= FileUtils.getOutputStream(file);
-        int length = super.writeBytes(outputStream);
-        outputStream.close();
-        return length;
+        try(OutputStream outputStream= FileUtils.getOutputStream(file)) {
+            return super.writeBytes(outputStream);
+        }
     }
     public void mergeWithName(ResourceMergeOption mergeOption, ResXmlDocument document) {
         if(document == this){

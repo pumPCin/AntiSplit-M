@@ -13,7 +13,7 @@
     <LinearLayout
         android:id="@+id/topButtons"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="125dp"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -48,7 +48,6 @@
             android:src="@drawable/settings"
             android:contentDescription="@string/settings" />
     </LinearLayout>
-
 
     <LinearLayout
         android:id="@+id/wrapImg"
@@ -112,12 +111,30 @@
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             android:contentDescription="@string/cancel" />
 
-        <ImageView
-            android:id="@+id/copyLog"
+        <LinearLayout
+            android:id="@+id/finishedButtons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/copy"
-            android:contentDescription="@string/pause" />
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/copyLog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/copy"
+                android:contentDescription="@string/pause"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp" />
+
+            <ImageView
+                android:id="@+id/installButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/stat_sys_download"
+                android:contentDescription="@string/install" />
+
+        </LinearLayout>
 
     </ViewSwitcher>
 </RelativeLayout>

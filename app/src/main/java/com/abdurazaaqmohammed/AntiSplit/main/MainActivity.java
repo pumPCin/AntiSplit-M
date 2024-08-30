@@ -3,6 +3,7 @@ package com.abdurazaaqmohammed.AntiSplit.main;
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
 import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsActionBar;
 import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsArraysCopyOfAndDownloadManager;
+import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsFileChannel;
 import static com.reandroid.apkeditor.merge.LogUtil.logEnabled;
 
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -16,7 +17,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,6 +38,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.OpenableColumns;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -76,6 +77,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.channels.ClosedByInterruptException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -294,7 +297,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 styleAlertDialog(new AlertDialog.Builder(this).setSingleChoiceItems(display, curr, (dialog, which) -> {
                     updateLang(LocaleHelper.setLocale(MainActivity.this, lang = langs[which]).getResources(), l);
                     dialog.dismiss();
-                }).create(), display, true);
+                }).create(), display, true, null);
             });
 
             l.findViewById(R.id.changeBgColor).setOnClickListener(v3 -> showColorPickerDialog(false, bgColor, l));
@@ -305,7 +308,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             title.setTextSize(25);
             styleAlertDialog(
                     new AlertDialog.Builder(this).setCustomTitle(title).setView(l)
-                            .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create(), null, false);
+                            .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create(), null, false, null);
         });
 
         decodeButton.setOnClickListener(v -> {
@@ -373,7 +376,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         }
     }
 
-    public void styleAlertDialog(AlertDialog ad, String[] display, boolean isLang) {
+    public void styleAlertDialog(AlertDialog ad, String[] display, boolean isLang, ArrayAdapter aagh) {
         GradientDrawable border = new GradientDrawable();
         border.setColor(bgColor); // Background color
         border.setStroke(5, textColor); // Border width and color
@@ -382,7 +385,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         runOnUiThread(() -> {
             ad.show();
             ListView lv;
-            if(display != null && (lv = ad.getListView()) != null) lv.setAdapter(new CustomArrayAdapter(this, display, textColor, isLang));
+            if((aagh != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(aagh == null ? new CustomArrayAdapter(this, display, textColor, isLang) : aagh);
             Window w = ad.getWindow();
 
             Button positiveButton = ad.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -534,36 +537,31 @@ public class MainActivity extends Activity implements Merger.LogListener {
         PackageManager pm = getPackageManager();
         List<PackageInfo> packageInfoList = pm.getInstalledPackages(0);
 
-        List<String> appsList = new ArrayList<>();
-        List<String> pkgNamesList = new ArrayList<>();
+        List<AppInfo> appInfoList = new ArrayList<>();
 
         for (PackageInfo packageInfo : packageInfoList) {
             try {
-                ApplicationInfo ai = pm.getApplicationInfo(packageInfo.packageName, 0);
+                String packageName = packageInfo.packageName;
+                ApplicationInfo ai = pm.getApplicationInfo(packageName, 0);
                 if (ai.splitSourceDirs != null) {
-                    appsList.add((String) pm.getApplicationLabel(ai));
-                    pkgNamesList.add(packageInfo.packageName);
+                    appInfoList.add(new AppInfo((String) pm.getApplicationLabel(ai), pm.getApplicationIcon(ai), packageName));
                 }
             } catch (PackageManager.NameNotFoundException ignored) {}
         }
 
-        String[] apps = appsList.toArray(new String[0]);
-        String[] pkgNames = pkgNamesList.toArray(new String[0]);
+        Collections.sort(appInfoList, Comparator.comparing(p -> p.name));
 
         LinearLayout dialogView = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.dialog_search, null);
 
         ListView listView = dialogView.findViewById(R.id.list_view);
-        final ArrayAdapter<String> adapter = new CustomArrayAdapter(this, apps, textColor, true);
+        final AppListArrayAdapter adapter = new AppListArrayAdapter(this, appInfoList, textColor, true);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener((parent, view, position, id) -> {
             ad.dismiss();
             boolean realAskValue = ask;
             ask = true;
-            // try {
-            //apkExtractor.extractApk(apps[position]);
-            for(int i = 0; i < apps.length; i++) if(Objects.equals(apps[i], adapter.getItem(position))) pkgName = pkgNames[i];
+            pkgName = adapter.filteredAppInfoList.get(position).packageName;
             selectDirToSaveAPKOrSaveNow();
-            // } catch (PackageManager.NameNotFoundException | IOException e) { showError(e); }
             ask = realAskValue;
         });
 
@@ -586,7 +584,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             }
         });
         ad.setView(dialogView);
-        styleAlertDialog(ad, apps, false);
+        styleAlertDialog(ad, null, false, adapter);
     }
 
     private static class ProcessTask extends AsyncTask<Uri, Void, Void> {
@@ -676,7 +674,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                         Merger.run(
                                 activity.urisAreSplitApks ? activity.splitAPKUri : null,
                                 cacheDir,
-                                uris[0],
+                                (uris[0]),
                                 activity,
                                 splits,
                                 signApk);
@@ -781,7 +779,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         cancelButton.setColorFilter(new LightingColorFilter(0xFF000000, textColor));
         ViewSwitcher vs = findViewById(R.id.viewSwitcher);
         vs.setVisibility(View.VISIBLE);
-        if(Objects.equals(vs.getCurrentView(), findViewById(R.id.copyLog))) vs.showNext();
+        if(Objects.equals(vs.getCurrentView(), findViewById(R.id.finishedButtons))) vs.showNext();
 
         cancelButton.setOnClickListener(v -> {
             Intent intent;
@@ -849,10 +847,10 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 try {
                     currentVer = ((Context) activity).getPackageManager().getPackageInfo(((Context) activity).getPackageName(), 0).versionName;
                 } catch (Exception e) {
-                    currentVer = "1.6.6";
+                    currentVer = null;
                 }
                 boolean newVer = false;
-                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {1, 6, 6} : currentVer.replace(".", "").toCharArray();
+                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {1, 6, 6, 1} : currentVer.replace(".", "").toCharArray();
                 char[] latest = latestVersion.replace(".", "").toCharArray();
                 for(int i = 0; i < curr.length; i++) {
                     if(latest[i] > curr[i]) {
@@ -885,7 +883,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     });
                     if(supportsArraysCopyOfAndDownloadManager) builder.setNeutralButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest"))));
                     activity.styleAlertDialog(builder.setNegativeButton(rss.getString(R.string.cancel), null).create(),
-                            null, false);
+                            null, false, null);
                 } else if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show());
             } catch (Exception ignored) {
                 if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, "Failed to check for update", Toast.LENGTH_SHORT).show());
@@ -998,29 +996,42 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     splitsToUse = splits;
                     selectDirToSaveAPKOrSaveNow();
                 }
-            }).setNegativeButton("Cancel", null).create(), apkNames, false);
+            }).setNegativeButton("Cancel", null).create(), apkNames, false, null);
         } catch (IOException e) {
             showError(e);
         }
     }
 
-    private void showSuccess() {
-        if(!errorOccurred) {
-            final String success = rss.getString(R.string.success_saved);
-            LogUtil.logMessage(success);
-            runOnUiThread(() -> Toast.makeText(this, success, Toast.LENGTH_SHORT).show());
-        }
 
+    private void showSuccess() {
         ViewSwitcher vs = findViewById(R.id.viewSwitcher);
         vs.setVisibility(View.VISIBLE);
         if(Objects.equals(vs.getCurrentView(), findViewById(R.id.cancelButton))) vs.showNext();
-        ImageView b = findViewById(R.id.copyLog);
-        b.setColorFilter(new LightingColorFilter(0xFF000000, textColor));
-        b.setOnClickListener(v -> copyText(new StringBuilder().append(((TextView) findViewById(R.id.logField)).getText()).append('\n').append(((TextView) findViewById(R.id.errorField)).getText())));
+        ImageView copyLogButton = findViewById(R.id.copyLog);
+        LightingColorFilter cf = new LightingColorFilter(0xFF000000, textColor);
+        copyLogButton.setColorFilter(cf);
+        copyLogButton.setOnClickListener(v -> copyText(new StringBuilder().append(((TextView) findViewById(R.id.logField)).getText()).append('\n').append(((TextView) findViewById(R.id.errorField)).getText())));
+        ImageView installButton = findViewById(R.id.installButton);
+        if(errorOccurred) installButton.setVisibility(View.GONE);
+        else {
+            final String success = rss.getString(R.string.success_saved);
+            LogUtil.logMessage(success);
+            runOnUiThread(() -> Toast.makeText(this, success, Toast.LENGTH_SHORT).show());
+            File output;
+            if(signApk && (output = Merger.signedApk) != null && output.exists() && output.length() > 999) {
+                installButton.setColorFilter(cf);
+                installButton.setVisibility(View.VISIBLE);
+                installButton.setOnClickListener(v ->          //if (supportsFileChannel && !getPackageManager().canRequestPackageInstalls()) startActivityForResult(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).setData(Uri.parse(String.format("package:%s", getPackageName()))), 1234);
+                        startActivity(new Intent(Build.VERSION.SDK_INT > 13 ? Intent.ACTION_INSTALL_PACKAGE : Intent.ACTION_VIEW)
+                                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                .setData(FileProvider.getUriForFile(this, "com.abdurazaaqmohammed.AntiSplit.provider", output))));
+            } else installButton.setVisibility(View.GONE);
+        }
     }
 
     private void copyText(CharSequence text) {
-        if(supportsActionBar) ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("log", text));
+        if(supportsActionBar) ((android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("log", text));
         else ((android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setText(text);
         Toast.makeText(this, rss.getString(R.string.copied_log), Toast.LENGTH_SHORT).show();
     }
@@ -1051,7 +1062,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 sv.setBackgroundColor(bgColor);
                 msg.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int) (rss.getDisplayMetrics().heightPixels * 0.6)));
                 sv.addView(msg);
-                styleAlertDialog(b.setCustomTitle(title).setView(sv).create(), null, false);
+                styleAlertDialog(b.setCustomTitle(title).setView(sv).create(), null, false, null);
             /*TextView errorBox = findViewById(R.id.errorField);
             errorBox.setVisibility(View.VISIBLE);
             errorBox.setText(stackTrace);

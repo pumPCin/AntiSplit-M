@@ -131,12 +131,15 @@ public class ZipFileInput implements Closeable {
 	 * @return THe number of bytes written into the output-stream.
 	 */
 	public long readFileDataToFile(File outputFile) throws IOException {
-		long numBytes = readFileData(FileUtils.getOutputStream(outputFile));
-		if (outputFileMap == null) {
-			outputFileMap = new HashMap<>();
+		try(OutputStream os = FileUtils.getOutputStream(outputFile)) {
+			long numBytes = readFileData(os);
+			if (outputFileMap == null) {
+				outputFileMap = new HashMap<>();
+			}
+			outputFileMap.put(currentFileHeader.getFileName(), outputFile);
+			return numBytes;
 		}
-		outputFileMap.put(currentFileHeader.getFileName(), outputFile);
-		return numBytes;
+
 	}
 
 	/**
@@ -227,12 +230,14 @@ public class ZipFileInput implements Closeable {
 	 * @return THe number of bytes written into the output-stream.
 	 */
 	public long readRawFileDataToFile(File outputFile) throws IOException {
-		long numBytes = readRawFileData(FileUtils.getOutputStream(outputFile));
-		if (outputFileMap == null) {
-			outputFileMap = new HashMap<>();
+		try(OutputStream os = FileUtils.getOutputStream(outputFile)) {
+			long numBytes = readRawFileData(os);
+			if (outputFileMap == null) {
+				outputFileMap = new HashMap<>();
+			}
+			outputFileMap.put(currentFileHeader.getFileName(), outputFile);
+			return numBytes;
 		}
-		outputFileMap.put(currentFileHeader.getFileName(), outputFile);
-		return numBytes;
 	}
 
 	/**

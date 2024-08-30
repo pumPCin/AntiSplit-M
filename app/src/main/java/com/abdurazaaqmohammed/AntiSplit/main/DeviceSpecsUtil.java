@@ -13,6 +13,7 @@ import com.starry.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -36,7 +37,8 @@ public class DeviceSpecsUtil {
     public List<String> getListOfSplits(Uri splitAPKUri) throws IOException {
         List<String> splits = new ArrayList<>();
 
-        try (ZipFileInput zis = new ZipFileInput(FileUtils.getInputStream(splitAPKUri, context))) {
+        try (InputStream is = FileUtils.getInputStream(splitAPKUri, context);
+                ZipFileInput zis = new ZipFileInput(is)) {
             ZipFileHeader header;
             while ((header = zis.readFileHeader()) != null) {
                 final String name = header.getFileName();
@@ -47,7 +49,9 @@ public class DeviceSpecsUtil {
         if(splits.size() < 2) {
             File file = new File(FileUtils.getPath(splitAPKUri, context));
             boolean couldNotRead = !file.canRead();
-            if(couldNotRead) FileUtils.copyFile(FileUtils.getInputStream(splitAPKUri, context), file = new File(context.getCacheDir(), file.getName()));
+            try(InputStream is = FileUtils.getInputStream(splitAPKUri, context)) {
+                if(couldNotRead) FileUtils.copyFile(is, file = new File(context.getCacheDir(), file.getName()));
+            }
             Enumeration<ZipArchiveEntry> entries = (zipFile = new ZipFile(file)).getEntries();
             // Do not close this ZipFile it could be used later in merger
             while (entries.hasMoreElements()) {

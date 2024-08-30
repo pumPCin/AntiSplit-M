@@ -95,9 +95,9 @@ public abstract class InputSource {
         if(!dir.exists()){
             dir.mkdirs();
         }
-        OutputStream outputStream = FileUtils.getOutputStream(file);
-        write(outputStream);
-        outputStream.close();
+        try(OutputStream outputStream = FileUtils.getOutputStream(file)) {
+            write(outputStream);
+        }
     }
     public long write(OutputStream outputStream) throws IOException {
         InputStream inputStream = openStream();
