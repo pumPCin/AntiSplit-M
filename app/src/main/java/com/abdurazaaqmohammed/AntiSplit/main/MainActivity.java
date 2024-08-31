@@ -3,7 +3,6 @@ package com.abdurazaaqmohammed.AntiSplit.main;
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
 import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsActionBar;
 import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsArraysCopyOfAndDownloadManager;
-import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsFileChannel;
 import static com.reandroid.apkeditor.merge.LogUtil.logEnabled;
 
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -17,6 +16,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -207,6 +207,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         if(LegacyUtils.canSetNotificationBarTransparent) selectFromInstalledApps.setOnClickListener(this::selectAppsListener);
         else selectFromInstalledApps.setVisibility(View.GONE);
         ((LinearLayout) findViewById(R.id.topButtons)).setGravity(Gravity.CENTER_VERTICAL);
+        findViewById(R.id.processButtons).setLayoutParams(new LinearLayout.LayoutParams((int) (rss.getDisplayMetrics().widthPixels * 0.8), LinearLayout.LayoutParams.FILL_PARENT));
 
         settingsButton.setOnClickListener(v -> {
             ScrollView l = (ScrollView) LayoutInflater.from(this).inflate(R.layout.dialog_settings, null);
@@ -376,7 +377,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
         }
     }
 
-    public void styleAlertDialog(AlertDialog ad, String[] display, boolean isLang, ArrayAdapter aagh) {
+    /** @noinspection rawtypes*/
+    public void styleAlertDialog(AlertDialog ad, String[] display, boolean isLang, ArrayAdapter adapter) {
         GradientDrawable border = new GradientDrawable();
         border.setColor(bgColor); // Background color
         border.setStroke(5, textColor); // Border width and color
@@ -385,7 +387,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         runOnUiThread(() -> {
             ad.show();
             ListView lv;
-            if((aagh != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(aagh == null ? new CustomArrayAdapter(this, display, textColor, isLang) : aagh);
+            if((adapter != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(adapter == null ? new CustomArrayAdapter(this, display, textColor, isLang) : adapter);
             Window w = ad.getWindow();
 
             Button positiveButton = ad.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -430,6 +432,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             settingsButton.setLayoutParams(params);
         });
         ((LinearLayout) findViewById(R.id.topButtons)).setGravity(Gravity.CENTER_VERTICAL);
+        findViewById(R.id.processButtons).setLayoutParams(new LinearLayout.LayoutParams((int) (rss.getDisplayMetrics().widthPixels * 0.8), LinearLayout.LayoutParams.FILL_PARENT));
 
         if(settingsDialog != null) {
             ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(res.getString(R.string.lang));
@@ -606,16 +609,20 @@ public class MainActivity extends Activity implements Merger.LogListener {
             if (activity == null) return null;
 
             final File cacheDir = LegacyUtils.supportsExternalCacheDir ? activity.getExternalCacheDir() : activity.getCacheDir();
-                if (cacheDir != null && activity.urisAreSplitApks) deleteDir(cacheDir);
+            if (cacheDir != null && activity.urisAreSplitApks) deleteDir(cacheDir);
+            try {
                 if(TextUtils.isEmpty(packageNameFromAppList)) {
                     List<String> splits = activity.splitsToUse;
-                    try {
-                        if (activity.urisAreSplitApks) {
-                            if (selectSplitsForDevice) {
-
-                                splits = DeviceSpecsUtil.getListOfSplits(activity.splitAPKUri);
-                                if (splits.size() == 4 || splits.size() == 3) splits.clear();
-                                else {
+                    if (activity.urisAreSplitApks) {
+                        if (selectSplitsForDevice) {
+                            splits = DeviceSpecsUtil.getListOfSplits(activity.splitAPKUri);
+                            switch (splits.size()) {
+                                case 4:
+                                case 3:
+                                case 2:
+                                    splits.clear();
+                                    break;
+                                default:
                                     List<String> copy = List.copyOf(splits);
                                     List<String> toRemove = new ArrayList<>();
                                     boolean splitApkContainsArch = false;
@@ -660,35 +667,31 @@ public class MainActivity extends Activity implements Merger.LogListener {
                                             if (thisSplit.contains("hdpi")) toRemove.add(thisSplit);
                                         }
                                     }
-                                    //if((toRemove.size() == 3 && !toRemove.contains(lang)) || toRemove.size() == 4);
                                     splits.removeAll(toRemove);
-                                }
-                            }
-                        } else {
-                            // These are the splits from inside the APK, just copy the splits to cache folder
-                            for (Uri uri : activity.uris) {
-                                try (InputStream is = FileUtils.getInputStream(uri, activity)) {
-                                    FileUtils.copyFile(is, new File(cacheDir, getOriginalFileName(activity, uri)));
-                                }
                             }
                         }
-                        Merger.run(
-                                activity.urisAreSplitApks ? activity.splitAPKUri : null,
-                                cacheDir,
-                                (uris[0]),
-                                activity,
-                                splits,
-                                signApk);
-                    } catch (Exception e) {
-                        activity.showError(e);
+                    } else {
+                        // These are the splits from inside the APK, just copy the splits to cache folder
+                        for (Uri uri : activity.uris) {
+                            try (InputStream is = FileUtils.getInputStream(uri, activity)) {
+                                FileUtils.copyFile(is, new File(cacheDir, getOriginalFileName(activity, uri)));
+                            }
+                        }
                     }
+                    Merger.run(
+                        activity.urisAreSplitApks ? activity.splitAPKUri : null,
+                        cacheDir,
+                        uris[0],
+                        activity,
+                        splits,
+                        signApk);
                 } else try(ApkBundle bundle = new ApkBundle()) {
-                    String baseApk = activity.getPackageManager().getPackageInfo(packageNameFromAppList, 0).applicationInfo.sourceDir;
-                    bundle.loadApkDirectory(new File(baseApk.substring(0, baseApk.lastIndexOf(File.separator))), false, activity);
+                    bundle.loadApkDirectory(new File(activity.getPackageManager().getPackageInfo(packageNameFromAppList, 0).applicationInfo.sourceDir).getParentFile(), false, activity);
                     Merger.run(bundle, cacheDir, uris[0], activity, signApk);
-                } catch (Exception e) {
-                    activity.showError(e);
                 }
+            } catch (Exception e) {
+                activity.showError(e);
+            }
             return null;
         }
 
@@ -1032,7 +1035,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     }
 
     private void copyText(CharSequence text) {
-        if(supportsActionBar) ((android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("log", text));
+        if(supportsActionBar) ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("log", text));
         else ((android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setText(text);
         Toast.makeText(this, rss.getString(R.string.copied_log), Toast.LENGTH_SHORT).show();
     }
@@ -1113,9 +1116,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
         else {
             checkStoragePerm();
             try {
-                if(splitAPKUri == null) {
-                    process(Uri.fromFile(new File(getAntisplitMFolder(), "output.apk")));
-                } else {
+                if(splitAPKUri == null) process(Uri.fromFile(new File(getAntisplitMFolder(), "output.apk")));
+                else {
                     String originalFilePath;
                     if(urisAreSplitApks) originalFilePath = FileUtils.getPath(splitAPKUri, this);
                     else {
