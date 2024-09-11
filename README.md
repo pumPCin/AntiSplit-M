@@ -24,10 +24,13 @@ Note: if you are planning to further modify the APK, you only need to sign it af
 Note: Some apps verify the signature of the APK or take other measures to check if the app was modified, which may cause it to crash on startup.
 
 # Screenshots
-| Main screen                                                                 | Settings                                                                    | Dialog                                                                      | Processing                                                                  | Result                                                                      |
-| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| ![Main screen](https://raw.githubusercontent.com/AbdurazaaqMohammed/AntiSplit-M/redesign/images/2.0%20mainscreen.jpg) | ![Settings](https://raw.githubusercontent.com/AbdurazaaqMohammed/AntiSplit-M/redesign/images/2.0%20settings.jpg) | ![Dialog](https://raw.githubusercontent.com/AbdurazaaqMohammed/AntiSplit-M/redesign/images/2.0%20dialog.jpg) | ![Processing](https://raw.githubusercontent.com/AbdurazaaqMohammed/AntiSplit-M/redesign/images/2.0%20processing.jpg) | ![Result](https://raw.githubusercontent.com/AbdurazaaqMohammed/AntiSplit-M/redesign/images/2.0%20result.jpg) |
+| Main screen                                                                 | Settings                                                                    | Selecting from installed apps                                               |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| ![Main screen](images/2.0%20mainscreen.jpg) | ![Settings](images/2.0%20settings.jpg) | ![Selecting from installed apps](images/2.0%20app%20list.jpg) |
 
+| Dialog allowing splits selection                                            | Processing                                                                  | Result                                                                      |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| ![Dialog](images/2.0%20dialog.jpg) | ![Processing](images/2.0%20processing.jpg) | ![Result](images/2.0%20result.jpg) |
 
 # Used projects
 
