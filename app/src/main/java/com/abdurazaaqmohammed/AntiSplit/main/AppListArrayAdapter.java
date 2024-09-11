@@ -19,16 +19,14 @@ public class AppListArrayAdapter extends ArrayAdapter<AppInfo> implements Filter
     private final Context context;
     private final List<AppInfo> originalAppInfoList;
     public List<AppInfo> filteredAppInfoList;
-    private final int textColor;
     private final boolean showIcon;
     private AppInfoFilter filter;
 
-    public AppListArrayAdapter(Context context, List<AppInfo> appInfoList, int textColor, boolean showIcon) {
+    public AppListArrayAdapter(Context context, List<AppInfo> appInfoList, boolean showIcon) {
         super(context, R.layout.list_item, appInfoList);
         this.context = context;
         this.originalAppInfoList = new ArrayList<>(appInfoList);
         this.filteredAppInfoList = new ArrayList<>(appInfoList);
-        this.textColor = textColor;
         this.showIcon = showIcon;
     }
 
@@ -53,7 +51,6 @@ public class AppListArrayAdapter extends ArrayAdapter<AppInfo> implements Filter
 
         AppInfo appInfo = getItem(position);
         textView.setText(appInfo.name);
-        textView.setTextColor(textColor);
 
         if (showIcon) {
             iconView.setImageDrawable(appInfo.icon);

@@ -232,7 +232,7 @@ public class VerityTreeBuilder implements Closeable {
 
         final byte[][] hashes = new byte[chunks][];
 
-        if (LegacyUtils.canSetNotificationBarTransparent) {
+        {
             Phaser tasks = new Phaser(1);
             // Reading the input file as fast as we can.
             final long maxReadSize = ioSizeChunks * CHUNK_SIZE;
@@ -269,51 +269,6 @@ public class VerityTreeBuilder implements Closeable {
 
             // Waiting for the tasks to complete.
             tasks.arriveAndAwaitAdvance();
-        } else {
-            final CountDownLatch latch = new CountDownLatch(chunks);
-
-            // Reading the input file as fast as we can.
-            final long maxReadSize = ioSizeChunks * CHUNK_SIZE;
-
-            long readOffset = 0;
-            int startChunkIndex = 0;
-            while (readOffset < size) {
-                final long readLimit = Math.min(readOffset + maxReadSize, size);
-                final int readSize = (int) (readLimit - readOffset);
-                final int bufferSizeChunks = (int) divideRoundup(readSize, CHUNK_SIZE);
-
-                // Overallocating to zero-pad last chunk.
-                // With 4MiB block size, 32 threads and 4 queue size we might allocate up to 144MiB.
-                final ByteBuffer buffer = ByteBuffer.allocate(bufferSizeChunks * CHUNK_SIZE);
-                dataSource.copyTo(readOffset, readSize, buffer);
-                buffer.rewind();
-
-                final int readChunkIndex = startChunkIndex;
-                Runnable task = () -> {
-                    try {
-                        final MessageDigest md = cloneMessageDigest();
-                        for (int offset = 0, finish = buffer.capacity(), chunkIndex = readChunkIndex;
-                             offset < finish; offset += CHUNK_SIZE, ++chunkIndex) {
-                            ByteBuffer chunk = slice(buffer, offset, offset + CHUNK_SIZE);
-                            hashes[chunkIndex] = saltedDigest(md, chunk);
-                        }
-                    } finally {
-                        latch.countDown();
-                    }
-                };
-                mExecutor.execute(task);
-
-                startChunkIndex += bufferSizeChunks;
-                readOffset += readSize;
-            }
-
-            // Waiting for the tasks to complete.
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt(); // Restore interrupted status
-                throw new RuntimeException("Operation interrupted", e);
-            }
         }
         // Streaming hashes back.
         for (byte[] hash : hashes) {

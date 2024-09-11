@@ -16,8 +16,6 @@
 
 package com.android.apksig.internal.apk.v4;
 
-import com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -183,11 +181,8 @@ public class V4Signature {
             }
 
             // Combine all arrays into one.
-            byte[] result = new byte[0];
-            if(LegacyUtils.supportsArraysCopyOfAndDownloadManager) result = Arrays.copyOf(arrays[0], size);
-            else {
-                System.arraycopy(arrays[0], 0, result, 0, arrays[0].length);
-            }
+            byte[] result;
+            result = Arrays.copyOf(arrays[0], size);
             int offset = arrays[0].length;
             for (int i = 0, isize = this.signingInfoBlocks.length; i < isize; ++i) {
                 System.arraycopy(arrays[i + 1], 0, result, offset, arrays[i + 1].length);

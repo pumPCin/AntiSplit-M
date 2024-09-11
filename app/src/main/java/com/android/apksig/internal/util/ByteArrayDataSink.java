@@ -16,7 +16,6 @@
 
 package com.android.apksig.internal.util;
 
-import com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils;
 import com.android.apksig.util.DataSink;
 import com.android.apksig.util.DataSource;
 import com.android.apksig.util.ReadableDataSink;
@@ -105,13 +104,7 @@ public class ByteArrayDataSink implements ReadableDataSink {
         }
         int doubleCurrentSize = (int) Math.min(mArray.length * 2L, Integer.MAX_VALUE);
         int newSize = (int) Math.max(minCapacity, doubleCurrentSize);
-        if(LegacyUtils.supportsArraysCopyOfAndDownloadManager) mArray = Arrays.copyOf(mArray, newSize);
-        else {
-            byte[] copy = new byte[newSize];
-            System.arraycopy(mArray, 0, copy, 0,
-                    Math.min(mArray.length, newSize));
-            mArray = copy;
-        }
+        mArray = Arrays.copyOf(mArray, newSize);
     }
 
     @Override

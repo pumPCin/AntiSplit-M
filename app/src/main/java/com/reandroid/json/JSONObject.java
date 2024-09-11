@@ -5,9 +5,9 @@
  */
 package com.reandroid.json;
 
+
 import android.text.TextUtils;
 
-import com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils;
 import com.reandroid.common.FileChannelInputStream;
 
 import java.io.*;
@@ -135,14 +135,14 @@ public class JSONObject extends JSONItem {
 
         Enumeration<String> keys = bundle.getKeys();
         while (keys.hasMoreElements()) {
-            Object key = keys.nextElement();
+            String key = keys.nextElement();
             if (key != null) {
 
 // Go through the path, ensuring that there is a nested JSONObject for each
 // segment except the last. Add the value using the last segment's name into
 // the deepest nested JSONObject.
 
-                String[] path = ((String) key).split("\\.");
+                String[] path = key.split("\\.");
                 int last = path.length - 1;
                 JSONObject target = this;
                 for (int i = 0; i < last; i += 1) {
@@ -154,7 +154,7 @@ public class JSONObject extends JSONItem {
                     }
                     target = nextTarget;
                 }
-                target.put(path[last], bundle.getString((String) key));
+                target.put(path[last], bundle.getString(key));
             }
         }
     }
@@ -765,9 +765,9 @@ public class JSONObject extends JSONItem {
             return null;
         }
         if (key.length() == 1) {
-            key = key.toLowerCase(LegacyUtils.supportsArraysCopyOfAndDownloadManager ? Locale.ROOT : Locale.getDefault());
+            key = key.toLowerCase(Locale.ROOT);
         } else if (!Character.isUpperCase(key.charAt(1))) {
-            key = key.substring(0, 1).toLowerCase(LegacyUtils.supportsArraysCopyOfAndDownloadManager ? Locale.ROOT : Locale.getDefault()) + key.substring(1);
+            key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
         }
         return key;
     }

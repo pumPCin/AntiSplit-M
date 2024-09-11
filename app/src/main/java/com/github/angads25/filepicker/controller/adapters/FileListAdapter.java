@@ -83,7 +83,7 @@ public class FileListAdapter extends BaseAdapter{
     public View getView(final int i, View view, ViewGroup viewGroup) {
         final ViewHolder holder;
         if (view == null) {
-            view = LayoutInflater.from(context).inflate(R.layout.dialog_file_list_item, viewGroup, false);
+            view = LayoutInflater.from(context).inflate(R.layout.file_list_item, viewGroup, false);
             holder = new ViewHolder(view);
             view.setTag(holder);
         }

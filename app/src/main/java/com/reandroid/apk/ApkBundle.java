@@ -17,12 +17,13 @@ package com.reandroid.apk;
 
 import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss;
 
-import android.app.AlertDialog;
+
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.text.TextUtils;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
 import com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil;
@@ -34,7 +35,6 @@ import com.reandroid.archive.BlockInputSource;
 import com.reandroid.archive.ZipEntryMap;
 import com.reandroid.archive.block.ApkSignatureBlock;
 import com.reandroid.arsc.chunk.TableBlock;
-import com.reandroid.arsc.pool.TableStringPool;
 import com.reandroid.arsc.pool.builder.StringPoolMerger;
 
 import java.io.ByteArrayOutputStream;
@@ -112,13 +112,7 @@ public class ApkBundle implements Closeable {
 
         StringPoolMerger poolMerger = new StringPoolMerger();
 
-        for(ApkModule apkModule:getModules()){
-            if(!apkModule.hasTableBlock()){
-                continue;
-            }
-            TableStringPool stringPool = apkModule.getVolatileTableStringPool();
-            poolMerger.add(stringPool);
-        }
+        for(ApkModule apkModule:getModules()) if (apkModule.hasTableBlock()) poolMerger.add(apkModule.getVolatileTableStringPool());
 
         poolMerger.mergeTo(createdTable.getTableStringPool());
 
@@ -215,25 +209,30 @@ public class ApkBundle implements Closeable {
             final CountDownLatch latch = new CountDownLatch(1);
             TextView title = new TextView(context);
             title.setText(rss.getString(R.string.warning));
-            title.setTextColor(MainActivity.textColor);
             title.setTextSize(25);
             TextView msg = new TextView(context);
             msg.setText(rss.getString(R.string.mismatch, s.replaceFirst(", ", "")));
-            msg.setTextColor(MainActivity.textColor);
             MainActivity act = ((MainActivity) context);
-            act.getHandler().post(() -> act.styleAlertDialog(new AlertDialog.Builder(context).setCustomTitle(title).setView(msg).setPositiveButton("OK", (dialog, which) -> {
-                for(String filename : s.split(", ")) {
-                    File f = new File(dir, filename);
-                    f.delete();
-                    apkList.remove(f);
-                }
-                latch.countDown();
-            }).setNegativeButton(rss.getString(R.string.cancel), (dialog, which) -> {
-                act.startActivity(new Intent(act, MainActivity.class));
-                if(Build.VERSION.SDK_INT > 15) act.finishAffinity();
-                else act.finish();
-                latch.countDown();
-            }).create(), null, false, null));
+            act.getHandler().post(() -> {
+        /*  ListView lv;
+            if((adapter != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(adapter == null ? new CustomArrayAdapter(this, display, isLang) : adapter);
+            Window w = ad.getWindow();
+            if (w != null) {
+                int padding = 16;
+                w.getDecorView().setPadding(padding, padding, padding, padding);
+            }*/
+                act.runOnUiThread(new AlertDialog.Builder(context).setCustomTitle(title).setView(msg).setPositiveButton("OK", (dialog, which) -> {
+                        for(String filename : s.split(", ")) {
+                            File f = new File(dir, filename);
+                            if(f.delete()) apkList.remove(f);
+                        }
+                        latch.countDown();
+                    }).setNegativeButton(rss.getString(R.string.cancel), (dialog, which) -> {
+                        act.startActivity(new Intent(act, MainActivity.class));
+                        act.finishAffinity();
+                        latch.countDown();
+                    }).create()::show);
+            });
             latch.await();
         }
         load(apkList);
@@ -265,9 +264,7 @@ public class ApkBundle implements Closeable {
     }
     @Override
     public void close() throws IOException {
-        for(ApkModule module : mModulesMap.values()) {
-            module.close();
-        }
+        for(ApkModule module : mModulesMap.values()) module.close();
         mModulesMap.clear();
     }
 }

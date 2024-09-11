@@ -1,19 +1,11 @@
 package com.abdurazaaqmohammed.AntiSplit.main;
 
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
-import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsActionBar;
-import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.supportsArraysCopyOfAndDownloadManager;
 import static com.reandroid.apkeditor.merge.LogUtil.logEnabled;
 
-import com.github.angads25.filepicker.model.DialogConfigs;
-import com.github.angads25.filepicker.model.DialogProperties;
-import com.github.angads25.filepicker.view.FilePickerDialog;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -25,11 +17,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.LightingColorFilter;
-import android.graphics.Paint;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RectShape;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -43,25 +30,29 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.animation.AnimationUtils;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewSwitcher;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
+import androidx.core.widget.NestedScrollView;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
+import com.google.android.material.color.DynamicColors;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.android.material.textview.MaterialTextView;
 import com.reandroid.apk.ApkBundle;
 import com.reandroid.apkeditor.merge.LogUtil;
 import com.reandroid.apkeditor.merge.Merger;
@@ -84,10 +75,9 @@ import java.util.Locale;
 import java.util.Objects;
 
 import com.github.paul035.LocaleHelper;
-import yuku.ambilwarna.AmbilWarnaDialog;
 
 /** @noinspection deprecation*/
-public class MainActivity extends Activity implements Merger.LogListener {
+public class MainActivity extends AppCompatActivity implements Merger.LogListener {
     private static boolean ask = true;
     private static boolean showDialog;
     private static boolean signApk;
@@ -95,67 +85,12 @@ public class MainActivity extends Activity implements Merger.LogListener {
     private Uri splitAPKUri;
     private ArrayList<Uri> uris;
     private boolean urisAreSplitApks = true;
-    public static int textColor;
-    public static int bgColor;
     public static boolean errorOccurred;
     //public static boolean revanced;
     public static boolean checkForUpdates;
     public static String lang;
     public DeviceSpecsUtil DeviceSpecsUtil;
     private String pkgName;
-
-    public void setButtonBorder(Button button) {
-        ShapeDrawable border = new ShapeDrawable(new RectShape());
-        Paint paint = border.getPaint();
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(textColor);
-        paint.setStrokeWidth(4);
-
-        button.setTextColor(textColor);
-        button.setBackgroundDrawable(border);
-    }
-
-    private void setColor(int color, boolean isTextColor, ScrollView settingsMenu) {
-        final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
-        boolean fromSettingsMenu = settingsMenu != null;
-        //if(fromSettingsMenu) settingsMenu.setBackgroundColor(color);
-        if(isTextColor) {
-            textColor = color;
-            ((TextView) findViewById(R.id.errorField)).setTextColor(color);
-            ((TextView) findViewById(R.id.logField)).setTextColor(color);
-            if(fromSettingsMenu) {
-                ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.logToggle : R.id.logToggleText)).setTextColor(color);
-                ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.ask : R.id.askText)).setTextColor(color);
-                ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setTextColor(color);
-                ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setTextColor(color);
-                ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setTextColor(color);
-                //((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.revancedToggle : R.id.revancedText)).setTextColor(color);
-                ((TextView) settingsMenu.findViewById(supportsSwitch ? R.id.updateToggle : R.id.updateToggleText)).setTextColor(color);
-            }
-        } else findViewById(R.id.main).setBackgroundColor(bgColor = color);
-        setButtonBorder(findViewById(R.id.decodeButton));
-        setButtonBorder(findViewById(R.id.fromAppsButton));
-        LightingColorFilter themeColor = new LightingColorFilter(0xFF000000, textColor);
-        ImageView settingsButton = findViewById(R.id.settingsButton);
-        settingsButton.setColorFilter(themeColor);
-
-        ((ImageView) findViewById(R.id.loadingImage)).setColorFilter(themeColor);
-        if(fromSettingsMenu) {
-            setButtonBorder(settingsMenu.findViewById(R.id.langPicker));
-            setButtonBorder(settingsMenu.findViewById(R.id.changeTextColor));
-            setButtonBorder(settingsMenu.findViewById(R.id.changeBgColor));
-            setButtonBorder(settingsMenu.findViewById(R.id.checkUpdateNow));
-            if(!supportsSwitch) {
-                //setButtonBorder(settingsMenu.findViewById(R.id.revancedToggle));
-                setButtonBorder(settingsMenu.findViewById(R.id.logToggle));
-                setButtonBorder(settingsMenu.findViewById(R.id.ask));
-                setButtonBorder(settingsMenu.findViewById(R.id.showDialogToggle));
-                setButtonBorder(settingsMenu.findViewById(R.id.selectSplitsForDeviceToggle));
-                setButtonBorder(settingsMenu.findViewById(R.id.signToggle));
-                setButtonBorder(settingsMenu.findViewById(R.id.updateToggle));
-            }
-        }
-    }
 
     public Handler getHandler() {
         return handler;
@@ -164,29 +99,21 @@ public class MainActivity extends Activity implements Merger.LogListener {
     /** @noinspection AssignmentUsedAsCondition*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
+        DynamicColors.applyToActivitiesIfAvailable(getApplication());
         handler = new Handler(Looper.getMainLooper());
 
-        ActionBar ab;
         File externalCacheDir;
-        if (LegacyUtils.supportsExternalCacheDir && ((externalCacheDir = getExternalCacheDir()) != null)) deleteDir(externalCacheDir);
+        if ((externalCacheDir = getExternalCacheDir()) != null) deleteDir(externalCacheDir);
 
-        deleteDir(getCacheDir());
-        if(supportsActionBar && (ab = getActionBar()) != null) {
-            /*Spannable text = new SpannableString(getString(R.string.app_name));
-            text.setSpan(new ForegroundColorSpan(textColor), 0, text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-            ab.setTitle(text);
-            ab.setBackgroundDrawable(new ColorDrawable(bgColor));*/
-            ab.hide();
-        }
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         setContentView(R.layout.activity_main);
         DeviceSpecsUtil = new DeviceSpecsUtil(this);
-
+       // setSupportActionBar(this.<MaterialToolbar>findViewById(R.id.topAppBar));
         // Fetch settings from SharedPreferences
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
-        setColor(settings.getInt("textColor", 0xffffffff), true, null);
-        setColor(settings.getInt("backgroundColor", 0xff000000), false, null);
 
         checkForUpdates = settings.getBoolean("checkForUpdates", true);
         //revanced = settings.getBoolean("revanced", false);
@@ -201,34 +128,75 @@ public class MainActivity extends Activity implements Merger.LogListener {
         if(Objects.equals(lang, Locale.getDefault().getLanguage())) rss = getResources();
         else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources(), null);
 
-        ImageView settingsButton = findViewById(R.id.settingsButton);
         Button decodeButton = findViewById(R.id.decodeButton);
-        Button selectFromInstalledApps = findViewById(R.id.fromAppsButton);
-        if(LegacyUtils.canSetNotificationBarTransparent) selectFromInstalledApps.setOnClickListener(this::selectAppsListener);
-        else selectFromInstalledApps.setVisibility(View.GONE);
-        ((LinearLayout) findViewById(R.id.topButtons)).setGravity(Gravity.CENTER_VERTICAL);
-        findViewById(R.id.processButtons).setLayoutParams(new LinearLayout.LayoutParams((int) (rss.getDisplayMetrics().widthPixels * 0.8), LinearLayout.LayoutParams.FILL_PARENT));
+        findViewById(R.id.fromAppsButton).setOnClickListener(v3 -> {
+            AlertDialog ad = new AlertDialog.Builder(MainActivity.this).setNegativeButton(rss.getString(R.string.cancel), null).create();
+            PackageManager pm = getPackageManager();
+            List<PackageInfo> packageInfoList = pm.getInstalledPackages(0);
 
+            List<AppInfo> appInfoList = new ArrayList<>();
+
+            for (PackageInfo packageInfo : packageInfoList) {
+                try {
+                    String packageName = packageInfo.packageName;
+                    ApplicationInfo ai = pm.getApplicationInfo(packageName, 0);
+                    if (ai.splitSourceDirs != null) {
+                        appInfoList.add(new AppInfo((String) pm.getApplicationLabel(ai), pm.getApplicationIcon(ai), packageName));
+                    }
+                } catch (PackageManager.NameNotFoundException ignored) {}
+            }
+
+            Collections.sort(appInfoList, Comparator.comparing((AppInfo p) -> p.name.toLowerCase(Locale.ROOT)));
+
+            LinearLayout dialogView = (LinearLayout) LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_search, null);
+
+            ListView listView = dialogView.findViewById(R.id.list_view);
+            final AppListArrayAdapter adapter = new AppListArrayAdapter(MainActivity.this, appInfoList, true);
+            listView.setAdapter(adapter);
+            listView.setOnItemClickListener((parent, view, position, id) -> {
+                ad.dismiss();
+                boolean realAskValue = ask;
+                ask = true;
+                pkgName = adapter.filteredAppInfoList.get(position).packageName;
+                selectDirToSaveAPKOrSaveNow();
+                ask = realAskValue;
+            });
+
+            EditText searchBar = dialogView.findViewById(R.id.search_bar);
+            searchBar.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    // No action needed here
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    adapter.getFilter().filter(s);
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    // No action needed here
+                }
+            });
+            ad.setView(dialogView);
+            runOnUiThread(ad::show);
+        });
+
+        FloatingActionButton settingsButton = findViewById(R.id.settingsButton);
         settingsButton.setOnClickListener(v -> {
-            ScrollView l = (ScrollView) LayoutInflater.from(this).inflate(R.layout.dialog_settings, null);
-            l.setBackgroundColor(bgColor);
-
-            setColor(textColor, true, l);
+            ScrollView l = (ScrollView) LayoutInflater.from(this).inflate(R.layout.setty, null);
 
             ((TextView) l.findViewById(R.id.langPicker)).setText(rss.getString(R.string.lang));
-            final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
-            ((TextView) l.findViewById(supportsSwitch ? R.id.logToggle : R.id.logToggleText)).setText(rss.getString(R.string.enable_logs));
-            ((TextView) l.findViewById(supportsSwitch ? R.id.ask : R.id.askText)).setText(rss.getString(R.string.ask));
-            ((TextView) l.findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setText(rss.getString(R.string.show_dialog));
-            ((TextView) l.findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setText(rss.getString(R.string.sign_apk));
-            ((TextView) l.findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setText(rss.getString(R.string.automatically_select));
-            ((TextView) l.findViewById(supportsSwitch ? R.id.updateToggle : R.id.updateToggleText)).setText(rss.getString(R.string.auto_update));
-          //  ((TextView) l.findViewById(supportsSwitch ? R.id.revancedToggle : R.id.revancedText)).setText(rss.getString(R.string.fix));
-            ((TextView) l.findViewById(R.id.changeTextColor)).setText(rss.getString(R.string.change_text_color));
-            ((TextView) l.findViewById(R.id.changeBgColor)).setText(rss.getString(R.string.change_background_color));
+            ((TextView) l.findViewById(R.id.logToggle)).setText(rss.getString(R.string.enable_logs));
+            ((TextView) l.findViewById(R.id.ask)).setText(rss.getString(R.string.ask));
+            ((TextView) l.findViewById(R.id.showDialogToggle)).setText(rss.getString(R.string.show_dialog));
+            ((TextView) l.findViewById(R.id.signToggle)).setText(rss.getString(R.string.sign_apk));
+            ((TextView) l.findViewById(R.id.selectSplitsForDeviceToggle)).setText(rss.getString(R.string.automatically_select));
+            ((TextView) l.findViewById(R.id.updateToggle)).setText(rss.getString(R.string.auto_update));
             ((TextView) l.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.check_update_now));
 
-            Button checkUpdateNow = l.findViewById(R.id.checkUpdateNow);
+                Button checkUpdateNow = l.findViewById(R.id.checkUpdateNow);
             CompoundButton updateSwitch = l.findViewById(R.id.updateToggle);
             updateSwitch.setChecked(checkForUpdates);
             updateSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> checkUpdateNow.setVisibility((checkForUpdates = isChecked) ? View.GONE : View.VISIBLE));
@@ -239,10 +207,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 checkUpdateNow.setVisibility(View.VISIBLE);
             }
             checkUpdateNow.setOnClickListener(v1 -> new CheckForUpdatesTask(this, true).execute());
-
-            /*CompoundButton revancedSwitch = l.findViewById(R.id.revancedToggle);
-            revancedSwitch.setChecked(revanced);
-            revancedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> revanced = isChecked);*/
 
             CompoundButton logSwitch = l.findViewById(R.id.logToggle);
             logSwitch.setChecked(logEnabled);
@@ -274,85 +238,42 @@ public class MainActivity extends Activity implements Merger.LogListener {
             });
 
             CompoundButton askSwitch = l.findViewById(R.id.ask);
-            if(LegacyUtils.doesNotSupportInbuiltAndroidFilePicker) {
-                ask = false;
-                askSwitch.setVisibility(View.GONE);
-            }
-            else {
-                askSwitch.setChecked(ask);
-                askSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    ask = isChecked;
-                    if(!isChecked) checkStoragePerm();
-                });
-            }
-
-            Button langPicker = l.findViewById(R.id.langPicker);
-            setButtonBorder(langPicker);
-            langPicker.setOnClickListener(v2 -> {
-                int curr = -1;
-
-                String[] langs = rss.getStringArray(R.array.langs);
-
-                String[] display = rss.getStringArray(R.array.langs_display);
-
-                styleAlertDialog(new AlertDialog.Builder(this).setSingleChoiceItems(display, curr, (dialog, which) -> {
-                    updateLang(LocaleHelper.setLocale(MainActivity.this, lang = langs[which]).getResources(), l);
-                    dialog.dismiss();
-                }).create(), display, true, null);
+            askSwitch.setChecked(ask);
+            askSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                ask = isChecked;
+                if(!isChecked) checkStoragePerm();
             });
 
-            l.findViewById(R.id.changeBgColor).setOnClickListener(v3 -> showColorPickerDialog(false, bgColor, l));
-            l.findViewById(R.id.changeTextColor).setOnClickListener(v4 -> showColorPickerDialog(true, textColor, l));
-            TextView title = new TextView(this);
-            title.setText(rss.getString(R.string.settings));
-            title.setTextColor(textColor);
-            title.setTextSize(25);
-            styleAlertDialog(
-                    new AlertDialog.Builder(this).setCustomTitle(title).setView(l)
-                            .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create(), null, false, null);
-        });
+            l.findViewById(R.id.langPicker).setOnClickListener(v2 -> {
+                String[] langs = rss.getStringArray(R.array.langs);
+                String[] display = rss.getStringArray(R.array.langs_display);
 
-        decodeButton.setOnClickListener(v -> {
-            if(LegacyUtils.doesNotSupportInbuiltAndroidFilePicker) {
-                DialogProperties properties = new DialogProperties();
-                properties.selection_mode = DialogConfigs.MULTI_MODE;
-                properties.selection_type = DialogConfigs.FILE_SELECT;
-                properties.root = Environment.getExternalStorageDirectory();
-                properties.error_dir = Environment.getExternalStorageDirectory();
-                properties.offset = new File(DialogConfigs.DEFAULT_DIR);
-                properties.extensions = new String[] {"apk", "zip", "apks", "aspk", "apks", "xapk", "apkm"};
-                FilePickerDialog dialog = new FilePickerDialog(MainActivity.this, properties, textColor, bgColor);
-                dialog.setTitle(rss.getString(R.string.select));
-                dialog.setDialogSelectionListener(files -> {
-                    urisAreSplitApks = !files[0].endsWith(".apk");
-                    uris = new ArrayList<>();
-                    for(String file : files) {
-                        Uri uri = Uri.fromFile(new File(file));
-                        if (urisAreSplitApks) processOneSplitApkUri(uri);
-                        else uris.add(uri);
-                    }
+                AlertDialog ad = new AlertDialog.Builder(this).setSingleChoiceItems(display, -1, (dialog, which) -> {
+                    updateLang(LocaleHelper.setLocale(this, lang = langs[which]).getResources(), l);
                     dialog.dismiss();
-                });
-                runOnUiThread(dialog::show);
-            }
+                }).create();
+                runOnUiThread(ad::show);
+                ad.getListView().setAdapter(new CustomArrayAdapter(this, display, true));
+            });
 
-            else MainActivity.this.startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
-                            .addCategory(Intent.CATEGORY_OPENABLE)
-                            .setType("*/*")
-                            .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                            .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/zip", "application/vnd.android.package-archive", "application/octet-stream"})
-                    , 1);
-        } // XAPK is octet-stream
-        );
-        decodeButton.post(() -> {
-            int buttonHeight = decodeButton.getHeight();
-            int size = (int) (buttonHeight * 0.75);
-            ViewGroup.LayoutParams params = settingsButton.getLayoutParams();
-            params.height = size;
-            params.width = size;
-            settingsButton.setLayoutParams(params);
+            /*  ListView lv;
+                if((adapter != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(adapter == null ? new CustomArrayAdapter(this, display, isLang) : adapter);
+                Window w = ad.getWindow();
+                if (w != null) {
+                    int padding = 16;
+                    w.getDecorView().setPadding(padding, padding, padding, padding);
+                }*/
+            runOnUiThread(new AlertDialog.Builder(this).setTitle(rss.getString(R.string.settings)).setView(l)
+                                .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create()::show);
         });
 
+        decodeButton.setOnClickListener(v -> startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
+                        .addCategory(Intent.CATEGORY_OPENABLE)
+                        .setType("*/*")
+                        .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                        .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/zip", "application/vnd.android.package-archive", "application/octet-stream"})
+                , 1) // XAPK is octet-stream
+        );
 
         // Check if user shared or opened file with the app.
         final Intent openIntent = getIntent();
@@ -377,91 +298,31 @@ public class MainActivity extends Activity implements Merger.LogListener {
         }
     }
 
-    /** @noinspection rawtypes*/
-    public void styleAlertDialog(AlertDialog ad, String[] display, boolean isLang, ArrayAdapter adapter) {
-        GradientDrawable border = new GradientDrawable();
-        border.setColor(bgColor); // Background color
-        border.setStroke(5, textColor); // Border width and color
-        border.setCornerRadius(16);
-
-        runOnUiThread(() -> {
-            ad.show();
-            ListView lv;
-            if((adapter != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(adapter == null ? new CustomArrayAdapter(this, display, textColor, isLang) : adapter);
-            Window w = ad.getWindow();
-
-            Button positiveButton = ad.getButton(AlertDialog.BUTTON_POSITIVE);
-            if(positiveButton != null) positiveButton.setTextColor(textColor);
-
-            Button negativeButton = ad.getButton(AlertDialog.BUTTON_NEGATIVE);
-            if(negativeButton != null) negativeButton.setTextColor(textColor);
-
-            Button neutralButton = ad.getButton(AlertDialog.BUTTON_NEUTRAL);
-            if(neutralButton != null) neutralButton.setTextColor(textColor);
-
-            if (w != null) {
-                View dv = w.getDecorView();
-                dv.getBackground().setColorFilter(new LightingColorFilter(0xFF000000, bgColor));
-                w.setBackgroundDrawable(border);
-
-                int padding = 16;
-                dv.setPadding(padding, padding, padding, padding);
-            }
-        });
-    }
-
     public static Resources rss;
 
     private void updateLang(Resources res, ScrollView settingsDialog) {
         rss = res;
         Button decodeButton = findViewById(R.id.decodeButton);
         decodeButton.setText(res.getString(R.string.merge));
-        setButtonBorder(decodeButton);
         Button fromAppsButton = findViewById(R.id.fromAppsButton);
         fromAppsButton.setText(res.getString(R.string.select_from_installed_apps));
-        setButtonBorder(fromAppsButton);
-        ImageView settingsButton = findViewById(R.id.settingsButton);
+        FloatingActionButton settingsButton = findViewById(R.id.settingsButton);
         settingsButton.setContentDescription(res.getString(R.string.settings));
         findViewById(R.id.installButton).setContentDescription(res.getString(R.string.install));
-        decodeButton.post(() -> {
-            int buttonHeight = decodeButton.getHeight();
-            int size = (int) (buttonHeight * 0.75);
-            ViewGroup.LayoutParams params = settingsButton.getLayoutParams();
-            params.height = size;
-            params.width = size;
-            settingsButton.setLayoutParams(params);
-        });
-        ((LinearLayout) findViewById(R.id.topButtons)).setGravity(Gravity.CENTER_VERTICAL);
-        findViewById(R.id.processButtons).setLayoutParams(new LinearLayout.LayoutParams((int) (rss.getDisplayMetrics().widthPixels * 0.8), LinearLayout.LayoutParams.FILL_PARENT));
+
+        //((LinearLayout) findViewById(R.id.topButtons)).setGravity(Gravity.CENTER_VERTICAL);
+       // findViewById(R.id.processButtons).setLayoutParams(new LinearLayout.LayoutParams((int) (rss.getDisplayMetrics().widthPixels * 0.8), LinearLayout.LayoutParams.FILL_PARENT));
 
         if(settingsDialog != null) {
             ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(res.getString(R.string.lang));
-            final boolean supportsSwitch = Build.VERSION.SDK_INT > 13;
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.logToggle : R.id.logToggleText)).setText(res.getString(R.string.enable_logs));
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.ask : R.id.askText)).setText(res.getString(R.string.ask));
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.showDialogToggle : R.id.showDialogToggleText)).setText(res.getString(R.string.show_dialog));
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.signToggle : R.id.signToggleText)).setText(res.getString(R.string.sign_apk));
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.selectSplitsForDeviceToggle : R.id.selectSplitsForDeviceToggleText)).setText(res.getString(R.string.automatically_select));
-            ((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.updateToggle : R.id.updateToggleText)).setText(res.getString(R.string.auto_update));
-            //((TextView) settingsDialog.findViewById(supportsSwitch ? R.id.revancedToggle : R.id.revancedText)).setText(res.getString(R.string.fix));
-            ((TextView) settingsDialog.findViewById(R.id.changeTextColor)).setText(res.getString(R.string.change_text_color));
-            ((TextView) settingsDialog.findViewById(R.id.changeBgColor)).setText(res.getString(R.string.change_background_color));
+            ((TextView) settingsDialog.findViewById(R.id.logToggle)).setText(res.getString(R.string.enable_logs));
+            ((TextView) settingsDialog.findViewById(R.id.ask)).setText(res.getString(R.string.ask));
+            ((TextView) settingsDialog.findViewById(R.id.showDialogToggle)).setText(res.getString(R.string.show_dialog));
+            ((TextView) settingsDialog.findViewById(R.id.signToggle)).setText(res.getString(R.string.sign_apk));
+            ((TextView) settingsDialog.findViewById(R.id.selectSplitsForDeviceToggle)).setText(res.getString(R.string.automatically_select));
+            ((TextView) settingsDialog.findViewById(R.id.updateToggle)).setText(res.getString(R.string.auto_update));
             ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(res.getString(R.string.check_update_now));
         }
-    }
-
-    private void showColorPickerDialog(boolean isTextColor, int currentColor, ScrollView from) {
-        new AmbilWarnaDialog(this, currentColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
-            @Override
-            public void onOk(AmbilWarnaDialog dialog1, int color) {
-                setColor(color, isTextColor, from);
-            }
-
-            @Override
-            public void onCancel(AmbilWarnaDialog dialog1) {
-                // cancel was selected by the user
-            }
-        }).show();
     }
 
     final File getAntisplitMFolder() {
@@ -495,11 +356,8 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 .putBoolean("selectSplitsForDevice", selectSplitsForDevice)
                 //.putBoolean("revanced", revanced)
                 .putBoolean("checkForUpdates", checkForUpdates)
-                .putInt("textColor", textColor)
-                .putInt("backgroundColor", bgColor)
                 .putString("lang", lang);
-        if (supportsArraysCopyOfAndDownloadManager) e.apply();
-        else e.commit();
+        e.apply();
         super.onPause();
     }
 
@@ -507,7 +365,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     public void onLog(String msg) {
         runOnUiThread(() -> {
             ((TextView)findViewById(R.id.logField)).append(msg + '\n');
-            ScrollView scrollView = findViewById(R.id.scrollView);
+            NestedScrollView scrollView = findViewById(R.id.scrollView);
             scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
         });
     }
@@ -529,67 +387,11 @@ public class MainActivity extends Activity implements Merger.LogListener {
     protected void onDestroy() {
         File dir = getCacheDir();
         deleteDir(dir);
-        if (LegacyUtils.supportsExternalCacheDir && (dir = getExternalCacheDir()) != null) deleteDir(dir);
+        if ((dir = getExternalCacheDir()) != null) deleteDir(dir);
         super.onDestroy();
     }
 
     private List<String> splitsToUse = null;
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void selectAppsListener(View v) {
-        AlertDialog ad = new AlertDialog.Builder(this).setNegativeButton(rss.getString(R.string.cancel), null).create();
-        PackageManager pm = getPackageManager();
-        List<PackageInfo> packageInfoList = pm.getInstalledPackages(0);
-
-        List<AppInfo> appInfoList = new ArrayList<>();
-
-        for (PackageInfo packageInfo : packageInfoList) {
-            try {
-                String packageName = packageInfo.packageName;
-                ApplicationInfo ai = pm.getApplicationInfo(packageName, 0);
-                if (ai.splitSourceDirs != null) {
-                    appInfoList.add(new AppInfo((String) pm.getApplicationLabel(ai), pm.getApplicationIcon(ai), packageName));
-                }
-            } catch (PackageManager.NameNotFoundException ignored) {}
-        }
-
-        Collections.sort(appInfoList, Comparator.comparing((AppInfo p) -> p.name.toLowerCase(Locale.ROOT)));
-
-        LinearLayout dialogView = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.dialog_search, null);
-
-        ListView listView = dialogView.findViewById(R.id.list_view);
-        final AppListArrayAdapter adapter = new AppListArrayAdapter(this, appInfoList, textColor, true);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener((parent, view, position, id) -> {
-            ad.dismiss();
-            boolean realAskValue = ask;
-            ask = true;
-            pkgName = adapter.filteredAppInfoList.get(position).packageName;
-            selectDirToSaveAPKOrSaveNow();
-            ask = realAskValue;
-        });
-
-        EditText searchBar = dialogView.findViewById(R.id.search_bar);
-        searchBar.setTextColor(textColor);
-        searchBar.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // No action needed here
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                adapter.getFilter().filter(s);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // No action needed here
-            }
-        });
-        ad.setView(dialogView);
-        styleAlertDialog(ad, null, false, adapter);
-    }
 
     private static class ProcessTask extends AsyncTask<Uri, Void, Void> {
         private final WeakReference<MainActivity> activityReference;
@@ -608,7 +410,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
             MainActivity activity = activityReference.get();
             if (activity == null) return null;
 
-            final File cacheDir = LegacyUtils.supportsExternalCacheDir ? activity.getExternalCacheDir() : activity.getCacheDir();
+            final File cacheDir = activity.getExternalCacheDir();
             if (cacheDir != null && activity.urisAreSplitApks) deleteDir(cacheDir);
             try {
                 if(TextUtils.isEmpty(packageNameFromAppList)) {
@@ -716,16 +518,15 @@ public class MainActivity extends Activity implements Merger.LogListener {
     }
 
     public static void toggleAnimation(MainActivity context, boolean on) {
-        ImageView loadingImage = context.findViewById(R.id.loadingImage);
+        LinearProgressIndicator loadingImage = context.findViewById(R.id.progressIndicator);
         context.runOnUiThread(() -> {
             if(on) {
-                ((LinearLayout) context.findViewById(R.id.wrapImg)).setGravity(Gravity.CENTER);
                 loadingImage.setVisibility(View.VISIBLE);
-                loadingImage.startAnimation(AnimationUtils.loadAnimation(context, R.anim.loading));
+                //loadingImage.startAnimation(AnimationUtils.loadAnimation(context, R.anim.loading));
             }
             else {
                 loadingImage.setVisibility(View.GONE);
-                loadingImage.clearAnimation();
+              //  loadingImage.clearAnimation();
             }
         });
     }
@@ -736,7 +537,6 @@ public class MainActivity extends Activity implements Merger.LogListener {
         else selectDirToSaveAPKOrSaveNow();
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -779,7 +579,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
         ProcessTask processTask = new ProcessTask(this, DeviceSpecsUtil, pkgName);
         processTask.execute(outputUri);
 
-        ImageView cancelButton = findViewById(R.id.cancelButton);
+       /* ImageView cancelButton = findViewById(R.id.cancelButton);
         cancelButton.setColorFilter(new LightingColorFilter(0xFF000000, textColor));
         ViewSwitcher vs = findViewById(R.id.viewSwitcher);
         vs.setVisibility(View.VISIBLE);
@@ -797,7 +597,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 startActivity(intent);
             }
             //viewSwitcher.setVisibility(View.GONE);
-        });
+        });*/
     }
 
     private static class CheckForUpdatesTask extends AsyncTask<Void, Void, String[]> {
@@ -854,11 +654,18 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     currentVer = null;
                 }
                 boolean newVer = false;
-                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {1, 6, 6, 1} : currentVer.replace(".", "").toCharArray();
+                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '0'} : currentVer.replace(".", "").toCharArray();
                 char[] latest = latestVersion.replace(".", "").toCharArray();
-                for(int i = 0; i < curr.length; i++) {
-                    if(latest[i] > curr[i]) {
+
+                int maxLength = Math.max(curr.length, latest.length);
+                for (int i = 0; i < maxLength; i++) {
+                    char currChar = i < curr.length ? curr[i] : '0';
+                    char latestChar = i < latest.length ? latest[i] : '0';
+
+                    if (latestChar > currChar) {
                         newVer = true;
+                        break;
+                    } else if (latestChar < currChar) {
                         break;
                     }
                 }
@@ -867,27 +674,23 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     String ending = ".apk";
                     String filename = "AntiSplit-M.v" + latestVersion + ending;
                     String link = result[2].endsWith(ending) ? result[2] : result[2] + File.separator + filename;
-                    TextView changelogText = new TextView(activity);
+                    MaterialTextView changelogText = new MaterialTextView(activity);
                     String linebreak = "<br />";
                     changelogText.setText(Html.fromHtml(rss.getString(R.string.new_ver) + " (" + latestVersion  + ")" + linebreak + "Changelog:" + linebreak + result[1].replace("\\r\\n", linebreak)));
-                    changelogText.setTextColor(textColor);
-                    TextView title = new TextView(activity);
-                    title.setText(rss.getString(R.string.update));
-                    title.setTextColor(textColor);
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity).setCustomTitle(title).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
-                        if (supportsArraysCopyOfAndDownloadManager) {
-                            DownloadManager downloadManager = (DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE);
-                            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link))
-                            .setTitle(filename).setDescription(filename).setMimeType("application/vnd.android.package-archive");
-                            if (Build.VERSION.SDK_INT < 29) activity.checkStoragePerm();
-                            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
-                            if (supportsActionBar) request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                            downloadManager.enqueue(request);
-                        } else activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(link)));
-                    });
-                    if(supportsArraysCopyOfAndDownloadManager) builder.setNeutralButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest"))));
-                    activity.styleAlertDialog(builder.setNegativeButton(rss.getString(R.string.cancel), null).create(),
-                            null, false, null);
+                    /*  ListView lv;
+                        if((adapter != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(adapter == null ? new CustomArrayAdapter(this, display, isLang) : adapter);
+                        Window w = ad.getWindow();
+                        if (w != null) {
+                            int padding = 16;
+                            w.getDecorView().setPadding(padding, padding, padding, padding);
+                        }*/
+                    activity.runOnUiThread(new AlertDialog.Builder(activity).setTitle(rss.getString(R.string.update)).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
+                                    if (Build.VERSION.SDK_INT < 29) activity.checkStoragePerm();
+                                    ((DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(Uri.parse(link))
+                                    .setTitle(filename).setDescription(filename).setMimeType("application/vnd.android.package-archive")
+                                    .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
+                                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED));
+                                }).setNeutralButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest")))).setNegativeButton(rss.getString(R.string.cancel), null).create()::show);
                 } else if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show());
             } catch (Exception ignored) {
                 if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, "Failed to check for update", Toast.LENGTH_SHORT).show());
@@ -911,111 +714,112 @@ public class MainActivity extends Activity implements Merger.LogListener {
                 apkNames[i] = splits.get(i - 5);
                 checkedItems[i] = false;
             }
-
-            TextView title = new TextView(this);
-            title.setTextColor(textColor);
-            title.setTextSize(20);
-            title.setText(rss.getString(R.string.select_splits));
-            title.setPadding(15,15,15,15);
-
-            styleAlertDialog(new AlertDialog.Builder(this).setCustomTitle(title).setMultiChoiceItems(apkNames, checkedItems, (dialog, which, isChecked) -> {
-                switch (which) {
-                    case 0:
-                        // "Select All" option
-                        for (int i = 5; i < checkedItems.length; i++) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
-                        break;
-                    case 1:
-                        // device specs option
-                        for (int i = 5; i < checkedItems.length; i++) {
-                            ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = (isChecked && DeviceSpecsUtil.shouldIncludeSplit(apkNames[i])));
-                        }
-                        boolean didNotFindAppropriateDpi = true;
-                        for (int i = 5; i < checkedItems.length; i++) {
-                            if (checkedItems[i] && apkNames[i].contains("dpi")) {
-                                didNotFindAppropriateDpi = false;
-                                break;
-                            }
-                        }
-                        if (didNotFindAppropriateDpi) {
+            // "Select All" option
+            // device specs option
+            //arch for device
+            //dpi for device
+            //lang for device
+            // Uncheck "Select All" if any individual item is unchecked
+            // uncheck device arch if non device arch selected
+            // ?????
+            // reset
+            /*  ListView lv;
+                if((adapter != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(adapter == null ? new CustomArrayAdapter(this, display, isLang) : adapter);
+                Window w = ad.getWindow();
+                if (w != null) {
+                    int padding = 16;
+                    w.getDecorView().setPadding(padding, padding, padding, padding);
+                }*/
+            runOnUiThread(new AlertDialog.Builder(this).setTitle(rss.getString(R.string.select_splits)).setMultiChoiceItems(apkNames, checkedItems, (dialog, which, isChecked) -> {
+                    switch (which) {
+                        case 0:
+                            // "Select All" option
+                            for (int i = 5; i < checkedItems.length; i++) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                            break;
+                        case 1:
+                            // device specs option
                             for (int i = 5; i < checkedItems.length; i++) {
-                                if (apkNames[i].contains("hdpi")) {
-                                    ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                                ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = (isChecked && DeviceSpecsUtil.shouldIncludeSplit(apkNames[i])));
+                            }
+                            boolean didNotFindAppropriateDpi = true;
+                            for (int i = 5; i < checkedItems.length; i++) {
+                                if (checkedItems[i] && apkNames[i].contains("dpi")) {
+                                    didNotFindAppropriateDpi = false;
                                     break;
                                 }
                             }
-                        }
-                        break;
-                    case 2:
-                        //arch for device
-                        for (int i = 5; i < checkedItems.length; i++) {
-                            if(DeviceSpecsUtil.shouldIncludeArch(apkNames[i])) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
-                        }
-                    break;
-                    case 3:
-                        //dpi for device
-                        for (int i = 5; i < checkedItems.length; i++) {
-                            if(DeviceSpecsUtil.shouldIncludeDpi(apkNames[i])) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
-                        }
-                        boolean didNotFoundAppropriateDpi = true;
-                        for (int i = 5; i < checkedItems.length; i++) {
-                            if (checkedItems[i] && apkNames[i].contains("dpi")) {
-                                didNotFoundAppropriateDpi = false;
-                                break;
+                            if (didNotFindAppropriateDpi) {
+                                for (int i = 5; i < checkedItems.length; i++) {
+                                    if (apkNames[i].contains("hdpi")) {
+                                        ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                                        break;
+                                    }
+                                }
                             }
-                        }
-                        if (didNotFoundAppropriateDpi) {
+                            break;
+                        case 2:
+                            //arch for device
                             for (int i = 5; i < checkedItems.length; i++) {
-                                if (apkNames[i].contains("hdpi")) {
-                                    ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                                if(DeviceSpecsUtil.shouldIncludeArch(apkNames[i])) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                            }
+                        break;
+                        case 3:
+                            //dpi for device
+                            for (int i = 5; i < checkedItems.length; i++) {
+                                if(DeviceSpecsUtil.shouldIncludeDpi(apkNames[i])) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                            }
+                            boolean didNotFoundAppropriateDpi = true;
+                            for (int i = 5; i < checkedItems.length; i++) {
+                                if (checkedItems[i] && apkNames[i].contains("dpi")) {
+                                    didNotFoundAppropriateDpi = false;
                                     break;
                                 }
                             }
-                        }
-                    break;
-                    case 4:
-                        //lang for device
-                        for (int i = 5; i < checkedItems.length; i++) {
-                            if(DeviceSpecsUtil.shouldIncludeLang(apkNames[i])) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
-                        }
-                    break;
-                    default:
-                        ListView listView = ((AlertDialog) dialog).getListView();
-                        if (!isChecked) listView.setItemChecked(0, checkedItems[0] = false); // Uncheck "Select All" if any individual item is unchecked
-                        for (int i = 1; i <= 4; i++) {
-                            if (checkedItems[i] && !DeviceSpecsUtil.shouldIncludeSplit(apkNames[which])) {
-                                listView.setItemChecked(i, checkedItems[i] = false); // uncheck device arch if non device arch selected
+                            if (didNotFoundAppropriateDpi) {
+                                for (int i = 5; i < checkedItems.length; i++) {
+                                    if (apkNames[i].contains("hdpi")) {
+                                        ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                                        break;
+                                    }
+                                }
                             }
-                        }
                         break;
-                }
-            }).setPositiveButton("OK", (dialog, which) -> {
-                for (int i = 1; i < checkedItems.length; i++) {
-                    if (checkedItems[i]) splits.remove(apkNames[i]); // ?????
-                }
+                        case 4:
+                            //lang for device
+                            for (int i = 5; i < checkedItems.length; i++) {
+                                if(DeviceSpecsUtil.shouldIncludeLang(apkNames[i])) ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                            }
+                        break;
+                        default:
+                            ListView listView = ((AlertDialog) dialog).getListView();
+                            if (!isChecked) listView.setItemChecked(0, checkedItems[0] = false); // Uncheck "Select All" if any individual item is unchecked
+                            for (int i = 1; i <= 4; i++) {
+                                if (checkedItems[i] && !DeviceSpecsUtil.shouldIncludeSplit(apkNames[which])) {
+                                    listView.setItemChecked(i, checkedItems[i] = false); // uncheck device arch if non device arch selected
+                                }
+                            }
+                            break;
+                    }
+                }).setPositiveButton("OK", (dialog, which) -> {
+                    for (int i = 1; i < checkedItems.length; i++) {
+                        if (checkedItems[i]) splits.remove(apkNames[i]); // ?????
+                    }
 
-                if (splits.size() == initialSize) {
-                    urisAreSplitApks = true; // reset
-                    showError(rss.getString(R.string.nothing));
-                } else {
-                    splitsToUse = splits;
-                    selectDirToSaveAPKOrSaveNow();
-                }
-            }).setNegativeButton("Cancel", null).create(), apkNames, false, null);
+                    if (splits.size() == initialSize) {
+                        urisAreSplitApks = true; // reset
+                        showError(rss.getString(R.string.nothing));
+                    } else {
+                        splitsToUse = splits;
+                        selectDirToSaveAPKOrSaveNow();
+                    }
+                }).setNegativeButton("Cancel", null).create()::show);
         } catch (IOException e) {
             showError(e);
         }
     }
 
-
     private void showSuccess() {
-        ViewSwitcher vs = findViewById(R.id.viewSwitcher);
-        vs.setVisibility(View.VISIBLE);
-        if(Objects.equals(vs.getCurrentView(), findViewById(R.id.cancelButton))) vs.showNext();
-        ImageView copyLogButton = findViewById(R.id.copyLog);
-        LightingColorFilter cf = new LightingColorFilter(0xFF000000, textColor);
-        copyLogButton.setColorFilter(cf);
-        copyLogButton.setOnClickListener(v -> copyText(new StringBuilder().append(((TextView) findViewById(R.id.logField)).getText()).append('\n').append(((TextView) findViewById(R.id.errorField)).getText())));
-        ImageView installButton = findViewById(R.id.installButton);
+        FloatingActionButton installButton = findViewById(R.id.installButton);
         if(errorOccurred) installButton.setVisibility(View.GONE);
         else {
             final String success = rss.getString(R.string.success_saved);
@@ -1023,10 +827,9 @@ public class MainActivity extends Activity implements Merger.LogListener {
             runOnUiThread(() -> Toast.makeText(this, success, Toast.LENGTH_SHORT).show());
             File output;
             if(signApk && (output = Merger.signedApk) != null && output.exists() && output.length() > 999) {
-                installButton.setColorFilter(cf);
                 installButton.setVisibility(View.VISIBLE);
                 installButton.setOnClickListener(v ->          //if (supportsFileChannel && !getPackageManager().canRequestPackageInstalls()) startActivityForResult(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).setData(Uri.parse(String.format("package:%s", getPackageName()))), 1234);
-                        startActivity(new Intent(Build.VERSION.SDK_INT > 13 ? Intent.ACTION_INSTALL_PACKAGE : Intent.ACTION_VIEW)
+                        startActivity(new Intent(Intent.ACTION_INSTALL_PACKAGE)
                                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                 .setData(FileProvider.getUriForFile(this, "com.abdurazaaqmohammed.AntiSplit.provider", output))));
@@ -1035,8 +838,7 @@ public class MainActivity extends Activity implements Merger.LogListener {
     }
 
     private void copyText(CharSequence text) {
-        if(supportsActionBar) ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("log", text));
-        else ((android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setText(text);
+        ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("log", text));
         Toast.makeText(this, rss.getString(R.string.copied_log), Toast.LENGTH_SHORT).show();
     }
 
@@ -1054,23 +856,19 @@ public class MainActivity extends Activity implements Merger.LogListener {
                     .setPositiveButton(rss.getString(R.string.create_issue), (dialog, which) -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/issues/new?title=Crash%20Report&body=" + fullLog))))
                     .setNeutralButton(rss.getString(R.string.copy_log), (dialog, which) -> copyText(fullLog));
             runOnUiThread(() -> {
-                TextView title = new TextView( this);
-                title.setText(mainErr);
-                title.setTextColor(textColor);
-                title.setTextSize(20);
-
-                TextView msg = new TextView(this);
+                MaterialTextView msg = new MaterialTextView(this);
                 msg.setText(stackTrace);
-                msg.setTextColor(textColor);
                 ScrollView sv = new ScrollView(this);
-                sv.setBackgroundColor(bgColor);
                 msg.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int) (rss.getDisplayMetrics().heightPixels * 0.6)));
                 sv.addView(msg);
-                styleAlertDialog(b.setCustomTitle(title).setView(sv).create(), null, false, null);
-            /*TextView errorBox = findViewById(R.id.errorField);
-            errorBox.setVisibility(View.VISIBLE);
-            errorBox.setText(stackTrace);
-            Toast.makeText(this, mainErr, Toast.LENGTH_SHORT).show();*/
+                /*  ListView lv;
+                    if((adapter != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(adapter == null ? new CustomArrayAdapter(this, display, isLang) : adapter);
+                    Window w = ad.getWindow();
+                    if (w != null) {
+                        int padding = 16;
+                        w.getDecorView().setPadding(padding, padding, padding, padding);
+                    }*/
+                runOnUiThread(b.setTitle(mainErr).setView(sv).create()::show);
             });
         }
     }

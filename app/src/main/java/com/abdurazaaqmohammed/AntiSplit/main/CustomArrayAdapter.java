@@ -16,15 +16,13 @@ import java.util.Objects;
 public class CustomArrayAdapter extends ArrayAdapter<String> {
     private final Context context;
     private final String[] values;
-    private final int textColor;
     private final boolean lang;
     private String langCode;
 
-    public CustomArrayAdapter(Context context, String[] values, int textColor, boolean lang) {
+    public CustomArrayAdapter(Context context, String[] values, boolean lang) {
         super(context, android.R.layout.simple_list_item_multiple_choice, values);
         this.context = context;
         this.values = values;
-        this.textColor = textColor;
         this.lang = lang;
         if (lang) {
             String[] langCodes = MainActivity.rss.getStringArray(R.array.langs);
@@ -45,7 +43,6 @@ public class CustomArrayAdapter extends ArrayAdapter<String> {
         TextView textView = convertView.findViewById(android.R.id.text1);
         String curr = values[position];
         textView.setText(lang ? Html.fromHtml(Objects.equals(curr, langCode) ? ("<b>" + curr + "</b>") : curr) : curr);
-        textView.setTextColor(textColor);
         return convertView;
     }
 }
