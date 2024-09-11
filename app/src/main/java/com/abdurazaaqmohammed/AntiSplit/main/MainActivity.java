@@ -51,7 +51,6 @@ import androidx.core.widget.NestedScrollView;
 import com.abdurazaaqmohammed.AntiSplit.R;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textview.MaterialTextView;
 import com.reandroid.apk.ApkBundle;
@@ -183,8 +182,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             runOnUiThread(ad::show);
         });
 
-        FloatingActionButton settingsButton = findViewById(R.id.settingsButton);
-        settingsButton.setOnClickListener(v -> {
+        findViewById(R.id.settingsButton).setOnClickListener(v -> {
             ScrollView l = (ScrollView) LayoutInflater.from(this).inflate(R.layout.setty, null);
 
             ((TextView) l.findViewById(R.id.langPicker)).setText(rss.getString(R.string.lang));
@@ -303,14 +301,11 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     private void updateLang(Resources res, ScrollView settingsDialog) {
         rss = res;
         this.<TextView>findViewById(R.id.decodeButton).setText(res.getString(R.string.merge));
-        Button fromAppsButton = findViewById(R.id.fromAppsButton);
-        fromAppsButton.setText(res.getString(R.string.select_from_installed_apps));
-        FloatingActionButton settingsButton = findViewById(R.id.settingsButton);
-        settingsButton.setContentDescription(res.getString(R.string.settings));
+        this.<TextView>findViewById(R.id.fromAppsButton).setText(res.getString(R.string.select_from_installed_apps));
+        findViewById(R.id.settingsButton).setContentDescription(res.getString(R.string.settings));
         findViewById(R.id.installButton).setContentDescription(res.getString(R.string.install));
-
-        //((LinearLayout) findViewById(R.id.topButtons)).setGravity(Gravity.CENTER_VERTICAL);
-       // findViewById(R.id.processButtons).setLayoutParams(new LinearLayout.LayoutParams((int) (rss.getDisplayMetrics().widthPixels * 0.8), LinearLayout.LayoutParams.FILL_PARENT));
+        findViewById(R.id.cancelButton).setContentDescription(res.getString(R.string.cancel));
+        findViewById(R.id.copyButton).setContentDescription(res.getString(R.string.copy_log));
 
         if(settingsDialog != null) {
             ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(res.getString(R.string.lang));
@@ -575,28 +570,29 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     }
 
     private void process(Uri outputUri) {
+        findViewById(R.id.installButton).setVisibility(View.GONE);
         ProcessTask processTask = new ProcessTask(this, DeviceSpecsUtil, pkgName);
         processTask.execute(outputUri);
 
-       /* ImageView cancelButton = findViewById(R.id.cancelButton);
-        cancelButton.setColorFilter(new LightingColorFilter(0xFF000000, textColor));
-        ViewSwitcher vs = findViewById(R.id.viewSwitcher);
-        vs.setVisibility(View.VISIBLE);
-        if(Objects.equals(vs.getCurrentView(), findViewById(R.id.finishedButtons))) vs.showNext();
+        View cancelButton = findViewById(R.id.cancelButton);
+        cancelButton.setVisibility(View.VISIBLE);
 
         cancelButton.setOnClickListener(v -> {
-            Intent intent;
-            if(supportsActionBar && (intent = getPackageManager().getLaunchIntentForPackage(getPackageName())) != null) {
-                startActivity(Intent.makeRestartActivityTask(intent.getComponent()));
-                Runtime.getRuntime().exit(0);
-            } else {
+            Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+            if (intent == null) {
                 processTask.cancel(true);
                 intent = getIntent();
                 finish();
                 startActivity(intent);
+            } else {
+                startActivity(Intent.makeRestartActivityTask(intent.getComponent()));
+                Runtime.getRuntime().exit(0);
             }
-            //viewSwitcher.setVisibility(View.GONE);
-        });*/
+        });
+
+        View copyButton = findViewById(R.id.copyButton);
+        copyButton.setVisibility(View.VISIBLE);
+        copyButton.setOnClickListener(v -> copyText(new StringBuilder().append(((TextView) findViewById(R.id.logField)).getText()).append('\n').append(((TextView) findViewById(R.id.errorField)).getText())));
     }
 
     private static class CheckForUpdatesTask extends AsyncTask<Void, Void, String[]> {
@@ -818,7 +814,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     }
 
     private void showSuccess() {
-        FloatingActionButton installButton = findViewById(R.id.installButton);
+        findViewById(R.id.cancelButton).setVisibility(View.GONE);
+        View installButton = findViewById(R.id.installButton);
         if(errorOccurred) installButton.setVisibility(View.GONE);
         else {
             final String success = rss.getString(R.string.success_saved);
@@ -842,6 +839,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     }
 
     private void showError(Exception e) {
+        findViewById(R.id.cancelButton).setVisibility(View.GONE);
         if(!(e instanceof ClosedByInterruptException)) {
             final String mainErr = e.toString();
             errorOccurred = !mainErr.equals(rss.getString(R.string.sign_failed));
