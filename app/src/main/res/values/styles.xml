@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:fitsSystemWindows">true</item>
+    <style name="Theme.MyApp.Black" parent="Theme.Material3.Dark">
+        <item name="android:background">@android:color/black</item>
+        <item name="android:windowBackground">@android:color/black</item>
     </style>
 </resources>

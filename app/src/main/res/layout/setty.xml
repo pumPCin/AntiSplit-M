@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="16dp">
@@ -10,6 +11,60 @@
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:orientation="vertical">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/themeToggleGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    app:singleSelection="true"
+                    app:selectionRequired="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/lightThemeButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:icon="@drawable/light"
+                        app:tooltipText="@string/light_theme"
+                        android:contentDescription="@string/light_theme"
+                        style="@style/Widget.Material3.Button.IconButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/darkThemeButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:icon="@drawable/dark"
+                        app:tooltipText="@string/dark_theme"
+                        android:contentDescription="@string/dark_theme"
+                        style="@style/Widget.Material3.Button.IconButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/blackThemeButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:icon="@drawable/black"
+                        app:tooltipText="@string/black_theme"
+                        android:contentDescription="@string/black_theme"
+                        style="@style/Widget.Material3.Button.IconButton"/>
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/logToggle"

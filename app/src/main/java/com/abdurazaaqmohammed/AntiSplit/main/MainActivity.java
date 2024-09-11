@@ -49,6 +49,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.widget.NestedScrollView;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     //public static boolean revanced;
     public static boolean checkForUpdates;
     public static String lang;
+    public static int theme;
     public DeviceSpecsUtil DeviceSpecsUtil;
     private String pkgName;
 
@@ -108,12 +110,14 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         if ((externalCacheDir = getExternalCacheDir()) != null) deleteDir(externalCacheDir);
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
+
+        setTheme(theme = settings.getInt("theme", R.style.Theme_MyApp_Black));
 
         setContentView(R.layout.activity_main);
         DeviceSpecsUtil = new DeviceSpecsUtil(this);
        // setSupportActionBar(this.<MaterialToolbar>findViewById(R.id.topAppBar));
         // Fetch settings from SharedPreferences
-        SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
 
         checkForUpdates = settings.getBoolean("checkForUpdates", true);
         //revanced = settings.getBoolean("revanced", false);
@@ -183,19 +187,34 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         });
 
         findViewById(R.id.settingsButton).setOnClickListener(v -> {
-            ScrollView l = (ScrollView) LayoutInflater.from(this).inflate(R.layout.setty, null);
+            ScrollView settingsDialog = (ScrollView) LayoutInflater.from(this).inflate(R.layout.setty, null);
 
-            ((TextView) l.findViewById(R.id.langPicker)).setText(rss.getString(R.string.lang));
-            ((TextView) l.findViewById(R.id.logToggle)).setText(rss.getString(R.string.enable_logs));
-            ((TextView) l.findViewById(R.id.ask)).setText(rss.getString(R.string.ask));
-            ((TextView) l.findViewById(R.id.showDialogToggle)).setText(rss.getString(R.string.show_dialog));
-            ((TextView) l.findViewById(R.id.signToggle)).setText(rss.getString(R.string.sign_apk));
-            ((TextView) l.findViewById(R.id.selectSplitsForDeviceToggle)).setText(rss.getString(R.string.automatically_select));
-            ((TextView) l.findViewById(R.id.updateToggle)).setText(rss.getString(R.string.auto_update));
-            ((TextView) l.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.check_update_now));
+            ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(rss.getString(R.string.lang));
+            ((TextView) settingsDialog.findViewById(R.id.logToggle)).setText(rss.getString(R.string.enable_logs));
+            ((TextView) settingsDialog.findViewById(R.id.ask)).setText(rss.getString(R.string.ask));
+            ((TextView) settingsDialog.findViewById(R.id.showDialogToggle)).setText(rss.getString(R.string.show_dialog));
+            ((TextView) settingsDialog.findViewById(R.id.signToggle)).setText(rss.getString(R.string.sign_apk));
+            ((TextView) settingsDialog.findViewById(R.id.selectSplitsForDeviceToggle)).setText(rss.getString(R.string.automatically_select));
+            ((TextView) settingsDialog.findViewById(R.id.updateToggle)).setText(rss.getString(R.string.auto_update));
+            ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.check_update_now));
+            MaterialButtonToggleGroup themeButtons = settingsDialog.findViewById(R.id.themeToggleGroup);
+            themeButtons.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+                if (isChecked) {
+                    if (checkedId == R.id.lightThemeButton) {
+                        theme = com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
+                    } else if (checkedId == R.id.darkThemeButton) {
+                        theme = com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar;
+                    } else if (checkedId == R.id.blackThemeButton) {
+                        theme = R.style.Theme_MyApp_Black;
+                    }
+                    settings.edit().putInt("theme", theme).apply();
+                    setTheme(theme);
+                    recreate();
+                }
+            });
 
-                Button checkUpdateNow = l.findViewById(R.id.checkUpdateNow);
-            CompoundButton updateSwitch = l.findViewById(R.id.updateToggle);
+            Button checkUpdateNow = settingsDialog.findViewById(R.id.checkUpdateNow);
+            CompoundButton updateSwitch = settingsDialog.findViewById(R.id.updateToggle);
             updateSwitch.setChecked(checkForUpdates);
             updateSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> checkUpdateNow.setVisibility((checkForUpdates = isChecked) ? View.GONE : View.VISIBLE));
             if(checkForUpdates) {
@@ -206,16 +225,16 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             }
             checkUpdateNow.setOnClickListener(v1 -> new CheckForUpdatesTask(this, true).execute());
 
-            CompoundButton logSwitch = l.findViewById(R.id.logToggle);
+            CompoundButton logSwitch = settingsDialog.findViewById(R.id.logToggle);
             logSwitch.setChecked(logEnabled);
             logSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> logEnabled = isChecked);
 
-            CompoundButton signToggle = l.findViewById(R.id.signToggle);
+            CompoundButton signToggle = settingsDialog.findViewById(R.id.signToggle);
             signToggle.setChecked(signApk);
             signToggle.setOnCheckedChangeListener((buttonView, isChecked) -> signApk = isChecked);
 
-            CompoundButton selectSplitsAutomaticallySwitch = l.findViewById(R.id.selectSplitsForDeviceToggle);
-            CompoundButton showDialogSwitch = l.findViewById(R.id.showDialogToggle);
+            CompoundButton selectSplitsAutomaticallySwitch = settingsDialog.findViewById(R.id.selectSplitsForDeviceToggle);
+            CompoundButton showDialogSwitch = settingsDialog.findViewById(R.id.showDialogToggle);
 
             showDialogSwitch.setChecked(showDialog);
             showDialogSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -235,19 +254,19 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 }
             });
 
-            CompoundButton askSwitch = l.findViewById(R.id.ask);
+            CompoundButton askSwitch = settingsDialog.findViewById(R.id.ask);
             askSwitch.setChecked(ask);
             askSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 ask = isChecked;
                 if(!isChecked) checkStoragePerm();
             });
 
-            l.findViewById(R.id.langPicker).setOnClickListener(v2 -> {
+            settingsDialog.findViewById(R.id.langPicker).setOnClickListener(v2 -> {
                 String[] langs = rss.getStringArray(R.array.langs);
                 String[] display = rss.getStringArray(R.array.langs_display);
 
                 AlertDialog ad = new MaterialAlertDialogBuilder(this).setSingleChoiceItems(display, -1, (dialog, which) -> {
-                    updateLang(LocaleHelper.setLocale(this, lang = langs[which]).getResources(), l);
+                    updateLang(LocaleHelper.setLocale(this, lang = langs[which]).getResources(), settingsDialog);
                     dialog.dismiss();
                 }).create();
                 runOnUiThread(ad::show);
@@ -261,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     int padding = 16;
                     w.getDecorView().setPadding(padding, padding, padding, padding);
                 }*/
-            runOnUiThread(new MaterialAlertDialogBuilder(this).setTitle(rss.getString(R.string.settings)).setView(l)
+            runOnUiThread(new MaterialAlertDialogBuilder(this).setTitle(rss.getString(R.string.settings)).setView(settingsDialog)
                                 .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create()::show);
         });
 

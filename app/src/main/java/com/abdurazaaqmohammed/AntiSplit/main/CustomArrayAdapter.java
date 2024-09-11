@@ -42,7 +42,7 @@ public class CustomArrayAdapter extends ArrayAdapter<String> {
         }
         TextView textView = convertView.findViewById(android.R.id.text1);
         String curr = values[position];
-        textView.setText(lang ? Html.fromHtml(Objects.equals(curr, langCode) ? ("<b>" + curr + "</b>") : curr) : curr);
+        textView.setText(lang && Objects.equals(curr, langCode) ? Html.fromHtml(("<b>" + curr + "</b>")) : curr);
         return convertView;
     }
 }

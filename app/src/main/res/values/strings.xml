@@ -75,4 +75,7 @@
     <string name="select_from_installed_apps">Select from Installed Apps</string>
     <string name="app_icon_list_label">App icon</string>
     <string name="install">Install</string>
+    <string name="black_theme">Black theme</string>
+    <string name="dark_theme">Dark theme</string>
+    <string name="light_theme">Light theme</string>
 </resources>
