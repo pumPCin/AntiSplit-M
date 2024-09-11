@@ -58,13 +58,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/check_update_now"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+            style="@style/Widget.Material3.Button.OutlinedButton" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/langPicker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/lang"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+            style="@style/Widget.Material3.Button.OutlinedButton" />
     </LinearLayout>
 </ScrollView>

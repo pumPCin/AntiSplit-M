@@ -50,6 +50,7 @@ import androidx.core.widget.NestedScrollView;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
 import com.google.android.material.color.DynamicColors;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textview.MaterialTextView;
@@ -128,9 +129,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         if(Objects.equals(lang, Locale.getDefault().getLanguage())) rss = getResources();
         else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources(), null);
 
-        Button decodeButton = findViewById(R.id.decodeButton);
         findViewById(R.id.fromAppsButton).setOnClickListener(v3 -> {
-            AlertDialog ad = new AlertDialog.Builder(MainActivity.this).setNegativeButton(rss.getString(R.string.cancel), null).create();
+            AlertDialog ad = new MaterialAlertDialogBuilder(MainActivity.this).setNegativeButton(rss.getString(R.string.cancel), null).create();
             PackageManager pm = getPackageManager();
             List<PackageInfo> packageInfoList = pm.getInstalledPackages(0);
 
@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 String[] langs = rss.getStringArray(R.array.langs);
                 String[] display = rss.getStringArray(R.array.langs_display);
 
-                AlertDialog ad = new AlertDialog.Builder(this).setSingleChoiceItems(display, -1, (dialog, which) -> {
+                AlertDialog ad = new MaterialAlertDialogBuilder(this).setSingleChoiceItems(display, -1, (dialog, which) -> {
                     updateLang(LocaleHelper.setLocale(this, lang = langs[which]).getResources(), l);
                     dialog.dismiss();
                 }).create();
@@ -263,11 +263,11 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     int padding = 16;
                     w.getDecorView().setPadding(padding, padding, padding, padding);
                 }*/
-            runOnUiThread(new AlertDialog.Builder(this).setTitle(rss.getString(R.string.settings)).setView(l)
+            runOnUiThread(new MaterialAlertDialogBuilder(this).setTitle(rss.getString(R.string.settings)).setView(l)
                                 .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create()::show);
         });
 
-        decodeButton.setOnClickListener(v -> startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
+        findViewById(R.id.decodeButton).setOnClickListener(v -> startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
                         .addCategory(Intent.CATEGORY_OPENABLE)
                         .setType("*/*")
                         .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
@@ -302,8 +302,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
     private void updateLang(Resources res, ScrollView settingsDialog) {
         rss = res;
-        Button decodeButton = findViewById(R.id.decodeButton);
-        decodeButton.setText(res.getString(R.string.merge));
+        this.<TextView>findViewById(R.id.decodeButton).setText(res.getString(R.string.merge));
         Button fromAppsButton = findViewById(R.id.fromAppsButton);
         fromAppsButton.setText(res.getString(R.string.select_from_installed_apps));
         FloatingActionButton settingsButton = findViewById(R.id.settingsButton);
@@ -684,7 +683,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                             int padding = 16;
                             w.getDecorView().setPadding(padding, padding, padding, padding);
                         }*/
-                    activity.runOnUiThread(new AlertDialog.Builder(activity).setTitle(rss.getString(R.string.update)).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
+                    activity.runOnUiThread(new MaterialAlertDialogBuilder(activity).setTitle(rss.getString(R.string.update)).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
                                     if (Build.VERSION.SDK_INT < 29) activity.checkStoragePerm();
                                     ((DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(Uri.parse(link))
                                     .setTitle(filename).setDescription(filename).setMimeType("application/vnd.android.package-archive")
@@ -730,7 +729,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     int padding = 16;
                     w.getDecorView().setPadding(padding, padding, padding, padding);
                 }*/
-            runOnUiThread(new AlertDialog.Builder(this).setTitle(rss.getString(R.string.select_splits)).setMultiChoiceItems(apkNames, checkedItems, (dialog, which, isChecked) -> {
+            runOnUiThread(new MaterialAlertDialogBuilder(this).setTitle(rss.getString(R.string.select_splits)).setMultiChoiceItems(apkNames, checkedItems, (dialog, which, isChecked) -> {
                     switch (which) {
                         case 0:
                             // "Select All" option
@@ -851,7 +850,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             for(StackTraceElement line : e.getStackTrace()) stackTrace.append(line).append('\n');
             StringBuilder fullLog = new StringBuilder(stackTrace.toString());
             fullLog.append('\n').append(((TextView) findViewById(R.id.logField)).getText());
-            AlertDialog.Builder b = new AlertDialog.Builder(this)
+            MaterialAlertDialogBuilder b = new MaterialAlertDialogBuilder(this)
                     .setNegativeButton(rss.getString(R.string.cancel), null)
                     .setPositiveButton(rss.getString(R.string.create_issue), (dialog, which) -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/issues/new?title=Crash%20Report&body=" + fullLog))))
                     .setNeutralButton(rss.getString(R.string.copy_log), (dialog, which) -> copyText(fullLog));
@@ -861,13 +860,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 ScrollView sv = new ScrollView(this);
                 msg.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int) (rss.getDisplayMetrics().heightPixels * 0.6)));
                 sv.addView(msg);
-                /*  ListView lv;
-                    if((adapter != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(adapter == null ? new CustomArrayAdapter(this, display, isLang) : adapter);
-                    Window w = ad.getWindow();
-                    if (w != null) {
-                        int padding = 16;
-                        w.getDecorView().setPadding(padding, padding, padding, padding);
-                    }*/
                 runOnUiThread(b.setTitle(mainErr).setView(sv).create()::show);
             });
         }
