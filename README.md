@@ -7,6 +7,10 @@ There are already some apps that can perform this task like Apktool M, AntiSplit
 
 In addition, Antisplit G2 (com.tilks.arscmerge), the fastest and lightest of the existing apps, has a large problem; it does not remove the information about splits in the APK from the AndroidManifest.xml. If a non-split APK contains this information it will cause an "App not installed" error on some devices. Fortunately the implementation by REAndroid contains a function to remove this automatically and it carries over to this app.
 
+Version 2.x - Material You design, support Android 5.0+
+
+Version 1.x - Support Android 1.6+
+
 # Usage
 Video - https://www.youtube.com/watch?v=Nd3vEzRWY-Q
 
@@ -20,12 +24,15 @@ Note: if you are planning to further modify the APK, you only need to sign it af
 Note: Some apps verify the signature of the APK or take other measures to check if the app was modified, which may cause it to crash on startup.
 
 # Screenshots
-<img src="/images/1.6.6.2 mainscreen.jpg" title="Main screen" height="25%" width="25%" /> <img src="/images/1.6.5.4 dialog.jpg" title="Dialog allowing selection of splits in a split APK" height="25%" width="25%" /> <img src="/images/1.6.6.2 result.jpg" title="Result of merging split APK" height="25%" width="25%" /> <img src="/images/1.6.5.4 settings.jpg" title="Settings menu of the app" height="25%" width="25%" /> <img src="/images/1.6.6.2 list.jpg" title="Menu allowing selection from apps installed on the device" height="25%" width="25%" />
+| Main screen                                                                 | Settings                                                                    | Dialog                                                                      | Processing                                                                  | Result                                                                      |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| ![Main screen](https://raw.githubusercontent.com/AbdurazaaqMohammed/AntiSplit-M/redesign/images/2.0%20mainscreen.jpg) | ![Settings](https://raw.githubusercontent.com/AbdurazaaqMohammed/AntiSplit-M/redesign/images/2.0%20settings.jpg) | ![Dialog](https://raw.githubusercontent.com/AbdurazaaqMohammed/AntiSplit-M/redesign/images/2.0%20dialog.jpg) | ![Processing](https://raw.githubusercontent.com/AbdurazaaqMohammed/AntiSplit-M/redesign/images/2.0%20processing.jpg) | ![Result](https://raw.githubusercontent.com/AbdurazaaqMohammed/AntiSplit-M/redesign/images/2.0%20result.jpg) |
+
 
 # Used projects
 
 ⭐ [APKEditor](https://github.com/REAndroid/APKEditor) by REAndroid, what makes it all possible
-* [simplezip](https://github.com/j256/simplezip) by j256 to help in fixing APK to patch with ReVanced
+* [simplezip](https://github.com/j506/simplezip) by j506 to help in fixing APK to patch with ReVanced
 * [Android port](https://github.com/MuntashirAkon/apksig-android) of apksig library by MuntashirAkon to sign APKs
 * [PseudoApkSigner](https://github.com/Aefyr/PseudoApkSigner) by Aefyr for backup signing on older Android versions
 * [AmbilWarna Color Picker](https://github.com/yukuku/ambilwarna)
