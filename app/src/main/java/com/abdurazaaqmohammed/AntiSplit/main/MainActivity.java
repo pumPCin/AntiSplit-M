@@ -47,6 +47,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     public static int theme;
     public DeviceSpecsUtil DeviceSpecsUtil;
     private String pkgName;
+    private boolean systemTheme;
 
     public Handler getHandler() {
         return handler;
@@ -124,9 +126,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
         setContentView(R.layout.activity_main);
         DeviceSpecsUtil = new DeviceSpecsUtil(this);
-//        android.util.TypedValue a = new android.util.TypedValue();
-//        getTheme().resolveAttribute(android.R.attr.windowBackground, a, true);
-//        findViewById(R.id.main).setBackgroundColor(a.data);
 
         // Fetch settings from SharedPreferences
         checkForUpdates = settings.getBoolean("checkForUpdates", true);
@@ -135,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         selectSplitsForDevice = settings.getBoolean("selectSplitsForDevice", false);
         logEnabled = settings.getBoolean("logEnabled", true);
         ask = settings.getBoolean("ask", true);
+        systemTheme = settings.getBoolean("systemTheme", true);
         LogUtil.setLogListener(this);
 
         lang = settings.getString("lang", "en");
@@ -222,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             MaterialButtonToggleGroup themeButtons = settingsDialog.findViewById(R.id.themeToggleGroup);
             themeButtons.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
                 if (isChecked) {
+                    systemTheme = false;
                     if (checkedId == R.id.lightThemeButton) {
                         theme = com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
                     } else if (checkedId == R.id.darkThemeButton) {
@@ -229,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     } else if (checkedId == R.id.blackThemeButton) {
                         theme = R.style.Theme_MyApp_Black;
                     } else {
+                        systemTheme = true;
                         theme = (rss.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES ?
                                 com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar :
                                 com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
@@ -338,6 +340,21 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         }
     }
 
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if(systemTheme) {
+            int currentNightMode = newConfig.uiMode & Configuration.UI_MODE_NIGHT_MASK;
+            if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+                setTheme(theme = com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar);
+                recreate();
+            } else if (currentNightMode == Configuration.UI_MODE_NIGHT_NO) {
+                setTheme(theme = com.google.android.material.R.style.Theme_Material3_Light_NoActionBar);
+                recreate();
+            }
+        }
+    }
+
     private void setupSwipe(FloatingActionButton fab) {
         LinearLayout fabs = findViewById(R.id.fabs);
         fab.setOnTouchListener(new View.OnTouchListener() {
@@ -429,16 +446,17 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
     @Override
     protected void onPause() {
-        SharedPreferences.Editor e = getSharedPreferences("set", Context.MODE_PRIVATE).edit()
+        getSharedPreferences("set", Context.MODE_PRIVATE).edit()
                 .putBoolean("logEnabled", logEnabled)
                 .putBoolean("ask", ask)
                 .putBoolean("showDialog", showDialog)
                 .putBoolean("signApk", signApk)
+                .putBoolean("systemTheme", systemTheme)
                 .putBoolean("selectSplitsForDevice", selectSplitsForDevice)
-                //.putBoolean("revanced", revanced)
+                .putInt("theme", theme)
                 .putBoolean("checkForUpdates", checkForUpdates)
-                .putString("lang", lang);
-        e.apply();
+                .putString("lang", lang)
+                .apply();
         super.onPause();
     }
 
@@ -672,7 +690,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         cancelButton.setOnClickListener(v -> {
             try {
                 if(doesNotHaveStoragePerm(this)) AndroidXI.getInstance().with(this).delete(launcher, outputUri);
-                else new File(FileUtils.getPath(outputUri, this)).delete();
+                else if(new File(FileUtils.getPath(outputUri, this)).delete()) LogUtil.logMessage("Cleaned output file " + getOriginalFileName(this, outputUri));
             } catch (Exception ignored) {}
             Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
             if (intent == null) {
