@@ -7,6 +7,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.DownloadManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -35,6 +36,9 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -58,6 +62,7 @@ import com.fom.storage.media.AndroidXI;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.dialog.MaterialDialogs;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.search.SearchBar;
@@ -199,14 +204,15 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             runOnUiThread(ad::show);
         });
 
-        FloatingActionButton fabCopy = findViewById(R.id.copyButton);
-        FloatingActionButton fabInstall = findViewById(R.id.installButton);
-        FloatingActionButton fabCancel = findViewById(R.id.cancelButton);
-        FloatingActionButton fabSettings = findViewById(R.id.settingsButton);
-        setupSwipe(fabCopy);
-        setupSwipe(fabInstall);
-        setupSwipe(fabCancel);
-        setupSwipe(fabSettings);
+//        FloatingActionButton fabCopy = findViewById(R.id.copyButton);
+//        FloatingActionButton fabInstall = findViewById(R.id.installButton);
+//        FloatingActionButton fabCancel = findViewById(R.id.cancelButton);
+//        FloatingActionButton fabSettings = findViewById(R.id.settingsButton);
+
+//        setupSwipe(fabCopy);
+//        setupSwipe(fabInstall);
+//        setupSwipe(fabCancel);
+//        setupSwipe(fabSettings);
 
         findViewById(R.id.settingsButton).setOnClickListener(v -> {
             ScrollView settingsDialog = (ScrollView) LayoutInflater.from(this).inflate(R.layout.setty, null);
@@ -355,50 +361,50 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         }
     }
 
-    private void setupSwipe(FloatingActionButton fab) {
-        LinearLayout fabs = findViewById(R.id.fabs);
-        fab.setOnTouchListener(new View.OnTouchListener() {
-            float dy = 0f;
-            boolean isSwiped = false;
-            boolean up = true;
-
-            @Override
-            public boolean onTouch(View v31, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        dy = event.getRawY();
-                        isSwiped = false;
-                        return false;
-
-                    case MotionEvent.ACTION_MOVE:
-                        float movement = event.getRawY() - dy;
-                        if (Math.abs(movement) > 10) {
-                            fabs.setTranslationY(v31.getTranslationY() + movement);
-                            dy = event.getRawY();
-                            isSwiped = true;
-                            return true;
-                        }
-                        return false;
-
-                    case MotionEvent.ACTION_UP:
-                        if (isSwiped) {
-                            if(up) {
-                                fabs.animate().translationY((float) (fabs.getHeight() * 0.9)).setDuration(300).start();
-                                up = false;
-                            } else fabs.animate().translationY(0f).setDuration(300).start();
-                            return true;
-                        } else {
-                            up = true;
-                            fabs.animate().translationY(0f).setDuration(300).start();
-                        }
-                        return false;
-
-                    default:
-                        return false;
-                }
-            }
-        });
-    }
+//    private void setupSwipe(FloatingActionButton fab) {
+//        LinearLayout fabs = findViewById(R.id.fabs);
+//        fab.setOnTouchListener(new View.OnTouchListener() {
+//            float dy = 0f;
+//            boolean isSwiped = false;
+//            boolean up = true;
+//
+//            @Override
+//            public boolean onTouch(View v31, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        dy = event.getRawY();
+//                        isSwiped = false;
+//                        return false;
+//
+//                    case MotionEvent.ACTION_MOVE:
+//                        float movement = event.getRawY() - dy;
+//                        if (Math.abs(movement) > 10) {
+//                            fabs.setTranslationY(v31.getTranslationY() + movement);
+//                            dy = event.getRawY();
+//                            isSwiped = true;
+//                            return true;
+//                        }
+//                        return false;
+//
+//                    case MotionEvent.ACTION_UP:
+//                        if (isSwiped) {
+//                            if(up) {
+//                                fabs.animate().translationY((float) (fabs.getHeight() * 0.9)).setDuration(300).start();
+//                                up = false;
+//                            } else fabs.animate().translationY(0f).setDuration(300).start();
+//                            return true;
+//                        } else {
+//                            up = true;
+//                            fabs.animate().translationY(0f).setDuration(300).start();
+//                        }
+//                        return false;
+//
+//                    default:
+//                        return false;
+//                }
+//            }
+//        });
+//    }
 
     public static Resources rss;
 
@@ -683,7 +689,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         findViewById(R.id.installButton).setVisibility(View.GONE);
         ProcessTask processTask = new ProcessTask(this, DeviceSpecsUtil, pkgName);
         processTask.execute(outputUri);
-
+        LinearLayout fabs = findViewById(R.id.fabs);
+        fabs.setAlpha(0.5f);
         View cancelButton = findViewById(R.id.cancelButton);
         cancelButton.setVisibility(View.VISIBLE);
 
@@ -953,7 +960,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     }
 
     private void showError(Exception e) {
-        findViewById(R.id.cancelButton).setVisibility(View.GONE);
         if(!(e instanceof ClosedByInterruptException)) {
             final String mainErr = e.toString();
             errorOccurred = !mainErr.equals(rss.getString(R.string.sign_failed));
@@ -962,15 +968,41 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             for(StackTraceElement line : e.getStackTrace()) stackTrace.append(line).append('\n');
             StringBuilder fullLog = new StringBuilder(stackTrace.toString());
             fullLog.append('\n').append(((TextView) findViewById(R.id.logField)).getText());
-            MaterialAlertDialogBuilder b = new MaterialAlertDialogBuilder(this)
-                    .setNegativeButton(rss.getString(R.string.cancel), null)
-                    .setPositiveButton(rss.getString(R.string.create_issue), (dialog, which) -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/issues/new?title=Crash%20Report&body=" + fullLog))))
-                    .setNeutralButton(rss.getString(R.string.copy_log), (dialog, which) -> copyText(fullLog));
-            runOnUiThread(() -> {
-                MaterialTextView msg = new MaterialTextView(this);
-                msg.setText(stackTrace);
-                runOnUiThread(b.setTitle(mainErr).setView(msg).create()::show);
-            });
+
+            getHandler().post(() -> runOnUiThread(() -> {
+                View dialogView = getLayoutInflater().inflate(R.layout.dialog_button_layout, null);
+
+                AlertDialog ad = new MaterialAlertDialogBuilder(this).setView(dialogView).setTitle(mainErr).create();
+
+                findViewById(R.id.cancelButton).setVisibility(View.GONE);
+
+                Button positiveButton = dialogView.findViewById(R.id.positiveButton);
+                Button negativeButton = dialogView.findViewById(R.id.negativeButton);
+                Button neutralButton = dialogView.findViewById(R.id.neutralButton);
+
+                positiveButton.setContentDescription(rss.getString(R.string.create_issue));
+                positiveButton.setOnClickListener(v -> {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/issues/new?title=Crash%20Report&body=" + fullLog)));
+                    ad.dismiss();
+                });
+
+                negativeButton.setContentDescription(rss.getString(R.string.cancel));
+                negativeButton.setOnClickListener(v -> ad.dismiss());
+
+                neutralButton.setContentDescription(rss.getString(R.string.copy_log));
+                neutralButton.setOnClickListener(v -> {
+                    copyText(fullLog);
+                    ad.dismiss();
+                });
+
+                ((TextView) dialogView.findViewById(R.id.errorD)).setText(stackTrace);
+
+                ad.show();
+                Window w = ad.getWindow();
+                if (w != null) {
+                    w.getDecorView().setLayoutParams(new WindowManager.LayoutParams((int) (rss.getDisplayMetrics().widthPixels * 0.8), ViewGroup.LayoutParams.WRAP_CONTENT));
+                }
+            }));
         }
     }
 
