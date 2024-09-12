@@ -78,4 +78,5 @@
     <string name="black_theme">Black theme</string>
     <string name="dark_theme">Dark theme</string>
     <string name="light_theme">Light theme</string>
+    <string name="system_theme">System theme</string>
 </resources>

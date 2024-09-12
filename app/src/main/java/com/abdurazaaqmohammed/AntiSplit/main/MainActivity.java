@@ -33,6 +33,7 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -56,6 +57,7 @@ import com.fom.storage.media.AndroidXI;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.search.SearchView;
@@ -176,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             SearchView searchView = dialogView.findViewById(R.id.search_view);
             searchView.setupWithSearchBar(searchBar);
             searchBar.callOnClick();
+            searchView.getToolbar().setNavigationOnClickListener(v -> ad.dismiss());
             searchView.getEditText().addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -195,6 +198,15 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             ad.setView(dialogView);
             runOnUiThread(ad::show);
         });
+
+        FloatingActionButton fabCopy = findViewById(R.id.copyButton);
+        FloatingActionButton fabInstall = findViewById(R.id.installButton);
+        FloatingActionButton fabCancel = findViewById(R.id.cancelButton);
+        FloatingActionButton fabSettings = findViewById(R.id.settingsButton);
+        setupSwipe(fabCopy);
+        setupSwipe(fabInstall);
+        setupSwipe(fabCancel);
+        setupSwipe(fabSettings);
 
         findViewById(R.id.settingsButton).setOnClickListener(v -> {
             ScrollView settingsDialog = (ScrollView) LayoutInflater.from(this).inflate(R.layout.setty, null);
@@ -216,6 +228,10 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                         theme = com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar;
                     } else if (checkedId == R.id.blackThemeButton) {
                         theme = R.style.Theme_MyApp_Black;
+                    } else {
+                        theme = (rss.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES ?
+                                com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar :
+                                com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
                     }
                     settings.edit().putInt("theme", theme).apply();
                     setTheme(theme);
@@ -320,6 +336,51 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             if(showDialog) showApkSelectionDialog();
             else selectDirToSaveAPKOrSaveNow();
         }
+    }
+
+    private void setupSwipe(FloatingActionButton fab) {
+        LinearLayout fabs = findViewById(R.id.fabs);
+        fab.setOnTouchListener(new View.OnTouchListener() {
+            float dy = 0f;
+            boolean isSwiped = false;
+            boolean up = true;
+
+            @Override
+            public boolean onTouch(View v31, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        dy = event.getRawY();
+                        isSwiped = false;
+                        return false;
+
+                    case MotionEvent.ACTION_MOVE:
+                        float movement = event.getRawY() - dy;
+                        if (Math.abs(movement) > 10) {
+                            fabs.setTranslationY(v31.getTranslationY() + movement);
+                            dy = event.getRawY();
+                            isSwiped = true;
+                            return true;
+                        }
+                        return false;
+
+                    case MotionEvent.ACTION_UP:
+                        if (isSwiped) {
+                            if(up) {
+                                fabs.animate().translationY((float) (fabs.getHeight() * 0.9)).setDuration(300).start();
+                                up = false;
+                            } else fabs.animate().translationY(0f).setDuration(300).start();
+                            return true;
+                        } else {
+                            up = true;
+                            fabs.animate().translationY(0f).setDuration(300).start();
+                        }
+                        return false;
+
+                    default:
+                        return false;
+                }
+            }
+        });
     }
 
     public static Resources rss;

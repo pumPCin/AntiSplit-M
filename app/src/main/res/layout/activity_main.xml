@@ -96,6 +96,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
+        android:id="@+id/fabs"
         android:orientation="vertical">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

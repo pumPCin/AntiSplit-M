@@ -60,6 +60,15 @@
                         android:contentDescription="@string/black_theme"
                         style="@style/Widget.Material3.Button.IconButton"/>
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/systemThemeButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:icon="@drawable/settings"
+                        app:tooltipText="@string/system_theme"
+                        android:contentDescription="@string/system_theme"
+                        style="@style/Widget.Material3.Button.IconButton"/>
+
                 </com.google.android.material.button.MaterialButtonToggleGroup>
 
             </LinearLayout>
