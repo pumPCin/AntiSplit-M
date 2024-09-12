@@ -96,7 +96,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/copyButton"
@@ -106,7 +106,7 @@
             app:elevation="0dp"
             android:contentDescription="@string/copy_log"
             android:src="@drawable/copy"
-            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
             android:visibility="gone" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -117,7 +117,7 @@
             app:elevation="0dp"
             android:contentDescription="@string/install"
             android:src="@android:drawable/stat_sys_download"
-            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
             android:visibility="gone" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -128,7 +128,7 @@
             app:elevation="0dp"
             android:contentDescription="@string/cancel"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
             android:visibility="gone" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

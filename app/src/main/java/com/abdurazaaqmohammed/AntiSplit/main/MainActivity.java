@@ -16,6 +16,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
@@ -116,7 +117,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
-        setTheme(theme = settings.getInt("theme", R.style.Theme_MyApp_Black));
+        setTheme(theme = settings.getInt("theme", (getResources().getConfiguration().uiMode &
+                Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES ? com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar));
 
         setContentView(R.layout.activity_main);
         DeviceSpecsUtil = new DeviceSpecsUtil(this);
@@ -172,7 +174,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
             SearchBar searchBar = dialogView.findViewById(R.id.search_bar);
             SearchView searchView = dialogView.findViewById(R.id.search_view);
-            searchView.show();
+            searchView.setupWithSearchBar(searchBar);
+            searchBar.callOnClick();
             searchView.getEditText().addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -181,8 +184,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if(!searchView.isSetupWithSearchBar()) searchView.setupWithSearchBar(searchBar);
-
                     adapter.getFilter().filter(s);
                 }
 
