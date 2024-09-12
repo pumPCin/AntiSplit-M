@@ -52,6 +52,8 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.android.material.search.SearchBar;
+import com.google.android.material.search.SearchView;
 import com.google.android.material.textview.MaterialTextView;
 import com.reandroid.apk.ApkBundle;
 import com.reandroid.apkeditor.merge.LogUtil;
@@ -164,8 +166,11 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 ask = realAskValue;
             });
 
-            EditText searchBar = dialogView.findViewById(R.id.search_bar);
-            searchBar.addTextChangedListener(new TextWatcher() {
+            SearchBar searchBar = dialogView.findViewById(R.id.search_bar);
+            SearchView searchView = dialogView.findViewById(R.id.search_view);
+            searchView.show();
+
+            searchView.getEditText().addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                     // No action needed here
@@ -173,6 +178,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if(!searchView.isSetupWithSearchBar()) searchView.setupWithSearchBar(searchBar);
+
                     adapter.getFilter().filter(s);
                 }
 
@@ -271,16 +278,13 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 runOnUiThread(ad::show);
                 ad.getListView().setAdapter(new CustomArrayAdapter(this, display, true));
             });
-
-            /*  ListView lv;
-                if((adapter != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(adapter == null ? new CustomArrayAdapter(this, display, isLang) : adapter);
-                Window w = ad.getWindow();
-                if (w != null) {
-                    int padding = 16;
-                    w.getDecorView().setPadding(padding, padding, padding, padding);
-                }*/
-            runOnUiThread(new MaterialAlertDialogBuilder(this).setTitle(rss.getString(R.string.settings)).setView(settingsDialog)
-                                .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create()::show);
+            MaterialTextView title = new MaterialTextView(this);
+            title.setText(rss.getString(R.string.settings));
+            int size = 20;
+            title.setPadding(size,size,size,size);
+            title.setTextSize(size);
+            runOnUiThread(new MaterialAlertDialogBuilder(this).setCustomTitle(title).setView(settingsDialog)
+                    .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create()::show);
         });
 
         findViewById(R.id.decodeButton).setOnClickListener(v -> startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)

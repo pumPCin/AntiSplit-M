@@ -15,7 +15,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="5dp"
             app:cardElevation="4dp"
             app:cardCornerRadius="8dp">
 
@@ -71,55 +71,63 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/enable_logs" />
+            android:text="@string/enable_logs"
+            android:layout_marginBottom="5dp" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/ask"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/ask" />
+            android:text="@string/ask"
+            android:layout_marginBottom="5dp" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/showDialogToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/show_dialog" />
+            android:text="@string/show_dialog"
+            android:layout_marginBottom="5dp" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/selectSplitsForDeviceToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/automatically_select" />
+            android:text="@string/automatically_select"
+            android:layout_marginBottom="5dp" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/signToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/sign_apk" />
+            android:text="@string/sign_apk"
+            android:layout_marginBottom="5dp" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/updateToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/auto_update" />
+            android:text="@string/auto_update"
+            android:layout_marginBottom="5dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/checkUpdateNow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/check_update_now"
-            style="@style/Widget.Material3.Button.OutlinedButton" />
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_marginBottom="5dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/langPicker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/lang"
-            style="@style/Widget.Material3.Button.OutlinedButton" />
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_marginBottom="5dp" />
     </LinearLayout>
 </ScrollView>
