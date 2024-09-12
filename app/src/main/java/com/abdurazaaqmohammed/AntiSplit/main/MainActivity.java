@@ -32,7 +32,6 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -111,16 +110,16 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
-
         setTheme(theme = settings.getInt("theme", R.style.Theme_MyApp_Black));
 
         setContentView(R.layout.activity_main);
         DeviceSpecsUtil = new DeviceSpecsUtil(this);
-       // setSupportActionBar(this.<MaterialToolbar>findViewById(R.id.topAppBar));
-        // Fetch settings from SharedPreferences
+//        android.util.TypedValue a = new android.util.TypedValue();
+//        getTheme().resolveAttribute(android.R.attr.windowBackground, a, true);
+//        findViewById(R.id.main).setBackgroundColor(a.data);
 
+        // Fetch settings from SharedPreferences
         checkForUpdates = settings.getBoolean("checkForUpdates", true);
-        //revanced = settings.getBoolean("revanced", false);
         signApk = settings.getBoolean("signApk", true);
         showDialog = settings.getBoolean("showDialog", false);
         selectSplitsForDevice = settings.getBoolean("selectSplitsForDevice", false);
@@ -874,10 +873,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             runOnUiThread(() -> {
                 MaterialTextView msg = new MaterialTextView(this);
                 msg.setText(stackTrace);
-                ScrollView sv = new ScrollView(this);
-                msg.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int) (rss.getDisplayMetrics().heightPixels * 0.6)));
-                sv.addView(msg);
-                runOnUiThread(b.setTitle(mainErr).setView(sv).create()::show);
+                runOnUiThread(b.setTitle(mainErr).setView(msg).create()::show);
             });
         }
     }
