@@ -7,7 +7,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.DownloadManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -34,7 +33,6 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -62,8 +60,6 @@ import com.fom.storage.media.AndroidXI;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.dialog.MaterialDialogs;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.search.SearchView;
@@ -971,8 +967,9 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
             getHandler().post(() -> runOnUiThread(() -> {
                 View dialogView = getLayoutInflater().inflate(R.layout.dialog_button_layout, null);
-
-                AlertDialog ad = new MaterialAlertDialogBuilder(this).setView(dialogView).setTitle(mainErr).create();
+                ScrollView sv = new ScrollView(this);
+                sv.addView(dialogView);
+                AlertDialog ad = new MaterialAlertDialogBuilder(this).setView(sv).setTitle(mainErr).create();
 
                 findViewById(R.id.cancelButton).setVisibility(View.GONE);
 

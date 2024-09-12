@@ -91,8 +91,8 @@ public class FileUtils {
     }
 
     public static OutputStream getOutputStream(Uri uri, Context context) throws IOException {
-        if(doesNotHaveStoragePerm(context))
-            return context.getContentResolver().openOutputStream(uri);
+        String uriPath;
+        if(doesNotHaveStoragePerm(context) || (uriPath = uri.getPath()) == null || uriPath.startsWith("/document/msf:")) return context.getContentResolver().openOutputStream(uri);
         String filePath = getPath(uri, context);
         File file = filePath == null ? null : new File(filePath);
         return file != null && file.canWrite() ? getOutputStream(file) : context.getContentResolver().openOutputStream(uri);
@@ -202,19 +202,19 @@ public class FileUtils {
                     return id.replaceFirst("raw:", "");
                 }
 
-                String[] contentUriPrefixesToTry = {
-                        "content://downloads/public_downloads",
-                        "content://downloads/my_downloads"
-                };
-
-                for (String contentUriPrefix : contentUriPrefixesToTry) {
-                    try {
-                        Uri contentUri = ContentUris.withAppendedId(Uri.parse(contentUriPrefix), Long.parseLong(id));
-                        return getDataColumn(context, contentUri, null, null);
-                    } catch (NumberFormatException e) {
-                        return uri.getPath().replaceFirst("^/document/raw:", "").replaceFirst("^raw:", "");
-                    }
-                }
+//                String[] contentUriPrefixesToTry = {
+//                        "content://downloads/public_downloads",
+//                        "content://downloads/my_downloads"
+//                };
+//
+//                for (String contentUriPrefix : contentUriPrefixesToTry) {
+//                    try {
+//                        Uri contentUri = ContentUris.withAppendedId(Uri.parse(contentUriPrefix), Long.parseLong(id));
+//                        return getDataColumn(context, contentUri, null, null);
+//                    } catch (NumberFormatException e) {
+//                        return uri.getPath().replaceFirst("^/document/raw:", "").replaceFirst("^raw:", "");
+//                    }
+//                }
             }
         }
 

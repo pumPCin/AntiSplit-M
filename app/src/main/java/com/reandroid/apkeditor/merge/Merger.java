@@ -19,6 +19,7 @@ import static com.reandroid.apkeditor.merge.LogUtil.logMessage;
 
 import android.content.Context;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
 import com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil;
@@ -216,7 +217,8 @@ public class Merger {
                 mergedModule.writeApk(temp = new File(cacheDir, "temp.apk"));
                 logMessage(MainActivity.rss.getString(R.string.signing));
                 boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
-                File stupid = signedApk = new File(noPerm ? (cacheDir + File.separator + "stupid.apk") : FileUtils.getPath(out, context));
+                String p;
+                File stupid = signedApk = new File(noPerm || (noPerm = TextUtils.isEmpty(p = FileUtils.getPath(out, context))) ? (cacheDir + File.separator + "stupid.apk") : p);
                 try {
                     SignUtil.signDebugKey(context, temp, stupid);
                         if (noPerm) try(OutputStream os = FileUtils.getOutputStream(out, context)) {
