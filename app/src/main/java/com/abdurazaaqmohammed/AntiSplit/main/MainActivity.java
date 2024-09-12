@@ -6,6 +6,7 @@ import static com.reandroid.apkeditor.merge.LogUtil.logEnabled;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -34,7 +35,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -42,12 +42,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.core.widget.NestedScrollView;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
+import com.fom.storage.media.AndroidXI;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -169,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             SearchBar searchBar = dialogView.findViewById(R.id.search_bar);
             SearchView searchView = dialogView.findViewById(R.id.search_view);
             searchView.show();
-
             searchView.getEditText().addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -590,6 +593,11 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 break;
         }
     }
+    private final ActivityResultLauncher<IntentSenderRequest> launcher = registerForActivityResult(
+            new ActivityResultContracts.StartIntentSenderForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) LogUtil.logMessage("Deleted ");
+            });
 
     private void process(Uri outputUri) {
         findViewById(R.id.installButton).setVisibility(View.GONE);
@@ -600,6 +608,10 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         cancelButton.setVisibility(View.VISIBLE);
 
         cancelButton.setOnClickListener(v -> {
+            try {
+                if(doesNotHaveStoragePerm(this)) AndroidXI.getInstance().with(this).delete(launcher, outputUri);
+                else new File(FileUtils.getPath(outputUri, this)).delete();
+            } catch (Exception ignored) {}
             Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
             if (intent == null) {
                 processTask.cancel(true);
