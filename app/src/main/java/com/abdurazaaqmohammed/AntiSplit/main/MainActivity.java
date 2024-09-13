@@ -32,6 +32,7 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,6 +57,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.core.widget.NestedScrollView;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
@@ -129,6 +132,16 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
         setContentView(R.layout.activity_main);
         DeviceSpecsUtil = new DeviceSpecsUtil(this);
+        if("samsung".equalsIgnoreCase(Build.MANUFACTURER)) {
+            TypedValue typedValue = new TypedValue();
+            getTheme().resolveAttribute(android.R.attr.windowBackground, typedValue, true);
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setNavigationBarColor(typedValue.data);
+            WindowInsetsControllerCompat insetsController = WindowCompat.getInsetsController(window, window.getDecorView());
+            insetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            insetsController.hide(WindowInsetsCompat.Type.statusBars());
+        }
 
         // Fetch settings from SharedPreferences
         checkForUpdates = settings.getBoolean("checkForUpdates", true);
@@ -167,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 } catch (PackageManager.NameNotFoundException ignored) {}
             }
             if(sortMode == 0) Collections.sort(appInfoList, Comparator.comparing((AppInfo p) -> p.name.toLowerCase(Locale.ROOT)));
-            else Collections.sort(appInfoList, Comparator.comparing((AppInfo p) -> sortMode == 1 ? p.lastUpdated : p.firstInstall));
+            else Collections.sort(appInfoList, Comparator.comparing((AppInfo p) -> sortMode == 1 ? p.lastUpdated : p.firstInstall).reversed());
 
             LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
             View dialogView = layoutInflater.inflate(R.layout.dialog_search, null);
@@ -267,7 +280,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                                 com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
                     }
 
-                    getWindow().setNavigationBarColor(com.google.android.material.R.attr.backgroundColor);
 
                     settings.edit().putInt("theme", theme).apply();
                     setTheme(theme);
@@ -759,21 +771,30 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         @Override
         protected String[] doInBackground(Void... voids) {
             HttpURLConnection conn;
+            String currentBranch;
             try {
+                Context activity = context.get();
+                String currentVer = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
+                currentBranch = TextUtils.isEmpty(currentVer) ? "2" : currentVer.split("\\.")[0];
+
                 conn = (HttpURLConnection) new URL("https://api.github.com/repos/AbdurazaaqMohammed/AntiSplit-M/releases").openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 Edg/128.0.0.0");
                 conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
                     String line;
                     String ver = "";
                     String changelog = "";
                     String dl = "";
+                    boolean rightBranch = false;
                     while ((line = reader.readLine()) != null) {
                         if(line.contains("browser_download_url")) {
                             dl = line.split("\"")[3];
                             ver = line.split("/")[7];
-                        } else if(line.contains("body")) {
+
+                            rightBranch = ver.split("\\.")[0].equals(currentBranch);
+                        } else if(line.contains("body") && rightBranch) {
                             changelog = line.split("\"")[3];
                             break;
                         }
@@ -785,6 +806,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 return null;
             }
         }
+
 
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
         @Override
@@ -801,7 +823,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     currentVer = null;
                 }
                 boolean newVer = false;
-                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '0'} : currentVer.replace(".", "").toCharArray();
+                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '0', '5'} : currentVer.replace(".", "").toCharArray();
                 char[] latest = latestVersion.replace(".", "").toCharArray();
 
                 int maxLength = Math.max(curr.length, latest.length);
