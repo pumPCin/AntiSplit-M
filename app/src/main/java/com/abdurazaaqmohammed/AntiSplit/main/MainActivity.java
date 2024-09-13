@@ -1,6 +1,7 @@
 package com.abdurazaaqmohammed.AntiSplit.main;
 
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
+import static android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
 import static com.reandroid.apkeditor.merge.LogUtil.logEnabled;
 
 import android.Manifest;
@@ -32,7 +33,6 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,8 +57,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.core.widget.NestedScrollView;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
@@ -122,27 +120,28 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         DynamicColors.applyToActivitiesIfAvailable(getApplication());
         handler = new Handler(Looper.getMainLooper());
 
-        File externalCacheDir;
-        if ((externalCacheDir = getExternalCacheDir()) != null) deleteDir(externalCacheDir);
-
+        deleteDir(getCacheDir());
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
-        setTheme(theme = settings.getInt("theme", (getResources().getConfiguration().uiMode &
-                Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES ? com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar));
+        boolean dark = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        setTheme(theme = settings.getInt("theme", dark
+                ? com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar));
+
+        DeviceSpecsUtil = new DeviceSpecsUtil(this);
 
         setContentView(R.layout.activity_main);
-        DeviceSpecsUtil = new DeviceSpecsUtil(this);
-        if("samsung".equalsIgnoreCase(Build.MANUFACTURER)) {
-            TypedValue typedValue = new TypedValue();
-            getTheme().resolveAttribute(android.R.attr.windowBackground, typedValue, true);
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setNavigationBarColor(typedValue.data);
-            WindowInsetsControllerCompat insetsController = WindowCompat.getInsetsController(window, window.getDecorView());
-            insetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            insetsController.hide(WindowInsetsCompat.Type.statusBars());
-        }
 
+        lang = settings.getString("lang", "en");
+        if(Objects.equals(lang, Locale.getDefault().getLanguage())) rss = getResources();
+        else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources(), null);
+        getWindow().addFlags(FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        int transparent = rss.getColor(android.R.color.transparent);
+        getWindow().setNavigationBarColor(transparent);
+        getWindow().setStatusBarColor(transparent);
+        if (!LegacyUtils.supportsWriteExternalStorage) {
+            getWindow().setStatusBarContrastEnforced(true);
+            getWindow().setNavigationBarContrastEnforced(true);
+        }
         // Fetch settings from SharedPreferences
         checkForUpdates = settings.getBoolean("checkForUpdates", true);
         signApk = settings.getBoolean("signApk", true);
@@ -154,9 +153,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         sortMode = settings.getInt("sortMode", 0);
         LogUtil.setLogListener(this);
 
-        lang = settings.getString("lang", "en");
-        if(Objects.equals(lang, Locale.getDefault().getLanguage())) rss = getResources();
-        else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources(), null);
 
         findViewById(R.id.fromAppsButton).setOnClickListener(v3 -> {
             AlertDialog ad = new MaterialAlertDialogBuilder(MainActivity.this).setNegativeButton(rss.getString(R.string.cancel), null).create();
@@ -242,16 +238,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             runOnUiThread(ad::show);
         });
 
-//        FloatingActionButton fabCopy = findViewById(R.id.copyButton);
-//        FloatingActionButton fabInstall = findViewById(R.id.installButton);
-//        FloatingActionButton fabCancel = findViewById(R.id.cancelButton);
-//        FloatingActionButton fabSettings = findViewById(R.id.settingsButton);
-
-//        setupSwipe(fabCopy);
-//        setupSwipe(fabInstall);
-//        setupSwipe(fabCancel);
-//        setupSwipe(fabSettings);
-
         findViewById(R.id.settingsButton).setOnClickListener(v -> {
             ScrollView settingsDialog = (ScrollView) LayoutInflater.from(this).inflate(R.layout.setty, null);
 
@@ -275,11 +261,9 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                         theme = R.style.Theme_MyApp_Black;
                     } else {
                         systemTheme = true;
-                        theme = (rss.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES ?
-                                com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar :
-                                com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
+                        theme = ((rss.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) ?
+                                com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
                     }
-
 
                     settings.edit().putInt("theme", theme).apply();
                     setTheme(theme);
@@ -398,6 +382,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 recreate();
             } else if (currentNightMode == Configuration.UI_MODE_NIGHT_NO) {
                 setTheme(theme = com.google.android.material.R.style.Theme_Material3_Light_NoActionBar);
+
                 recreate();
             }
         }
@@ -533,9 +518,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
     @Override
     protected void onDestroy() {
-        File dir = getCacheDir();
-        deleteDir(dir);
-        if ((dir = getExternalCacheDir()) != null) deleteDir(dir);
+        deleteDir(getCacheDir());
         super.onDestroy();
     }
 
@@ -558,7 +541,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             MainActivity activity = activityReference.get();
             if (activity == null) return null;
 
-            final File cacheDir = activity.getExternalCacheDir();
+            final File cacheDir = activity.getCacheDir();
             if (cacheDir != null && activity.urisAreSplitApks) deleteDir(cacheDir);
             try {
                 if(TextUtils.isEmpty(packageNameFromAppList)) {
@@ -865,6 +848,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     public void showApkSelectionDialog() {
         try {
             List<String> splits = DeviceSpecsUtil.getListOfSplits(splitAPKUri);
+            Collections.sort(splits, Comparator.comparing(splitName -> splitName.toLowerCase(Locale.ROOT)));
             final int initialSize = splits.size();
             String[] apkNames = new String[initialSize + 5];
             boolean[] checkedItems = new boolean[initialSize + 5];
@@ -878,22 +862,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 apkNames[i] = splits.get(i - 5);
                 checkedItems[i] = false;
             }
-            // "Select All" option
-            // device specs option
-            //arch for device
-            //dpi for device
-            //lang for device
-            // Uncheck "Select All" if any individual item is unchecked
-            // uncheck device arch if non device arch selected
-            // ?????
-            // reset
-            /*  ListView lv;
-                if((adapter != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(adapter == null ? new CustomArrayAdapter(this, display, isLang) : adapter);
-                Window w = ad.getWindow();
-                if (w != null) {
-                    int padding = 16;
-                    w.getDecorView().setPadding(padding, padding, padding, padding);
-                }*/
+
             runOnUiThread(new MaterialAlertDialogBuilder(this).setTitle(rss.getString(R.string.select_splits)).setMultiChoiceItems(apkNames, checkedItems, (dialog, which, isChecked) -> {
                     switch (which) {
                         case 0:
