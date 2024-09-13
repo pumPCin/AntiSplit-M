@@ -273,6 +273,9 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                                 com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar :
                                 com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
                     }
+
+                    getWindow().setNavigationBarColor(com.google.android.material.R.attr.backgroundColor);
+
                     settings.edit().putInt("theme", theme).apply();
                     setTheme(theme);
                     recreate();
