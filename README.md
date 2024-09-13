@@ -40,3 +40,5 @@ Note: Some apps verify the signature of the APK or take other measures to check 
 * [PseudoApkSigner](https://github.com/Aefyr/PseudoApkSigner) by Aefyr for backup signing on older Android versions
 * [AmbilWarna Color Picker](https://github.com/yukuku/ambilwarna)
 * [android-filepicker](https://github.com/singhangadin/android-filepicker) by Angad Singh for file picker on older Android versions
+  
+This project is tested with BrowserStack.
