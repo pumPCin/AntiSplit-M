@@ -1,13 +1,5 @@
 package com.reandroid.apkeditor.merge;
 
-import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.toggleAnimation;
-
-import android.widget.ImageView;
-
-import com.abdurazaaqmohammed.AntiSplit.main.MainActivity;
-
-import java.util.concurrent.CountDownLatch;
-
 public class LogUtil {
     private static Merger.LogListener logListener;
 

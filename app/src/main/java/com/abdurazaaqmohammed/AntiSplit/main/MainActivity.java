@@ -40,6 +40,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -63,8 +64,6 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
-import com.google.android.material.search.SearchBar;
-import com.google.android.material.search.SearchView;
 import com.google.android.material.textview.MaterialTextView;
 import com.reandroid.apk.ApkBundle;
 import com.reandroid.apkeditor.merge.LogUtil;
@@ -186,14 +185,24 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 ask = realAskValue;
             });
 
-            SearchBar searchBar = dialogView.findViewById(R.id.search_bar);
-            SearchView searchView = dialogView.findViewById(R.id.search_view);
-            searchView.setupWithSearchBar(searchBar);
-            searchBar.callOnClick();
-            searchView.clearFocusAndHideKeyboard();
-            androidx.appcompat.widget.Toolbar tb = searchView.getToolbar();
-            tb.setNavigationIcon(android.R.drawable.ic_menu_sort_by_size);
-            tb.setNavigationOnClickListener(v -> {
+            EditText searchBar = dialogView.findViewById(R.id.search_bar);
+            searchBar.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    // No action needed here
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    adapter.getFilter().filter(s);
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    // No action needed here
+                }
+            });
+            dialogView.findViewById(R.id.filter_button).setOnClickListener(v -> {
                 PopupMenu popupMenu = new PopupMenu(this, v);
                 popupMenu.getMenuInflater().inflate(R.menu.sort_menu, popupMenu.getMenu());
 
@@ -216,22 +225,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 popupMenu.show();
             });
 
-            searchView.getEditText().addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    // No action needed here
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    adapter.getFilter().filter(s);
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    // No action needed here
-                }
-            });
             ad.setView(dialogView);
             runOnUiThread(ad::show);
         });
@@ -381,6 +374,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             else selectDirToSaveAPKOrSaveNow();
         }
     }
+
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
@@ -830,13 +824,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     MaterialTextView changelogText = new MaterialTextView(activity);
                     String linebreak = "<br />";
                     changelogText.setText(Html.fromHtml(rss.getString(R.string.new_ver) + " (" + latestVersion  + ")" + linebreak + "Changelog:" + linebreak + result[1].replace("\\r\\n", linebreak)));
-                    /*  ListView lv;
-                        if((adapter != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(adapter == null ? new CustomArrayAdapter(this, display, isLang) : adapter);
-                        Window w = ad.getWindow();
-                        if (w != null) {
-                            int padding = 16;
-                            w.getDecorView().setPadding(padding, padding, padding, padding);
-                        }*/
+                    int padding = 5;
+                    changelogText.setPadding(padding, padding, padding, padding);
                     activity.runOnUiThread(new MaterialAlertDialogBuilder(activity).setTitle(rss.getString(R.string.update)).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
                                     if (Build.VERSION.SDK_INT < 29) activity.checkStoragePerm();
                                     ((DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(Uri.parse(link))

@@ -49,7 +49,7 @@ public class DeviceSpecsUtil {
         if(splits.size() < 2) {
             File file = new File(FileUtils.getPath(splitAPKUri, context));
             boolean couldNotRead = !file.canRead();
-            try(InputStream is = FileUtils.getInputStream(splitAPKUri, context)) {
+            try(InputStream is = context.getContentResolver().openInputStream(splitAPKUri)) {
                 if(couldNotRead) FileUtils.copyFile(is, file = new File(context.getCacheDir(), file.getName()));
             }
             Enumeration<ZipArchiveEntry> entries = (zipFile = new ZipFile(file)).getEntries();

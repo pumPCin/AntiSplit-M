@@ -97,7 +97,7 @@ public class Merger {
             if (DeviceSpecsUtil.zipFile == null) {
                 File input = new File(FileUtils.getPath(in, context));
                 boolean couldNotRead = !input.canRead();
-                if (couldNotRead) try(InputStream is = FileUtils.getInputStream(in, context)) {
+                if (couldNotRead) try(InputStream is = context.getContentResolver().openInputStream(in)) {
                     FileUtils.copyFile(is, input = new File(cacheDir, input.getName()));
                 }
                 ZipFile zf = new ZipFile(input);
@@ -221,42 +221,12 @@ public class Merger {
                 File stupid = signedApk = new File(noPerm || (noPerm = TextUtils.isEmpty(p = FileUtils.getPath(out, context))) ? (cacheDir + File.separator + "stupid.apk") : p);
                 try {
                     SignUtil.signDebugKey(context, temp, stupid);
-                        if (noPerm) try(OutputStream os = FileUtils.getOutputStream(out, context)) {
+                        if (noPerm) try(OutputStream os = context.getContentResolver().openOutputStream(out)) {
                             FileUtils.copyFile(stupid, os);
                     }
                 } catch (Exception e) {
                     SignUtil.signPseudoApkSigner(temp, context, out, e);
                 }
-                // Below no longer necessary
-                    /*if (revanced) {
-                       // The apk does not need to be signed to patch with ReVanced and it will make this already long crap take even more time
-                    // but someone is probably going to try to install it before patching and complain
-                    // and to avoid confusion/mistakes the sign apk option in the app should not be toggled off when revanced option is on
-                     logMessage(MainActivity.rss.getString(R.string.fixing));
-                        // Copying the contents of the zip to a new one works on most JRE implementations of java.util.zip but not on Android,
-                        // the exact same problem happens in ReVanced.
-                        try (ZipFileInput zfi = new ZipFileInput(temp);
-                             com.j256.simplezip.ZipFileOutput zfo = new com.j256.simplezip.ZipFileOutput(signApk ?
-                                     FileUtils.getOutputStream(temp = new File(cacheDir, "toSign.apk")) :
-                                     FileUtils.getOutputStream(out, context))) {
-                            ZipFileHeader header;
-                            while ((header = zfi.readFileHeader()) != null) {
-                                ZipFileHeader.Builder b = ZipFileHeader.builder();
-                                b.setCompressedSize(header.getCompressedSize());
-                                b.setCrc32(header.getCrc32());
-                                b.setCompressionMethod(header.getCompressionMethod());
-                                b.setFileName(header.getFileName());
-                                b.setGeneralPurposeFlags(header.getGeneralPurposeFlags());
-                                b.clearGeneralPurposeFlag(GeneralPurposeFlag.DATA_DESCRIPTOR);
-                                b.setExtraFieldBytes(header.getExtraFieldBytes());
-                                b.setLastModifiedDate(header.getLastModifiedDate());
-                                b.setVersionNeeded(header.getVersionNeeded());
-                                b.setUncompressedSize(header.getUncompressedSize());
-                                zfo.writeFileHeader(b.build());
-                                zfo.writeRawFileData(zfi.openFileDataInputStream(true));
-                            }
-                        }
-                    }*/
             } else {
                 mergedModule.writeApk(FileUtils.getOutputStream(out, context));
             }
@@ -268,8 +238,7 @@ public class Merger {
     public static void run(Uri in, File cacheDir, Uri out, Context context, List<String> splits, boolean signApk) throws Exception {
         logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.searching));
         try (ApkBundle bundle = new ApkBundle()) {
-            if (in == null)
-                bundle.loadApkDirectory(cacheDir, false, context); // Multiple splits from a split apk, already copied to cache dir
+            if (in == null) bundle.loadApkDirectory(cacheDir, false, context); // Multiple splits from a split apk, already copied to cache dir
             else extractAndLoad(in, cacheDir, context, splits, bundle);
             run(bundle, cacheDir, out, context, signApk);
         }
