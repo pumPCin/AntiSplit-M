@@ -10,8 +10,8 @@ android {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 32
-        versionName = "2.0.2"
+        versionCode = 33
+        versionName = "2.0.3"
     }
 
     buildTypes {

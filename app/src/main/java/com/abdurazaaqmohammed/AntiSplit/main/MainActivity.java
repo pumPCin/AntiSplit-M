@@ -32,6 +32,7 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.core.view.WindowCompat;
 import androidx.core.widget.NestedScrollView;
 
@@ -101,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     public static boolean checkForUpdates;
     public static String lang;
     public static int theme;
+    public static int sortMode;
     public DeviceSpecsUtil DeviceSpecsUtil;
     private String pkgName;
     private boolean systemTheme;
@@ -136,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         logEnabled = settings.getBoolean("logEnabled", true);
         ask = settings.getBoolean("ask", true);
         systemTheme = settings.getBoolean("systemTheme", true);
+        sortMode = settings.getInt("sortMode", 0);
         LogUtil.setLogListener(this);
 
         lang = settings.getString("lang", "en");
@@ -154,18 +158,25 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     String packageName = packageInfo.packageName;
                     ApplicationInfo ai = pm.getApplicationInfo(packageName, 0);
                     if (ai.splitSourceDirs != null) {
-                        appInfoList.add(new AppInfo((String) pm.getApplicationLabel(ai), pm.getApplicationIcon(ai), packageName));
+                        appInfoList.add(new AppInfo(
+                                (String) pm.getApplicationLabel(ai),
+                                pm.getApplicationIcon(ai),
+                                packageName,
+                                packageInfo.lastUpdateTime,
+                                packageInfo.firstInstallTime));
                     }
                 } catch (PackageManager.NameNotFoundException ignored) {}
             }
+            if(sortMode == 0) Collections.sort(appInfoList, Comparator.comparing((AppInfo p) -> p.name.toLowerCase(Locale.ROOT)));
+            else Collections.sort(appInfoList, Comparator.comparing((AppInfo p) -> sortMode == 1 ? p.lastUpdated : p.firstInstall));
 
-            Collections.sort(appInfoList, Comparator.comparing((AppInfo p) -> p.name.toLowerCase(Locale.ROOT)));
-
-            LinearLayout dialogView = (LinearLayout) LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_search, null);
+            LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+            View dialogView = layoutInflater.inflate(R.layout.dialog_search, null);
 
             ListView listView = dialogView.findViewById(R.id.list_view);
             final AppListArrayAdapter adapter = new AppListArrayAdapter(MainActivity.this, appInfoList, true);
             listView.setAdapter(adapter);
+
             listView.setOnItemClickListener((parent, view, position, id) -> {
                 ad.dismiss();
                 boolean realAskValue = ask;
@@ -179,7 +190,32 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             SearchView searchView = dialogView.findViewById(R.id.search_view);
             searchView.setupWithSearchBar(searchBar);
             searchBar.callOnClick();
-            searchView.getToolbar().setNavigationOnClickListener(v -> ad.dismiss());
+            searchView.clearFocusAndHideKeyboard();
+            androidx.appcompat.widget.Toolbar tb = searchView.getToolbar();
+            tb.setNavigationIcon(android.R.drawable.ic_menu_sort_by_size);
+            tb.setNavigationOnClickListener(v -> {
+                PopupMenu popupMenu = new PopupMenu(this, v);
+                popupMenu.getMenuInflater().inflate(R.menu.sort_menu, popupMenu.getMenu());
+
+                popupMenu.setOnMenuItemClickListener(item -> {
+                    int itemId = item.getItemId();
+                    if (itemId == R.id.sort_name) {
+                        sortMode = 0;
+                        Collections.sort(appInfoList, Comparator.comparing((AppInfo p) -> p.name.toLowerCase(Locale.ROOT)));
+                    } else if (itemId == R.id.date_updated) {
+                        sortMode = 1;
+                        Collections.sort(appInfoList, Comparator.comparing((AppInfo p) ->  p.lastUpdated).reversed());
+                    } else {
+                        Collections.sort(appInfoList, Comparator.comparing((AppInfo p) ->  p.firstInstall).reversed());
+                        sortMode = 2;
+                    }
+                    listView.setAdapter(new AppListArrayAdapter(MainActivity.this, appInfoList, true));
+                    return true;
+                });
+
+                popupMenu.show();
+            });
+
             searchView.getEditText().addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -307,6 +343,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             int size = 20;
             title.setPadding(size,size,size,size);
             title.setTextSize(size);
+            title.setGravity(Gravity.CENTER);
             runOnUiThread(new MaterialAlertDialogBuilder(this).setCustomTitle(title).setView(settingsDialog)
                     .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create()::show);
         });
@@ -456,6 +493,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 .putBoolean("systemTheme", systemTheme)
                 .putBoolean("selectSplitsForDevice", selectSplitsForDevice)
                 .putInt("theme", theme)
+                .putInt("sortMode", sortMode)
                 .putBoolean("checkForUpdates", checkForUpdates)
                 .putString("lang", lang)
                 .apply();

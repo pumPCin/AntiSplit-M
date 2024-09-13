@@ -4,7 +4,6 @@ import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.doesNotHaveStor
 import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.getOriginalFileName;
 
 import android.annotation.SuppressLint;
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -21,8 +20,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 
 public class FileUtils {
 
@@ -59,8 +56,8 @@ public class FileUtils {
 
     public static OutputStream getOutputStream(File file) throws IOException {
         return LegacyUtils.supportsFileChannel ?
-                Files.newOutputStream(file.toPath(), java.nio.file.StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
-        : new FileOutputStream(file);
+                StupidOS.getOutputStream(file)
+                : new FileOutputStream(file);
     }
 
     public static void copyFile(File sourceFile, File destinationFile) throws IOException {
@@ -100,7 +97,7 @@ public class FileUtils {
 
     public static InputStream getInputStream(File file) throws IOException {
         return LegacyUtils.supportsFileChannel ?
-                Files.newInputStream(file.toPath(), StandardOpenOption.READ)
+                StupidOS.getInputStream(file)
                 : new FileInputStream(file);
     }
 
