@@ -20,6 +20,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -250,17 +252,26 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             ((TextView) settingsDialog.findViewById(R.id.updateToggle)).setText(rss.getString(R.string.auto_update));
             ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.check_update_now));
             MaterialButtonToggleGroup themeButtons = settingsDialog.findViewById(R.id.themeToggleGroup);
+            themeButtons.check(
+                    theme == com.google.android.material.R.style.Theme_Material3_Light_NoActionBar ? R.id.lightThemeButton :
+                    theme == com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar ? R.id.darkThemeButton :
+                    theme == R.style.Theme_MyApp_Black ? R.id.blackThemeButton : R.id.systemThemeButton
+            );
             themeButtons.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
                 if (isChecked) {
                     systemTheme = false;
                     if (checkedId == R.id.lightThemeButton) {
+                        themeButtons.check(R.id.lightThemeButton);
                         theme = com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
                     } else if (checkedId == R.id.darkThemeButton) {
+                        themeButtons.findViewById(R.id.darkThemeButton);
                         theme = com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar;
                     } else if (checkedId == R.id.blackThemeButton) {
+                        themeButtons.check(R.id.blackThemeButton);
                         theme = R.style.Theme_MyApp_Black;
                     } else {
                         systemTheme = true;
+                        themeButtons.check(R.id.systemThemeButton);
                         theme = ((rss.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) ?
                                 com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
                     }
@@ -371,6 +382,13 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         }
     }
 
+    private GradientDrawable createBorderDrawable(int borderWidth, int cornerRadius) {
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setStroke(borderWidth, android.R.attr.colorPrimary); // Set border width and color
+        drawable.setCornerRadius(cornerRadius); // Set corner radius
+        drawable.setColor(Color.TRANSPARENT); // Set the background color
+        return drawable;
+    }
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
@@ -831,7 +849,14 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     changelogText.setText(Html.fromHtml(rss.getString(R.string.new_ver) + " (" + latestVersion  + ")" + linebreak + "Changelog:" + linebreak + result[1].replace("\\r\\n", linebreak)));
                     int padding = 5;
                     changelogText.setPadding(padding, padding, padding, padding);
-                    activity.runOnUiThread(new MaterialAlertDialogBuilder(activity).setTitle(rss.getString(R.string.update)).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
+                    changelogText.setGravity(Gravity.CENTER);
+                    MaterialTextView title = new MaterialTextView(activity);
+                    title.setText(rss.getString(R.string.update));
+                    int size = 20;
+                    title.setPadding(size,size,size,size);
+                    title.setTextSize(size);
+                    title.setGravity(Gravity.CENTER);
+                    activity.runOnUiThread(new MaterialAlertDialogBuilder(activity).setCustomTitle(title).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
                                     if (Build.VERSION.SDK_INT < 29) activity.checkStoragePerm();
                                     ((DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(Uri.parse(link))
                                     .setTitle(filename).setDescription(filename).setMimeType("application/vnd.android.package-archive")

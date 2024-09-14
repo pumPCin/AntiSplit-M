@@ -75,68 +75,101 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/logToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/enable_logs"
-            android:layout_marginBottom="5dp" />
+            android:text="@string/enable_logs" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/ask"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/ask"
-            android:layout_marginBottom="5dp" />
+            android:text="@string/ask" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/showDialogToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/show_dialog"
-            android:layout_marginBottom="5dp" />
+            android:text="@string/show_dialog" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/selectSplitsForDeviceToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/automatically_select"
-            android:layout_marginBottom="5dp" />
+            android:text="@string/automatically_select" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/signToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/sign_apk"
-            android:layout_marginBottom="5dp" />
+            android:text="@string/sign_apk" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/updateToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/auto_update"
-            android:layout_marginBottom="5dp" />
+            android:text="@string/auto_update" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/checkUpdateNow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/check_update_now"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_marginBottom="5dp" />
+            style="@style/Widget.Material3.Button.OutlinedButton" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/langPicker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/lang"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_marginBottom="5dp" />
+            style="@style/Widget.Material3.Button.OutlinedButton" />
+
     </LinearLayout>
 </ScrollView>
