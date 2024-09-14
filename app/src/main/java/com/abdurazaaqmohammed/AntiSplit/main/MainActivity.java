@@ -253,9 +253,10 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.check_update_now));
             MaterialButtonToggleGroup themeButtons = settingsDialog.findViewById(R.id.themeToggleGroup);
             themeButtons.check(
+                    systemTheme ?  R.id.systemThemeButton :
                     theme == com.google.android.material.R.style.Theme_Material3_Light_NoActionBar ? R.id.lightThemeButton :
                     theme == com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar ? R.id.darkThemeButton :
-                    theme == R.style.Theme_MyApp_Black ? R.id.blackThemeButton : R.id.systemThemeButton
+                    R.id.blackThemeButton
             );
             themeButtons.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
                 if (isChecked) {

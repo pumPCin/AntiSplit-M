@@ -21,8 +21,8 @@
             android:layout_height="wrap_content"
             android:outlineSpotShadowColor="@android:color/transparent"
             card_view:cardElevation="0dp"
-            android:layout_marginBottom="16dp"
-            app:cardElevation="0dp">
+            app:cardElevation="0dp"
+            android:layout_marginBottom="16dp">
 
             <LinearLayout
                 android:id="@+id/processButtons"
