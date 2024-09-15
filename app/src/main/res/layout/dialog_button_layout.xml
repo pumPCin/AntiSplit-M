@@ -1,38 +1,11 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/errorView"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools"
     android:layout_gravity="center_vertical"
     android:orientation="vertical">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="horizontal">
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/negativeButton"
-            style="@style/Widget.Material3.Button.IconButton"
-            app:icon="@android:drawable/ic_menu_close_clear_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/positiveButton"
-            style="@style/Widget.Material3.Button.IconButton"
-            app:icon="@android:drawable/ic_menu_upload"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/neutralButton"
-            style="@style/Widget.Material3.Button.IconButton"
-            app:icon="@drawable/copy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
@@ -48,4 +21,4 @@
             android:layout_height="wrap_content"/>
     </com.google.android.material.card.MaterialCardView>
 
-</LinearLayout>
+</ScrollView>

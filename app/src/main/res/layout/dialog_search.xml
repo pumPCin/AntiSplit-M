@@ -12,10 +12,11 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="🔍"
+            android:hint="⌕"
             app:endIconMode="clear_text"
             app:boxBackgroundMode="outline"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="5dp"
             app:boxCornerRadiusTopStart="24dp"
             app:boxCornerRadiusTopEnd="24dp"
             app:boxCornerRadiusBottomStart="24dp"

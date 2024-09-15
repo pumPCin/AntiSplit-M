@@ -20,8 +20,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -30,7 +28,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.OpenableColumns;
-import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -39,8 +36,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -145,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             getWindow().setNavigationBarContrastEnforced(true);
         }
         // Fetch settings from SharedPreferences
-        checkForUpdates = settings.getBoolean("checkForUpdates", true);
+        if(checkForUpdates = settings.getBoolean("checkForUpdates", true)) new CheckForUpdatesTask(this, false).execute();
         signApk = settings.getBoolean("signApk", true);
         showDialog = settings.getBoolean("showDialog", false);
         selectSplitsForDevice = settings.getBoolean("selectSplitsForDevice", false);
@@ -287,12 +282,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             CompoundButton updateSwitch = settingsDialog.findViewById(R.id.updateToggle);
             updateSwitch.setChecked(checkForUpdates);
             updateSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> checkUpdateNow.setVisibility((checkForUpdates = isChecked) ? View.GONE : View.VISIBLE));
-            if(checkForUpdates) {
-                checkUpdateNow.setVisibility(View.GONE);
-                new CheckForUpdatesTask(this, false).execute();
-            } else {
-                checkUpdateNow.setVisibility(View.VISIBLE);
-            }
+            checkUpdateNow.setVisibility(checkForUpdates ? View.GONE : View.VISIBLE);
             checkUpdateNow.setOnClickListener(v1 -> new CheckForUpdatesTask(this, true).execute());
 
             CompoundButton logSwitch = settingsDialog.findViewById(R.id.logToggle);
@@ -381,14 +371,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             if(showDialog) showApkSelectionDialog();
             else selectDirToSaveAPKOrSaveNow();
         }
-    }
-
-    private GradientDrawable createBorderDrawable(int borderWidth, int cornerRadius) {
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setStroke(borderWidth, android.R.attr.colorPrimary); // Set border width and color
-        drawable.setCornerRadius(cornerRadius); // Set corner radius
-        drawable.setColor(Color.TRANSPARENT); // Set the background color
-        return drawable;
     }
 
     @Override
@@ -738,7 +720,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         fabs.setAlpha(0.5f);
         View cancelButton = findViewById(R.id.cancelButton);
         cancelButton.setVisibility(View.VISIBLE);
-
         cancelButton.setOnClickListener(v -> {
             try {
                 if(doesNotHaveStoragePerm(this)) AndroidXI.getInstance().with(this).delete(launcher, outputUri);
@@ -772,19 +753,15 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
         @Override
         protected String[] doInBackground(Void... voids) {
-            HttpURLConnection conn;
-            String currentBranch;
             try {
-                Context activity = context.get();
-                String currentVer = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
-                currentBranch = TextUtils.isEmpty(currentVer) ? "2" : currentVer.split("\\.")[0];
-
-                conn = (HttpURLConnection) new URL("https://api.github.com/repos/AbdurazaaqMohammed/AntiSplit-M/releases").openConnection();
+                HttpURLConnection conn = (HttpURLConnection) new URL("https://api.github.com/repos/AbdurazaaqMohammed/AntiSplit-M/releases").openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 Edg/128.0.0.0");
                 conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                try (InputStream inputStream = conn.getInputStream();
+                     InputStreamReader in = new InputStreamReader(inputStream);
+                     BufferedReader reader = new BufferedReader(in)) {
                     String line;
                     String ver = "";
                     String changelog = "";
@@ -794,8 +771,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                         if(line.contains("browser_download_url")) {
                             dl = line.split("\"")[3];
                             ver = line.split("/")[7];
-
-                            rightBranch = ver.split("\\.")[0].equals(currentBranch);
+                            rightBranch = ver.charAt(0) == '2';
                         } else if(line.contains("body") && rightBranch) {
                             changelog = line.split("\"")[3];
                             break;
@@ -825,7 +801,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     currentVer = null;
                 }
                 boolean newVer = false;
-                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '0', '5'} : currentVer.replace(".", "").toCharArray();
+                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '0', '7'} : currentVer.replace(".", "").toCharArray();
                 char[] latest = latestVersion.replace(".", "").toCharArray();
 
                 int maxLength = Math.max(curr.length, latest.length);
@@ -847,8 +823,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     String link = result[2].endsWith(ending) ? result[2] : result[2] + File.separator + filename;
                     MaterialTextView changelogText = new MaterialTextView(activity);
                     String linebreak = "<br />";
-                    changelogText.setText(Html.fromHtml(rss.getString(R.string.new_ver) + " (" + latestVersion  + ")" + linebreak + "Changelog:" + linebreak + result[1].replace("\\r\\n", linebreak)));
-                    int padding = 5;
+                    changelogText.setText(Html.fromHtml(rss.getString(R.string.new_ver) + " (" + latestVersion  + ")" + linebreak + linebreak + "Changelog:" + linebreak + result[1].replace("\\r\\n", linebreak)));
+                    int padding = 16;
                     changelogText.setPadding(padding, padding, padding, padding);
                     changelogText.setGravity(Gravity.CENTER);
                     MaterialTextView title = new MaterialTextView(activity);
@@ -863,7 +839,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                                     .setTitle(filename).setDescription(filename).setMimeType("application/vnd.android.package-archive")
                                     .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
                                     .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED));
-                                }).setNeutralButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest")))).setNegativeButton(rss.getString(R.string.cancel), null).create()::show);
+                                }).setNegativeButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest")))).setNeutralButton(rss.getString(R.string.cancel), null).create()::show);
                 } else if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show());
             } catch (Exception ignored) {
                 if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, "Failed to check for update", Toast.LENGTH_SHORT).show());
@@ -985,14 +961,13 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             final String success = rss.getString(R.string.success_saved);
             LogUtil.logMessage(success);
             runOnUiThread(() -> Toast.makeText(this, success, Toast.LENGTH_SHORT).show());
-            File output;
-            if(signApk && (output = Merger.signedApk) != null && output.exists() && output.length() > 999) {
+            if(signApk && Merger.signedApk != null) {
                 installButton.setVisibility(View.VISIBLE);
                 installButton.setOnClickListener(v ->          //if (supportsFileChannel && !getPackageManager().canRequestPackageInstalls()) startActivityForResult(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).setData(Uri.parse(String.format("package:%s", getPackageName()))), 1234);
                         startActivity(new Intent(Intent.ACTION_INSTALL_PACKAGE)
                                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                .setData(FileProvider.getUriForFile(this, "com.abdurazaaqmohammed.AntiSplit.provider", output))));
+                                .setData(Merger.signedApk)));
             } else installButton.setVisibility(View.GONE);
         }
     }
@@ -1003,49 +978,42 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     }
 
     private void showError(Exception e) {
-        if(!(e instanceof ClosedByInterruptException)) {
+        if (!(e instanceof ClosedByInterruptException)) {
             final String mainErr = e.toString();
             errorOccurred = !mainErr.equals(rss.getString(R.string.sign_failed));
             toggleAnimation(this, false);
+
             StringBuilder stackTrace = new StringBuilder().append(mainErr).append('\n');
-            for(StackTraceElement line : e.getStackTrace()) stackTrace.append(line).append('\n');
+            for (StackTraceElement line : e.getStackTrace()) {
+                stackTrace.append(line).append('\n');
+            }
             StringBuilder fullLog = new StringBuilder(stackTrace.toString());
             fullLog.append('\n').append(((TextView) findViewById(R.id.logField)).getText());
 
             getHandler().post(() -> runOnUiThread(() -> {
                 View dialogView = getLayoutInflater().inflate(R.layout.dialog_button_layout, null);
-                ScrollView sv = new ScrollView(this);
-                sv.addView(dialogView);
-                AlertDialog ad = new MaterialAlertDialogBuilder(this).setView(sv).setTitle(mainErr).create();
-
-                findViewById(R.id.cancelButton).setVisibility(View.GONE);
-
-                Button positiveButton = dialogView.findViewById(R.id.positiveButton);
-                Button negativeButton = dialogView.findViewById(R.id.negativeButton);
-                Button neutralButton = dialogView.findViewById(R.id.neutralButton);
-
-                positiveButton.setContentDescription(rss.getString(R.string.create_issue));
-                positiveButton.setOnClickListener(v -> {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/issues/new?title=Crash%20Report&body=" + fullLog)));
-                    ad.dismiss();
-                });
-
-                negativeButton.setContentDescription(rss.getString(R.string.cancel));
-                negativeButton.setOnClickListener(v -> ad.dismiss());
-
-                neutralButton.setContentDescription(rss.getString(R.string.copy_log));
-                neutralButton.setOnClickListener(v -> {
-                    copyText(fullLog);
-                    ad.dismiss();
-                });
 
                 ((TextView) dialogView.findViewById(R.id.errorD)).setText(stackTrace);
 
-                ad.show();
-                Window w = ad.getWindow();
-                if (w != null) {
-                    w.getDecorView().setLayoutParams(new WindowManager.LayoutParams((int) (rss.getDisplayMetrics().widthPixels * 0.8), ViewGroup.LayoutParams.WRAP_CONTENT));
-                }
+                AlertDialog alertDialog = new MaterialAlertDialogBuilder(this)
+                        .setTitle(mainErr)
+                        .setView(dialogView)
+                        .setPositiveButton(rss.getString(R.string.create_issue), (dialog, which) -> {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/issues/new?title=Crash%20Report&body=" + fullLog)));
+                            dialog.dismiss();
+                        })
+                        .setNegativeButton(rss.getString(R.string.cancel), (dialog, which) -> dialog.dismiss())
+                        .setNeutralButton(rss.getString(R.string.copy_log), (dialog, which) -> {
+                            copyText(fullLog);
+                            dialog.dismiss();
+                        })
+                        .create();
+                alertDialog.show();
+                ScrollView scrollView = dialogView.findViewById(R.id.errorView);
+
+                ViewGroup.LayoutParams params = scrollView.getLayoutParams();
+                params.height = (int) (rss.getDisplayMetrics().heightPixels * 0.5);
+                scrollView.setLayoutParams(params);
             }));
         }
     }

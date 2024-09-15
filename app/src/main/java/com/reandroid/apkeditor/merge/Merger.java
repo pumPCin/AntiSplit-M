@@ -19,6 +19,7 @@ import static com.reandroid.apkeditor.merge.LogUtil.logMessage;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
@@ -218,12 +219,12 @@ public class Merger {
                 logMessage(MainActivity.rss.getString(R.string.signing));
                 boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
                 String p;
-                File stupid = signedApk = new File(noPerm || (noPerm = TextUtils.isEmpty(p = FileUtils.getPath(out, context))) ? (cacheDir + File.separator + "stupid.apk") : p);
+                File stupid = new File(noPerm || (noPerm = TextUtils.isEmpty(p = FileUtils.getPath(out, context))) ? (cacheDir + File.separator + "stupid.apk") : p);
                 try {
                     SignUtil.signDebugKey(context, temp, stupid);
-                        if (noPerm) try(OutputStream os = context.getContentResolver().openOutputStream(out)) {
+                        if (noPerm) try(OutputStream os = context.getContentResolver().openOutputStream(signedApk = out)) {
                             FileUtils.copyFile(stupid, os);
-                    }
+                        } else signedApk = FileProvider.getUriForFile(context, "com.abdurazaaqmohammed.AntiSplit.provider", stupid);
                 } catch (Exception e) {
                     SignUtil.signPseudoApkSigner(temp, context, out, e);
                 }
@@ -233,7 +234,7 @@ public class Merger {
         }
     }
 
-    public static File signedApk;
+    public static Uri signedApk;
 
     public static void run(Uri in, File cacheDir, Uri out, Context context, List<String> splits, boolean signApk) throws Exception {
         logMessage(com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.searching));
