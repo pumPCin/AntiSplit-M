@@ -219,12 +219,12 @@ public class Merger {
                 logMessage(MainActivity.rss.getString(R.string.signing));
                 boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
                 String p;
-                File stupid = new File(noPerm || (noPerm = TextUtils.isEmpty(p = FileUtils.getPath(out, context))) ? (cacheDir + File.separator + "stupid.apk") : p);
+                File signed = new File(noPerm || (noPerm = TextUtils.isEmpty(p = FileUtils.getPath(out, context))) ? (cacheDir + File.separator + "signed.apk") : p);
                 try {
-                    SignUtil.signDebugKey(context, temp, stupid);
+                    SignUtil.signDebugKey(context, temp, signed);
                         if (noPerm) try(OutputStream os = context.getContentResolver().openOutputStream(signedApk = out)) {
-                            FileUtils.copyFile(stupid, os);
-                        } else signedApk = FileProvider.getUriForFile(context, "com.abdurazaaqmohammed.AntiSplit.provider", stupid);
+                            FileUtils.copyFile(signed, os);
+                        } else signedApk = FileProvider.getUriForFile(context, "com.abdurazaaqmohammed.AntiSplit.provider", signed);
                 } catch (Exception e) {
                     SignUtil.signPseudoApkSigner(temp, context, out, e);
                 }

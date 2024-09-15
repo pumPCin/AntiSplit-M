@@ -36,6 +36,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -330,7 +331,13 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     dialog.dismiss();
                 }).create();
                 runOnUiThread(ad::show);
-                ad.getListView().setAdapter(new CustomArrayAdapter(this, display, true));
+                ad.getListView().setAdapter(new ArrayAdapter<>(this, android.R.layout.select_dialog_singlechoice, display));
+                for (int i = 0; i < langs.length; i++) {
+                    if (Objects.equals(lang, langs[i])) {
+                        ad.getListView().setItemChecked(i, true);
+                        break;
+                    }
+                }
             });
             MaterialTextView title = new MaterialTextView(this);
             title.setText(rss.getString(R.string.settings));
@@ -826,7 +833,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     changelogText.setText(Html.fromHtml(rss.getString(R.string.new_ver) + " (" + latestVersion  + ")" + linebreak + linebreak + "Changelog:" + linebreak + result[1].replace("\\r\\n", linebreak)));
                     int padding = 16;
                     changelogText.setPadding(padding, padding, padding, padding);
-                    changelogText.setGravity(Gravity.CENTER);
                     MaterialTextView title = new MaterialTextView(activity);
                     title.setText(rss.getString(R.string.update));
                     int size = 20;
@@ -998,15 +1004,15 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 AlertDialog alertDialog = new MaterialAlertDialogBuilder(this)
                         .setTitle(mainErr)
                         .setView(dialogView)
-                        .setPositiveButton(rss.getString(R.string.create_issue), (dialog, which) -> {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/issues/new?title=Crash%20Report&body=" + fullLog)));
-                            dialog.dismiss();
-                        })
-                        .setNegativeButton(rss.getString(R.string.cancel), (dialog, which) -> dialog.dismiss())
-                        .setNeutralButton(rss.getString(R.string.copy_log), (dialog, which) -> {
+                        .setPositiveButton(rss.getString(R.string.copy_log), (dialog, which) -> {
                             copyText(fullLog);
                             dialog.dismiss();
                         })
+                        .setNegativeButton(rss.getString(R.string.create_issue), (dialog, which) -> {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/issues/new?title=Crash%20Report&body=" + fullLog)));
+                            dialog.dismiss();
+                        })
+                        .setNeutralButton(rss.getString(R.string.cancel), (dialog, which) -> dialog.dismiss())
                         .create();
                 alertDialog.show();
                 ScrollView scrollView = dialogView.findViewById(R.id.errorView);
