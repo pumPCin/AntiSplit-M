@@ -79,4 +79,5 @@
     <string name="dark_theme">Dark theme</string>
     <string name="light_theme">Light theme</string>
     <string name="system_theme">System theme</string>
+    <string name="suffix">Suffix</string>
 </resources>

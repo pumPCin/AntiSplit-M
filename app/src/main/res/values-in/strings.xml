@@ -33,4 +33,5 @@
     <string name="last_edit">Terakhir kali disunting: </string>
     <string name="error_dir_access">Direktorinya tidak bisa diakses</string>
     <string name="lang" translatable="false">Bahasa</string>
+    <string name="suffix">Akhiran</string>
 </resources>

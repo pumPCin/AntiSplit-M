@@ -44,4 +44,7 @@
     <string name="mismatch">Les splits suivants (%1$s) ont des codes de version incompatibles. Ce sont uniquement des codes de langue, donc l\'application peut fonctionner sans eux, mais ces langues ne seront pas disponibles dans l\'application. Voulez-vous continuer la fusion malgré tout ?</string>
     <string name="warning">Avertissement</string>
     <string name="mismatch_base">" le code de version ne correspond pas à celui de base.apk"</string>
+    <string name="app_icon_list_label">Icône de l\'application</string>
+    <string name="install">Installer</string>
+    <string name="suffix">Suffixe</string>
 </resources>

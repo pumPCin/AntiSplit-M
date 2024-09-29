@@ -63,6 +63,8 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.reandroid.apk.ApkBundle;
 import com.reandroid.apkeditor.merge.LogUtil;
@@ -104,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     public static int sortMode;
     public DeviceSpecsUtil DeviceSpecsUtil;
     private String pkgName;
+    private static String suffix;
     private boolean systemTheme;
 
     public Handler getHandler() {
@@ -113,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     /** @noinspection AssignmentUsedAsCondition*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
         DynamicColors.applyToActivitiesIfAvailable(getApplication());
         handler = new Handler(Looper.getMainLooper());
@@ -129,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
         setContentView(R.layout.activity_main);
 
+        suffix = settings.getString("suffix", "_antisplit");
         lang = settings.getString("lang", "en");
         if(Objects.equals(lang, Locale.getDefault().getLanguage())) rss = getResources();
         else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources(), null);
@@ -137,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         getWindow().setNavigationBarColor(transparent);
         getWindow().setStatusBarColor(transparent);
         if (!LegacyUtils.supportsWriteExternalStorage) {
+            EdgeToEdge.enable(this);
             getWindow().setStatusBarContrastEnforced(true);
             getWindow().setNavigationBarContrastEnforced(true);
         }
@@ -247,9 +251,28 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             ((TextView) settingsDialog.findViewById(R.id.selectSplitsForDeviceToggle)).setText(rss.getString(R.string.automatically_select));
             ((TextView) settingsDialog.findViewById(R.id.updateToggle)).setText(rss.getString(R.string.auto_update));
             ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.check_update_now));
+            ((TextInputLayout) settingsDialog.findViewById(R.id.suffixLayout)).setHint(rss.getString(R.string.suffix));
+            TextInputEditText suffixInput = settingsDialog.findViewById(R.id.suffixInput);
+            suffixInput.setText(suffix);
+            suffixInput.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    suffix = s.toString();
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
             MaterialButtonToggleGroup themeButtons = settingsDialog.findViewById(R.id.themeToggleGroup);
             themeButtons.check(
-                    systemTheme ?  R.id.systemThemeButton :
+                    systemTheme ? R.id.systemThemeButton :
                     theme == com.google.android.material.R.style.Theme_Material3_Light_NoActionBar ? R.id.lightThemeButton :
                     theme == com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar ? R.id.darkThemeButton :
                     R.id.blackThemeButton
@@ -461,6 +484,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             ((TextView) settingsDialog.findViewById(R.id.selectSplitsForDeviceToggle)).setText(res.getString(R.string.automatically_select));
             ((TextView) settingsDialog.findViewById(R.id.updateToggle)).setText(res.getString(R.string.auto_update));
             ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(res.getString(R.string.check_update_now));
+            ((TextInputLayout) settingsDialog.findViewById(R.id.suffixLayout)).setHint(rss.getString(R.string.suffix));
         }
     }
 
@@ -498,6 +522,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 .putInt("sortMode", sortMode)
                 .putBoolean("checkForUpdates", checkForUpdates)
                 .putString("lang", lang)
+                .putString("suffix", suffix)
                 .apply();
         super.onPause();
     }
@@ -524,9 +549,28 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         for (String child : dir.list()) new File(dir, child).delete();
     }
 
+    /** @noinspection ResultOfMethodCallIgnored*/
+    private void cleanupAppFolder() {
+        if(!doesNotHaveStoragePerm(this)) {
+            File appFolder = new File(Environment.getExternalStorageDirectory(), "AntiSplit-M");
+            if(appFolder.exists()) {
+                File[] children = appFolder.listFiles();
+                if(children != null) {
+                    if (children.length == 0) appFolder.delete();
+                    else {
+                        for (File child : children) if (child.isFile() && child.length() == 0) child.delete();
+                        children = appFolder.listFiles();
+                        if (children.length == 0) appFolder.delete();
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     protected void onDestroy() {
         deleteDir(getCacheDir());
+        cleanupAppFolder();
         super.onDestroy();
     }
 
@@ -984,6 +1028,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     }
 
     private void showError(Exception e) {
+        cleanupAppFolder();
         if (!(e instanceof ClosedByInterruptException)) {
             final String mainErr = e.toString();
             errorOccurred = !mainErr.equals(rss.getString(R.string.sign_failed));
@@ -1050,7 +1095,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 if (cut != -1) result = result.substring(cut + 1);
             }
             LogUtil.logMessage(result);
-            return result.replaceFirst("\\.(?:xapk|aspk|apk[sm])", "_antisplit.apk");
+            return result.replaceFirst("\\.(?:xapk|aspk|apk[sm])", suffix + ".apk");
         } catch (Exception ignored) {
             return "filename_not_found";
         }
@@ -1061,7 +1106,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         if (ask) startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT)
                 .addCategory(Intent.CATEGORY_OPENABLE)
                 .setType("application/vnd.android.package-archive")
-                .putExtra(Intent.EXTRA_TITLE, TextUtils.isEmpty(pkgName) ? (urisAreSplitApks ? getOriginalFileName(this, splitAPKUri) : getNameFromNonSplitApks()) : pkgName + "_antisplit"), 2);
+                .putExtra(Intent.EXTRA_TITLE, TextUtils.isEmpty(pkgName) ? (urisAreSplitApks ? getOriginalFileName(this, splitAPKUri) : getNameFromNonSplitApks()) : pkgName + suffix), 2);
         else {
             checkStoragePerm();
             try {
@@ -1076,7 +1121,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     File f;
                     String newFilePath = TextUtils.isEmpty(originalFilePath) ?
                             getAntisplitMFolder() + File.separator + getOriginalFileName(this, splitAPKUri) // If originalFilePath is null urisAreSplitApks must be true because getNameFromNonSplitApks will always return something
-                            : originalFilePath.replaceFirst("\\.(?:xapk|aspk|apk[sm])", "_antisplit.apk");
+                            : originalFilePath.replaceFirst("\\.(?:xapk|aspk|apk[sm])", suffix + ".apk");
                     if(TextUtils.isEmpty(newFilePath) ||
                             newFilePath.startsWith("/data/")
                         // || !(f = new File(newFilePath)).createNewFile() || f.canWrite()
@@ -1111,6 +1156,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 break;
             }
         }
-        return (TextUtils.isEmpty(realName) ? "unknown" : realName.replace(".apk", "")) + "_antisplit.apk";
+        return (TextUtils.isEmpty(realName) ? "unknown" : realName.replace(".apk", "")) + suffix + ".apk";
     }
 }

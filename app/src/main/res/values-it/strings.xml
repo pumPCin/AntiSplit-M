@@ -51,4 +51,5 @@
     <string name="select_from_installed_apps">Scegli dalle App Installate</string>
     <string name="app_icon_list_label">Icona app</string>
     <string name="install">Installa</string>
+    <string name="suffix">Suffisso</string>
 </resources>

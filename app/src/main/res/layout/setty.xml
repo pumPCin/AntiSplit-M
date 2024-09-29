@@ -174,5 +174,29 @@
             android:text="@string/lang"
             style="@style/Widget.Material3.Button.OutlinedButton" />
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:id="@+id/suffixLayout"
+            android:layout_height="wrap_content"
+            android:hint="@string/suffix"
+            app:endIconMode="clear_text"
+            app:boxBackgroundMode="outline"
+            android:layout_marginTop="5dp"
+            app:boxCornerRadiusTopStart="24dp"
+            app:boxCornerRadiusTopEnd="24dp"
+            app:boxCornerRadiusBottomStart="24dp"
+            app:boxCornerRadiusBottomEnd="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/filter_button"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/suffixInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:importantForAutofill="no"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
     </LinearLayout>
 </ScrollView>

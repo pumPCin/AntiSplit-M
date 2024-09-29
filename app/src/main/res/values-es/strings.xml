@@ -50,4 +50,5 @@
     <string name="pause">Botón de pausa</string>
     <string name="copied_log">Registro copiado</string>
     <string name="select_from_installed_apps">Seleccionar desde aplicaciones instaladas</string>
+    <string name="suffix">Sufijo</string>
 </resources>

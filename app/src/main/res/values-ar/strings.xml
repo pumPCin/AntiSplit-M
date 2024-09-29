@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">AntiSplit M</string>
     <string name="merge">اختر ملف APK المقسم للدمج/أنتي سبلت</string>
     <string name="success_saved">تم حفظ الملف بنجاح</string>
     <string name="enable_logs">تفعيل السجلات</string>
@@ -33,7 +32,6 @@
     <string name="label_parent_directory">الدليل الرئيسي</string>
     <string name="last_edit">آخر تعديل: </string>
     <string name="error_dir_access">لا يمكن الوصول إلى الدليل</string>
-    <string name="lang" translatable="false">Language</string>
     <string name="update">تحديث متاح</string>
     <string name="new_ver">إصدار جديد من AntiSplit M متاح</string>
     <string name="dl">تحميل</string>
@@ -45,29 +43,6 @@
     <string name="mismatch">المقاطع التالية (%1$s) تحتوي على رموز إصدار غير متطابقة. هي فقط رموز لغات، لذا يمكن للتطبيق العمل بدونها، لكن هذه اللغات لن تعمل في التطبيق. هل ترغب في الاستمرار في الدمج على أي حال؟</string>
     <string name="warning">تحذير</string>
     <string name="mismatch_base">" رمز الإصدار لا يتطابق مع base.apk"</string>
-    <string-array name="langs_display">
-        <item>الإنجليزية</item>
-        <item>الإسبانية</item>
-        <item>الفرنسية</item>
-        <item>البهاسا الإندونيسية</item>
-        <item>الإيطالية</item>
-        <item>الروسية</item>
-        <item>التركية</item>
-        <item>الأوكرانية</item>
-        <item>البرتغالية</item>
-    </string-array>
-    <string-array name="langs">
-        <item>en</item>
-        <item>es</item>
-        <item>fr</item>
-        <item>in</item>
-        <item>it</item>
-        <item>ru</item>
-        <item>tr</item>
-        <item>uk</item>
-        <item>pt-BR</item>
-    </string-array>
-    <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">إنشاء مشكلة على GitHub</string>
     <string name="copy_log">نسخ السجل</string>
     <string name="pause">زر الإيقاف المؤقت</string>
@@ -75,4 +50,5 @@
     <string name="select_from_installed_apps">اختر من التطبيقات المثبتة</string>
     <string name="app_icon_list_label">أيقونة التطبيق</string>
     <string name="install">تثبيت</string>
+    <string name="suffix">اللاحقة</string>
 </resources>

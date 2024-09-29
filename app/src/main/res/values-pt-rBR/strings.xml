@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">AntiSplit M</string>
     <string name="merge">Selecione split APK para mesclar/AntiSplit</string>
     <string name="success_saved">Arquivo salvo com sucesso</string>
     <string name="enable_logs" >Ativar logs</string>
@@ -50,4 +49,5 @@
     <string name="copy_log">Copiar log</string>
     <string name="pause">Botão de pausa</string>
     <string name="copied_log">Log copiado</string>
+    <string name="suffix">Sufixo</string>
 </resources>
