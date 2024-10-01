@@ -196,8 +196,14 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 selectDirToSaveAPKOrSaveNow();
                 ask = realAskValue;
             });
-
             EditText searchBar = dialogView.findViewById(R.id.search_bar);
+
+            boolean black = theme == R.style.Theme_MyApp_Black;
+            View clearButton = dialogView.findViewById(R.id.clear_button);
+            clearButton.setVisibility(black ? View.VISIBLE : View.GONE);
+            if(black) clearButton.setOnClickListener(v -> searchBar.setText(""));
+            else dialogView.<TextInputLayout>findViewById(R.id.tilly).setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
+
             searchBar.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
