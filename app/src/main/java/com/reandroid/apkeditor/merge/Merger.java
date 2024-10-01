@@ -15,9 +15,11 @@
  */
 package com.reandroid.apkeditor.merge;
 
+import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss;
 import static com.reandroid.apkeditor.merge.LogUtil.logMessage;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
@@ -27,6 +29,7 @@ import com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil;
 import com.abdurazaaqmohammed.AntiSplit.main.MainActivity;
 import com.abdurazaaqmohammed.AntiSplit.main.MismatchedSplitsException;
 import com.abdurazaaqmohammed.AntiSplit.main.SignUtil;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.j256.simplezip.ZipFileInput;
 import com.j256.simplezip.format.ZipFileHeader;
 import com.reandroid.apk.ApkBundle;
@@ -54,11 +57,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class Merger {
 
     public interface LogListener {
-        void onLog(String log);
+        void onLog(CharSequence log);
 
         void onLog(int resID);
     }
@@ -127,9 +131,39 @@ public class Merger {
         zf.close();
     }
 
-    public static void run(ApkBundle bundle, File cacheDir, Uri out, Context context, boolean signApk) throws IOException {
+    public static void run(ApkBundle bundle, File cacheDir, Uri out, Context context, boolean signApk) throws IOException, InterruptedException {
         logMessage("Found modules: " + bundle.getApkModuleList().size());
-
+        final boolean[] saveToCacheDir = {false};
+        final boolean[] sign = {signApk};
+        for(File split : cacheDir.listFiles()) {
+            String splitName = split.getName();
+            String arch = null;
+            String var = "x86";
+            if(splitName.contains(var)) arch = var;
+            else if(splitName.contains(var = "x86_64") || splitName.contains("x86-64") || splitName.contains("x64")) arch = var;
+            else if(splitName.contains("arm64")) arch = "arm64-v8a";
+            else if(splitName.contains("v7a") || splitName.contains("arm7")) arch = "armeabi-v7a";
+            if(arch != null) try (ZipFile zf = new ZipFile(split)) {
+                if (zf.getEntry("lib" + File.separator + arch + File.separator + "libpairipcore.so") != null) {
+                    final CountDownLatch latch = new CountDownLatch(1);
+                    MainActivity act = ((MainActivity) context);
+                    act.getHandler().post(() ->
+                            act.runOnUiThread(new MaterialAlertDialogBuilder(context).setTitle(rss.getString(R.string.warning)).setMessage(R.string.pairip_warning)
+                                    .setPositiveButton("OK", (dialog, which) -> {
+                                        saveToCacheDir[0] = true;
+                                        sign[0] = false;
+                                        latch.countDown();
+                                    }).setNegativeButton(rss.getString(R.string.cancel), (dialog, which) -> {
+                                        act.startActivity(new Intent(act, MainActivity.class));
+                                        act.finishAffinity();
+                                        latch.countDown();
+                                    })
+                                    .create()::show));
+                    latch.await();
+                    break;
+                }
+            }
+        }
         try (ApkModule mergedModule = bundle.mergeModules()) {
             if (mergedModule.hasAndroidManifest()) {
                 AndroidManifestBlock manifest = mergedModule.getAndroidManifest();
@@ -214,20 +248,24 @@ public class Merger {
             logMessage(MainActivity.rss.getString(R.string.saving));
 
             File temp;
-            if (signApk) {
+            if (sign[0]) {
                 mergedModule.writeApk(temp = new File(cacheDir, "temp.apk"));
                 logMessage(MainActivity.rss.getString(R.string.signing));
-                boolean noPerm = MainActivity.doesNotHaveStoragePerm(context);
+                boolean saveToCache = MainActivity.doesNotHaveStoragePerm(context);
                 String p;
-                File signed = new File(noPerm || (noPerm = TextUtils.isEmpty(p = FileUtils.getPath(out, context))) ? (cacheDir + File.separator + "signed.apk") : p);
+                File signed = new File(saveToCache || (saveToCache = TextUtils.isEmpty(p = FileUtils.getPath(out, context))) ? (cacheDir + File.separator + "signed.apk") : p);
                 try {
                     SignUtil.signDebugKey(context, temp, signed);
-                        if (noPerm) try(OutputStream os = context.getContentResolver().openOutputStream(signedApk = out)) {
+                        if (saveToCache) try(OutputStream os = context.getContentResolver().openOutputStream(signedApk = out)) {
                             FileUtils.copyFile(signed, os);
                         } else signedApk = FileProvider.getUriForFile(context, "com.abdurazaaqmohammed.AntiSplit.provider", signed);
                 } catch (Exception e) {
                     SignUtil.signPseudoApkSigner(temp, context, out, e);
                 }
+            } else if (saveToCacheDir[0]) {
+                File poopyip = new File(cacheDir, "poopyip.apk");
+                mergedModule.writeApk(poopyip);
+                FileUtils.copyFile(poopyip, FileUtils.getOutputStream(out, context));
             } else {
                 mergedModule.writeApk(FileUtils.getOutputStream(out, context));
             }

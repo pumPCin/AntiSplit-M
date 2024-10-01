@@ -30,6 +30,7 @@ import com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil;
 import com.abdurazaaqmohammed.AntiSplit.main.MainActivity;
 import com.abdurazaaqmohammed.AntiSplit.main.MismatchedSplitsException;
 import com.android.apksig.apk.ApkUtils;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.reandroid.apkeditor.merge.LogUtil;
 import com.reandroid.archive.BlockInputSource;
 import com.reandroid.archive.ZipEntryMap;
@@ -207,32 +208,21 @@ public class ApkBundle implements Closeable {
         String s = mismatchedLangs.toString();
         if(!TextUtils.isEmpty(s)) {
             final CountDownLatch latch = new CountDownLatch(1);
-            TextView title = new TextView(context);
-            title.setText(rss.getString(R.string.warning));
-            title.setTextSize(25);
-            TextView msg = new TextView(context);
-            msg.setText(rss.getString(R.string.mismatch, s.replaceFirst(", ", "")));
             MainActivity act = ((MainActivity) context);
-            act.getHandler().post(() -> {
-        /*  ListView lv;
-            if((adapter != null || display != null) && (lv = ad.getListView()) != null) lv.setAdapter(adapter == null ? new CustomArrayAdapter(this, display, isLang) : adapter);
-            Window w = ad.getWindow();
-            if (w != null) {
-                int padding = 16;
-                w.getDecorView().setPadding(padding, padding, padding, padding);
-            }*/
-                act.runOnUiThread(new AlertDialog.Builder(context).setCustomTitle(title).setView(msg).setPositiveButton("OK", (dialog, which) -> {
+            act.getHandler().post(() ->
+                    act.runOnUiThread(new MaterialAlertDialogBuilder(context).setTitle(rss.getString(R.string.warning)).setMessage(rss.getString(R.string.mismatch, s.replaceFirst(", ", "")))
+                    .setPositiveButton("OK", (dialog, which) -> {
                         for(String filename : s.split(", ")) {
                             File f = new File(dir, filename);
                             if(f.delete()) apkList.remove(f);
                         }
-                        latch.countDown();
+                    latch.countDown();
                     }).setNegativeButton(rss.getString(R.string.cancel), (dialog, which) -> {
                         act.startActivity(new Intent(act, MainActivity.class));
                         act.finishAffinity();
                         latch.countDown();
-                    }).create()::show);
-            });
+                    })
+                    .create()::show));
             latch.await();
         }
         load(apkList);

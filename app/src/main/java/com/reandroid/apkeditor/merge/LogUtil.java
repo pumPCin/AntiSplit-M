@@ -9,9 +9,7 @@ public class LogUtil {
         logListener = listener;
     }
 
-
-
-    public static void logMessage(String msg) {
+    public static void logMessage(CharSequence msg) {
         if (logListener != null && logEnabled) {
             logListener.onLog(msg);
         }

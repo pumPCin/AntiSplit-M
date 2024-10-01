@@ -130,7 +130,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         DeviceSpecsUtil = new DeviceSpecsUtil(this);
 
         setContentView(R.layout.activity_main);
-
+        scrollView = findViewById(R.id.scrollView);
+        logField = findViewById(R.id.logField);
         suffix = settings.getString("suffix", "_antisplit");
         lang = settings.getString("lang", "en");
         if(Objects.equals(lang, Locale.getDefault().getLanguage())) rss = getResources();
@@ -527,18 +528,20 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         super.onPause();
     }
 
+    TextView logField;
+    NestedScrollView scrollView;
+
     @Override
-    public void onLog(String msg) {
+        public void onLog(CharSequence msg) {
         runOnUiThread(() -> {
-            ((TextView)findViewById(R.id.logField)).append(msg + '\n');
-            NestedScrollView scrollView = findViewById(R.id.scrollView);
+            logField.append(new StringBuilder(msg).append('\n'));
             scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
         });
     }
 
     @Override
     public void onLog(int resID) {
-        onLog(getString(resID));
+        onLog(rss.getString(resID));
     }
 
     private Handler handler;
@@ -752,7 +755,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 break;
             case 2:
                 // going to process and save a file now
-                ((TextView) findViewById(R.id.logField)).setText("");
+                logField.setText("");
                 process(data.getData());
                 break;
         }
@@ -790,7 +793,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
         View copyButton = findViewById(R.id.copyButton);
         copyButton.setVisibility(View.VISIBLE);
-        copyButton.setOnClickListener(v -> copyText(new StringBuilder().append(((TextView) findViewById(R.id.logField)).getText()).append('\n').append(((TextView) findViewById(R.id.errorField)).getText())));
+        copyButton.setOnClickListener(v -> copyText(new StringBuilder().append(logField.getText()).append('\n').append(((TextView) findViewById(R.id.errorField)).getText())));
     }
 
     private static class CheckForUpdatesTask extends AsyncTask<Void, Void, String[]> {
@@ -1039,7 +1042,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 stackTrace.append(line).append('\n');
             }
             StringBuilder fullLog = new StringBuilder(stackTrace.toString());
-            fullLog.append('\n').append(((TextView) findViewById(R.id.logField)).getText());
+            fullLog.append('\n').append(logField.getText());
 
             getHandler().post(() -> runOnUiThread(() -> {
                 View dialogView = getLayoutInflater().inflate(R.layout.dialog_button_layout, null);
@@ -1129,9 +1132,9 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                         f = new File(getAntisplitMFolder(), newFilePath.substring(newFilePath.lastIndexOf(File.separator) + 1));
                         showError(rss.getString(R.string.no_filepath) + newFilePath);
                     } else f = new File(newFilePath);
-                    ((TextView) findViewById(R.id.logField)).setText("");
+                    logField.setText("");
+                    while(f.exists() && f.length() > 99) f = new File(f.getPath().replace(".apk", "_1.apk"));
                     LogUtil.logMessage(rss.getString(R.string.output) + f);
-
                     process(Uri.fromFile(f));
                 }
 
