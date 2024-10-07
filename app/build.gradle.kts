@@ -11,7 +11,7 @@ android {
         minSdk = 21
         targetSdk = 35
         versionCode = 38
-        versionName = "2.0.9"
+        versionName = "2.1.0"
     }
 
     buildTypes {
@@ -36,9 +36,6 @@ android {
         implementation("org.apache.commons:commons-compress:1.24.0")
         coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
         implementation("androidx.appcompat:appcompat:1.7.0")
-        implementation("androidx.core:core-ktx:1.13.1")
-        implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-        implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
         implementation("com.google.android.material:material:1.12.0")
     }
 }

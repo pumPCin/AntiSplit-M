@@ -82,7 +82,7 @@ public class AppListArrayAdapter extends ArrayAdapter<AppInfo> implements Filter
                 List<AppInfo> filteredItems = new ArrayList<>();
                 String filterPattern = constraint.toString().toLowerCase().trim();
                 for (AppInfo appInfo : originalAppInfoList) {
-                    if (appInfo.name.toLowerCase().contains(filterPattern)) {
+                    if (appInfo.name.toLowerCase().contains(filterPattern) || appInfo.packageName.toLowerCase().contains(filterPattern)) {
                         filteredItems.add(appInfo);
                     }
                 }

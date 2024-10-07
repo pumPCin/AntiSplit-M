@@ -8,6 +8,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="?android:attr/windowBackground"
+    android:id="@+id/main"
     tools:context=".main.MainActivity">
 
     <LinearLayout

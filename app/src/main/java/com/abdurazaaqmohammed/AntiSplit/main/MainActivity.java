@@ -20,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -36,12 +37,14 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,7 +56,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.core.view.WindowCompat;
 import androidx.core.widget.NestedScrollView;
 
@@ -125,11 +127,12 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
         boolean dark = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
         setTheme(theme = settings.getInt("theme", dark
-                ? com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar));
+                    ? com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar));
 
         DeviceSpecsUtil = new DeviceSpecsUtil(this);
 
         setContentView(R.layout.activity_main);
+        if(theme == R.style.Theme_MyApp_Black) findViewById(R.id.main).setBackgroundColor(Color.BLACK);
         scrollView = findViewById(R.id.scrollView);
         logField = findViewById(R.id.logField);
         suffix = settings.getString("suffix", "_antisplit");
@@ -137,9 +140,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         if(Objects.equals(lang, Locale.getDefault().getLanguage())) rss = getResources();
         else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources(), null);
         getWindow().addFlags(FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        int transparent = rss.getColor(android.R.color.transparent);
-        getWindow().setNavigationBarColor(transparent);
-        getWindow().setStatusBarColor(transparent);
         if (!LegacyUtils.supportsWriteExternalStorage) {
             EdgeToEdge.enable(this);
             getWindow().setStatusBarContrastEnforced(true);
@@ -198,11 +198,10 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             });
             EditText searchBar = dialogView.findViewById(R.id.search_bar);
 
-            boolean black = theme == R.style.Theme_MyApp_Black;
             View clearButton = dialogView.findViewById(R.id.clear_button);
-            clearButton.setVisibility(black ? View.VISIBLE : View.GONE);
-            if(black) clearButton.setOnClickListener(v -> searchBar.setText(""));
-            else dialogView.<TextInputLayout>findViewById(R.id.tilly).setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
+    //            if(theme == R.style.Theme_MyApp_Black)
+            clearButton.setOnClickListener(v -> searchBar.setText(""));
+    //            else dialogView.<TextInputLayout>findViewById(R.id.tilly).setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
 
             searchBar.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -212,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    clearButton.setVisibility(TextUtils.isEmpty(s) ? View.GONE : View.VISIBLE);
                     adapter.getFilter().filter(s);
                 }
 
@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             });
 
             ad.setView(dialogView);
-            runOnUiThread(ad::show);
+            styleAlertDialog(ad);
         });
 
         findViewById(R.id.settingsButton).setOnClickListener(v -> {
@@ -329,27 +329,18 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
             showDialogSwitch.setChecked(showDialog);
             showDialogSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                showDialog = isChecked;
-                if(isChecked) {
-                    selectSplitsForDevice = false;
-                    selectSplitsAutomaticallySwitch.setChecked(false);
-                }
+                if(showDialog = isChecked) selectSplitsAutomaticallySwitch.setChecked(selectSplitsForDevice = false);
             });
 
             selectSplitsAutomaticallySwitch.setChecked(selectSplitsForDevice);
             selectSplitsAutomaticallySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                selectSplitsForDevice = isChecked;
-                if(isChecked) {
-                    showDialog = false;
-                    showDialogSwitch.setChecked(false);
-                }
+                if(selectSplitsForDevice = isChecked) showDialogSwitch.setChecked(showDialog = false);
             });
 
             CompoundButton askSwitch = settingsDialog.findViewById(R.id.ask);
             askSwitch.setChecked(ask);
             askSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                ask = isChecked;
-                if(!isChecked) checkStoragePerm();
+                if(!(ask = isChecked)) checkStoragePerm();
             });
 
             settingsDialog.findViewById(R.id.langPicker).setOnClickListener(v2 -> {
@@ -360,7 +351,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     updateLang(LocaleHelper.setLocale(this, lang = langs[which]).getResources(), settingsDialog);
                     dialog.dismiss();
                 }).create();
-                runOnUiThread(ad::show);
+                styleAlertDialog(ad);
                 ad.getListView().setAdapter(new ArrayAdapter<>(this, android.R.layout.select_dialog_singlechoice, display));
                 for (int i = 0; i < langs.length; i++) {
                     if (Objects.equals(lang, langs[i])) {
@@ -375,8 +366,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             title.setPadding(size,size,size,size);
             title.setTextSize(size);
             title.setGravity(Gravity.CENTER);
-            runOnUiThread(new MaterialAlertDialogBuilder(this).setCustomTitle(title).setView(settingsDialog)
-                    .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create()::show);
+            styleAlertDialog(new MaterialAlertDialogBuilder(this).setCustomTitle(title).setView(settingsDialog)
+                    .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create());
         });
 
         findViewById(R.id.decodeButton).setOnClickListener(v -> startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
@@ -399,8 +390,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             if (uris != null) {
                 final Uri uri = uris.get(0);
                 String path = uri.getPath();
-                urisAreSplitApks = TextUtils.isEmpty(path) || !path.endsWith(".apk");
-                if(urisAreSplitApks) splitAPKUri = uri;
+                if(urisAreSplitApks = TextUtils.isEmpty(path) || !path.endsWith(".apk")) splitAPKUri = uri;
                 else selectDirToSaveAPKOrSaveNow();
             }
         }
@@ -408,6 +398,20 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             if(showDialog) showApkSelectionDialog();
             else selectDirToSaveAPKOrSaveNow();
         }
+    }
+
+    public void styleAlertDialog(AlertDialog ad) {
+        if(theme == R.style.Theme_MyApp_Black) {
+            Window w = ad.getWindow();
+            if(w != null) {
+//                final android.view.WindowManager.LayoutParams params = w.getAttributes();
+                w.setBackgroundDrawableResource(R.drawable.dialog_border);
+                //w.setAttributes(params);
+                //This aint working
+//                w.setLayout(params.width, params.height);
+            }
+        }
+        runOnUiThread(ad::show);
     }
 
     @Override
@@ -420,56 +424,10 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 recreate();
             } else if (currentNightMode == Configuration.UI_MODE_NIGHT_NO) {
                 setTheme(theme = com.google.android.material.R.style.Theme_Material3_Light_NoActionBar);
-
                 recreate();
             }
         }
     }
-
-//    private void setupSwipe(FloatingActionButton fab) {
-//        LinearLayout fabs = findViewById(R.id.fabs);
-//        fab.setOnTouchListener(new View.OnTouchListener() {
-//            float dy = 0f;
-//            boolean isSwiped = false;
-//            boolean up = true;
-//
-//            @Override
-//            public boolean onTouch(View v31, MotionEvent event) {
-//                switch (event.getAction()) {
-//                    case MotionEvent.ACTION_DOWN:
-//                        dy = event.getRawY();
-//                        isSwiped = false;
-//                        return false;
-//
-//                    case MotionEvent.ACTION_MOVE:
-//                        float movement = event.getRawY() - dy;
-//                        if (Math.abs(movement) > 10) {
-//                            fabs.setTranslationY(v31.getTranslationY() + movement);
-//                            dy = event.getRawY();
-//                            isSwiped = true;
-//                            return true;
-//                        }
-//                        return false;
-//
-//                    case MotionEvent.ACTION_UP:
-//                        if (isSwiped) {
-//                            if(up) {
-//                                fabs.animate().translationY((float) (fabs.getHeight() * 0.9)).setDuration(300).start();
-//                                up = false;
-//                            } else fabs.animate().translationY(0f).setDuration(300).start();
-//                            return true;
-//                        } else {
-//                            up = true;
-//                            fabs.animate().translationY(0f).setDuration(300).start();
-//                        }
-//                        return false;
-//
-//                    default:
-//                        return false;
-//                }
-//            }
-//        });
-//    }
 
     public static Resources rss;
 
@@ -510,10 +468,9 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     }
 
     public static boolean doesNotHaveStoragePerm(Context context) {
-        if (Build.VERSION.SDK_INT < 23) return false;
-        return LegacyUtils.supportsWriteExternalStorage ?
+        return Build.VERSION.SDK_INT > 22 && (LegacyUtils.supportsWriteExternalStorage ?
             context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED :
-            !Environment.isExternalStorageManager();
+            !Environment.isExternalStorageManager());
     }
 
     @Override
@@ -924,7 +881,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 checkedItems[i] = false;
             }
 
-            runOnUiThread(new MaterialAlertDialogBuilder(this).setTitle(rss.getString(R.string.select_splits)).setMultiChoiceItems(apkNames, checkedItems, (dialog, which, isChecked) -> {
+            styleAlertDialog(new MaterialAlertDialogBuilder(this).setTitle(rss.getString(R.string.select_splits)).setMultiChoiceItems(apkNames, checkedItems, (dialog, which, isChecked) -> {
                     switch (which) {
                         case 0:
                             // "Select All" option
@@ -1006,7 +963,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                         splitsToUse = splits;
                         selectDirToSaveAPKOrSaveNow();
                     }
-                }).setNegativeButton("Cancel", null).create()::show);
+                }).setNegativeButton("Cancel", null).create());
         } catch (IOException e) {
             showError(e);
         }
@@ -1055,7 +1012,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
                 ((TextView) dialogView.findViewById(R.id.errorD)).setText(stackTrace);
 
-                AlertDialog alertDialog = new MaterialAlertDialogBuilder(this)
+                styleAlertDialog(new MaterialAlertDialogBuilder(this)
                         .setTitle(mainErr)
                         .setView(dialogView)
                         .setPositiveButton(rss.getString(R.string.copy_log), (dialog, which) -> {
@@ -1067,8 +1024,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                             dialog.dismiss();
                         })
                         .setNeutralButton(rss.getString(R.string.cancel), (dialog, which) -> dialog.dismiss())
-                        .create();
-                alertDialog.show();
+                        .create());
                 ScrollView scrollView = dialogView.findViewById(R.id.errorView);
 
                 ViewGroup.LayoutParams params = scrollView.getLayoutParams();
@@ -1112,11 +1068,24 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
     @SuppressLint("InlinedApi")
     private void selectDirToSaveAPKOrSaveNow() {
-        if (ask) startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT)
-                .addCategory(Intent.CATEGORY_OPENABLE)
-                .setType("application/vnd.android.package-archive")
-                .putExtra(Intent.EXTRA_TITLE, TextUtils.isEmpty(pkgName) ? (urisAreSplitApks ? getOriginalFileName(this, splitAPKUri) : getNameFromNonSplitApks()) : pkgName + suffix), 2);
-        else {
+        if (ask) {
+            String filename;
+            if(TextUtils.isEmpty(pkgName)) filename = (urisAreSplitApks ? getOriginalFileName(this, splitAPKUri) : getNameFromNonSplitApks());
+            else {
+                String versionName;
+                try {
+                    versionName = " v" + getPackageManager().getPackageInfo(pkgName, 0).versionName;
+                } catch (Exception ignored) {
+                    versionName = "";
+                }
+                filename = pkgName + versionName + suffix;
+            }
+
+            startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                    .addCategory(Intent.CATEGORY_OPENABLE)
+                    .setType("application/vnd.android.package-archive")
+                    .putExtra(Intent.EXTRA_TITLE, filename), 2);
+        } else {
             checkStoragePerm();
             try {
                 if(splitAPKUri == null) process(Uri.fromFile(new File(getAntisplitMFolder(), "output.apk")));
