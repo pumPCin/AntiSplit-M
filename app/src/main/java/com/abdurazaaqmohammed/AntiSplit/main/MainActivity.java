@@ -21,6 +21,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -33,6 +34,8 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -405,15 +408,20 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     }
 
     public void styleAlertDialog(AlertDialog ad) {
-        if(theme == R.style.Theme_MyApp_Black) {
-            Window w = ad.getWindow();
-            if(w != null) {
-//                final android.view.WindowManager.LayoutParams params = w.getAttributes();
-                w.setBackgroundDrawableResource(R.drawable.dialog_border);
-                //w.setAttributes(params);
-                //This aint working
-//                w.setLayout(params.width, params.height);
-            }
+        Window w = ad.getWindow();
+        if(w != null) {
+            GradientDrawable border = new GradientDrawable();
+            border.setColor(theme == com.google.android.material.R.style.Theme_Material3_Light_NoActionBar ? Color.WHITE : Color.BLACK); // Background color
+            TypedValue typedValue = new TypedValue();
+            getTheme().resolveAttribute(android.R.attr.colorPrimary, typedValue, true);
+            border.setStroke(5, typedValue.data); // Border width and color
+            border.setCornerRadius(24);
+            w.setBackgroundDrawable(border);
+            double m = 0.8;
+            DisplayMetrics displayMetrics = rss.getDisplayMetrics();
+            int height = (int) (displayMetrics.heightPixels * m);
+            int width = (int) (displayMetrics.widthPixels * m);
+            w.setLayout(width, height);
         }
         runOnUiThread(ad::show);
     }
