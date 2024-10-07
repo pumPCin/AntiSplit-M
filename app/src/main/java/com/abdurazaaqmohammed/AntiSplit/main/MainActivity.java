@@ -137,9 +137,13 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         logField = findViewById(R.id.logField);
         suffix = settings.getString("suffix", "_antisplit");
         lang = settings.getString("lang", "en");
-        if(Objects.equals(lang, Locale.getDefault().getLanguage())) rss = getResources();
+        if(lang.equals(Locale.getDefault().getLanguage())) rss = getResources();
         else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources(), null);
         getWindow().addFlags(FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        int transparent = rss.getColor(android.R.color.transparent);
+        getWindow().setNavigationBarColor(transparent);
+        getWindow().setStatusBarColor(transparent);
+
         if (!LegacyUtils.supportsWriteExternalStorage) {
             EdgeToEdge.enable(this);
             getWindow().setStatusBarContrastEnforced(true);
