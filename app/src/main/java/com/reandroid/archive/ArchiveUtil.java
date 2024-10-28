@@ -15,11 +15,11 @@
  */
 package com.reandroid.archive;
 
-import com.reandroid.utils.StringsUtil;
+import android.text.TextUtils;
 
 public class ArchiveUtil {
     public static String sanitizePath(String path){
-        if(StringsUtil.isEmpty(path)){
+        if(TextUtils.isEmpty(path)){
             return null;
         }
         path = path.replace('\\', '/');

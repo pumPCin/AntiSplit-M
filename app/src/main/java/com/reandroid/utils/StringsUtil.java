@@ -15,6 +15,8 @@
  */
 package com.reandroid.utils;
 
+import android.text.TextUtils;
+
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -23,7 +25,7 @@ public class StringsUtil {
     public static final String EMPTY = ObjectsUtil.of("");
 
     public static boolean containsUpperAZ(String text){
-        if(isEmpty(text)){
+        if(TextUtils.isEmpty(text)){
             return false;
         }
         int length = text.length();
@@ -112,7 +114,7 @@ public class StringsUtil {
         }
         int count = 0;
         for(int i = 0; i < length; i++){
-            if(isEmpty(strings[i])){
+            if(TextUtils.isEmpty(strings[i])){
                 strings[i] = null;
             }else {
                 count ++;
@@ -123,11 +125,10 @@ public class StringsUtil {
         }
         String[] results = new String[count];
         int index = 0;
-        for(int i = 0; i < length; i++){
-            String str = strings[i];
-            if(str != null){
+        for (String str : strings) {
+            if (str != null) {
                 results[index] = str;
-                index ++;
+                index++;
             }
         }
         return results;
@@ -139,7 +140,7 @@ public class StringsUtil {
         return split(text, search, true);
     }
     public static String[] split(String text, char[] search, boolean skipConsecutive) {
-        if(text == null || text.length() == 0){
+        if(TextUtils.isEmpty(text)){
             return new String[0];
         }
         int count = countChar(text, search, skipConsecutive);
@@ -171,13 +172,11 @@ public class StringsUtil {
         return results;
     }
     public static String[] split(String text, char search, boolean skipConsecutive) {
-        if(text == null || text.length() == 0){
+        if(TextUtils.isEmpty(text)){
             return new String[0];
         }
         int count = countChar(text, search, skipConsecutive);
-        if(count == 0){
-            return new String[]{text};
-        }
+        if(count == 0) return new String[]{text};
         String[] results = new String[count + 1];
         int index = 0;
         StringBuilder builder = new StringBuilder();
@@ -203,9 +202,7 @@ public class StringsUtil {
         return results;
     }
     public static int countChar(String text, char[] search, boolean skipConsecutive) {
-        if(text == null || text.length() == 0){
-            return 0;
-        }
+        if(TextUtils.isEmpty(text)) return 0;
         int length = text.length();
         int result = 0;
         boolean previousMatch = false;
@@ -223,9 +220,7 @@ public class StringsUtil {
         return result;
     }
     public static int countChar(String text, char search, boolean skipConsecutive) {
-        if(text == null || text.length() == 0){
-            return 0;
-        }
+        if(TextUtils.isEmpty(text)) return 0;
         int length = text.length();
         int result = 0;
         boolean previousMatch = false;
@@ -322,18 +317,12 @@ public class StringsUtil {
         return builder.toString();
     }
     public static String emptyToNull(String text){
-        if(isEmpty(text)){
-            return null;
-        }
+        if(TextUtils.isEmpty(text)) return null;
         return text;
     }
-    public static boolean isEmpty(String text){
-        return text == null || text.length() == 0;
-    }
+
     public static String toUpperCase(String str){
-        if(str == null || str.length() == 0){
-            return str;
-        }
+        if(TextUtils.isEmpty(str)) return str;
         char[] chars = str.toCharArray();
         boolean changed = false;
         for(int i = 0; i < chars.length; i++){

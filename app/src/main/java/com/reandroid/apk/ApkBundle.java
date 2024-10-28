@@ -21,9 +21,6 @@ import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.widget.TextView;
-
-import androidx.appcompat.app.AlertDialog;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
 import com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil;
@@ -63,37 +60,29 @@ public class ApkBundle implements Closeable {
 
     public ApkModule mergeModules() throws IOException {
         List<ApkModule> moduleList=getApkModuleList();
-        if(moduleList.isEmpty()){
-            throw new FileNotFoundException("Nothing to merge, empty modules");
-        }
+        if(moduleList.isEmpty()) throw new FileNotFoundException("Nothing to merge, empty modules");
         ApkModule result = new ApkModule(generateMergedModuleName(), new ZipEntryMap());
         result.setLoadDefaultFramework(false);
 
         mergeStringPools(result);
 
         ApkModule base=getBaseModule();
-        if(base==null){
-            base=getLargestTableModule();
-        }
+        if(base==null) base = getLargestTableModule();
         result.merge(base);
         ApkSignatureBlock signatureBlock = null;
         for(ApkModule module:moduleList){
             ApkSignatureBlock asb = module.getApkSignatureBlock();
             if(module==base){
-                if(asb != null){
-                    signatureBlock = asb;
-                }
+                if(asb != null) signatureBlock = asb;
                 continue;
             }
-            if(signatureBlock == null){
-                signatureBlock = asb;
-            }
+            if(signatureBlock == null) signatureBlock = asb;
             result.merge(module);
         }
 
         result.setApkSignatureBlock(signatureBlock);
 
-        if(result.hasTableBlock()){
+        if(result.hasTableBlock()) {
             TableBlock tableBlock=result.getTableBlock();
             tableBlock.sortPackages();
             tableBlock.refresh();
@@ -102,9 +91,7 @@ public class ApkBundle implements Closeable {
         return result;
     }
     private void mergeStringPools(ApkModule mergedModule) throws IOException {
-        if(!hasOneTableBlock() || mergedModule.hasTableBlock()){
-            return;
-        }
+        if(!hasOneTableBlock() || mergedModule.hasTableBlock()) return;
         LogUtil.logMessage("Merging string pools ... ");
         TableBlock createdTable = new TableBlock();
         BlockInputSource<TableBlock> inputSource=

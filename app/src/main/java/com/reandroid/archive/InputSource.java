@@ -15,6 +15,8 @@
  */
 package com.reandroid.archive;
 
+import android.text.TextUtils;
+
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.utils.StringsUtil;
@@ -162,28 +164,11 @@ public abstract class InputSource {
         mLength=length;
     }
 
-    public static int getDexNumber(String name){
-        int i = name.lastIndexOf('/');
-        if(i < 0){
-            i = name.lastIndexOf('\\');
-        }
-        if(i >= 0){
-            name = name.substring(i + 1);
-        }
-        if(name.equals("classes.dex")){
-            return 0;
-        }
-        String prefix = "classes";
-        String ext = ".dex";
-        if(!name.startsWith(prefix) || !name.endsWith(ext)){
-            return -1;
-        }
-        String num = name.substring(prefix.length(), name.length() - ext.length());
-        try {
-            return Integer.parseInt(num);
-        }catch (NumberFormatException ignored){
-            return -1;
-        }
+    public static int getDexNumber(String name) {
+        String n;
+        return name.equals("classes.dex") ? 0 : !name.contains("/") && name.startsWith("classes") &&
+                name.endsWith(".dex") &&
+                (n = name.substring(7, name.length() - 4)).matches("\\d") ? Integer.parseInt(n) : -1;
     }
     public static int compareDex(String dex1, String dex2){
         int d1 = getDexNumber(dex1);
@@ -201,37 +186,24 @@ public abstract class InputSource {
     }
     private static int getSortOrder(String[] alias){
         int length = alias.length;
-        if(length == 0){
-            return LAST_ORDER;
-        }
+        if(length == 0) return LAST_ORDER;
         String name = alias[0];
-        if(StringsUtil.isEmpty(name)){
-            return LAST_ORDER;
-        }
-        if(length != 1){
-            if(META_INF.equals(name)){
+        if(TextUtils.isEmpty(name)) return LAST_ORDER;
+        if(length != 1) switch (name) {
+            case META_INF:
                 return ORDER_meta_inf;
-            }
-            if(LIB.equals(name)){
+            case LIB:
                 return ORDER_lib;
-            }
-            if(RES.equals(name)){
+            case RES:
                 return ORDER_res;
-            }
-            if(ASSETS.equals(name)){
+            case ASSETS:
                 return ORDER_assets;
-            }
-            return LAST_ORDER;
+            default:
+                return LAST_ORDER;
         }
-        if(ANDROID_MANIFEST.equals(name)){
-            return ORDER_android_manifest;
-        }
-        if(RESOURCES.equals(name)){
-            return ORDER_resources;
-        }
-        if(name.startsWith("classes") && name.endsWith(".dex")){
-            return ORDER_classes;
-        }
+        if(ANDROID_MANIFEST.equals(name)) return ORDER_android_manifest;
+        if(RESOURCES.equals(name)) return ORDER_resources;
+        if(name.startsWith("classes") && name.endsWith(".dex")) return ORDER_classes;
         return LAST_ORDER;
     }
     private static int compareAlias(InputSource source1, InputSource source2){

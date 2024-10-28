@@ -8,10 +8,11 @@ android {
 
     defaultConfig {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
-        minSdk = 21
+        minSdk = 19
         targetSdk = 35
-        versionCode = 38
-        versionName = "2.1.0"
+        versionCode = 39
+        versionName = "2.1.1"
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -35,7 +36,12 @@ android {
     dependencies {
         implementation("org.apache.commons:commons-compress:1.24.0")
         coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
-        implementation("androidx.appcompat:appcompat:1.7.0")
         implementation("com.google.android.material:material:1.12.0")
+    }
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs.
+        includeInApk = false
+        // Disables dependency metadata when building Android App Bundles.
+        includeInBundle = false
     }
 }

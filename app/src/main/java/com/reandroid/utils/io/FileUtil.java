@@ -15,6 +15,8 @@
  */
 package com.reandroid.utils.io;
 
+import android.text.TextUtils;
+
 import com.reandroid.arsc.ARSCLib;
 import com.reandroid.utils.ObjectsUtil;
 import com.reandroid.utils.StringsUtil;
@@ -40,10 +42,10 @@ public class FileUtil {
 
 
     public static String combinePath(char separator, String parent, String name){
-        if(StringsUtil.isEmpty(parent)){
+        if(TextUtils.isEmpty(parent)){
             return name;
         }
-        if(StringsUtil.isEmpty(name)){
+        if(TextUtils.isEmpty(name)){
             return parent;
         }
         StringBuilder builder = new StringBuilder(parent.length() + name.length() + 1);
@@ -71,7 +73,7 @@ public class FileUtil {
         return file.getAbsolutePath().substring(i);
     }
     public static String getParent(String path){
-        if(StringsUtil.isEmpty(path)){
+        if(TextUtils.isEmpty(path)){
             return StringsUtil.EMPTY;
         }
         int i = path.lastIndexOf('/');

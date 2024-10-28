@@ -507,12 +507,8 @@ public class ApkModule implements ApkFile, Closeable {
         return mTableBlock;
     }
     private void checkExternalFramework(){
-        if(mDisableLoadFramework || preferredFramework != null){
-            return;
-        }
-        if(mExternalFrameworks.size() == 0){
-            return;
-        }
+        if(mDisableLoadFramework || preferredFramework != null) return;
+        if(mExternalFrameworks.isEmpty()) return;
         mDisableLoadFramework = true;
     }
     private void checkSelfFramework(){
@@ -741,7 +737,7 @@ public class ApkModule implements ApkFile, Closeable {
         List<DexFileInputSource> comingList = module.listDexFiles();
         ZipEntryMap zipEntryMap = getZipEntryMap();
         int index=0;
-        if(existList.size()>0){
+        if(!existList.isEmpty()) {
             index=existList.get(existList.size()-1).getDexNumber();
             if(index==0){
                 index=2;

@@ -15,6 +15,8 @@
  */
 package com.reandroid.arsc.chunk.xml;
 
+import android.text.TextUtils;
+
 import com.reandroid.arsc.array.ResXmlAttributeArray;
 import com.reandroid.arsc.chunk.ChunkType;
 import com.reandroid.arsc.base.Block;
@@ -31,7 +33,6 @@ import com.reandroid.json.JSONConvert;
 import com.reandroid.json.JSONArray;
 import com.reandroid.json.JSONObject;
 import com.reandroid.utils.ObjectsUtil;
-import com.reandroid.utils.StringsUtil;
 import com.reandroid.utils.collection.SingleIterator;
 import com.reandroid.utils.collection.*;
 import com.reandroid.xml.*;
@@ -74,10 +75,11 @@ public class ResXmlElement extends ResXmlNode implements
     }
 
     public boolean isUndefined() {
-        return size() == 0 &&
-                this.getAttributeCount() == 0 &&
-                this.getNamespaceCount() == 0 &&
-                StringsUtil.isEmpty(getName());
+        if (size() != 0 ||
+                this.getAttributeCount() != 0 ||
+                this.getNamespaceCount() != 0) return false;
+        String text = getName();
+        return TextUtils.isEmpty(text);
     }
     public ResXmlElement getParentElement(){
         return getParentInstance(ResXmlElement.class);

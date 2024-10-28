@@ -15,6 +15,8 @@
  */
 package com.reandroid.arsc.value;
 
+import android.text.TextUtils;
+
 import com.reandroid.arsc.ApkFile;
 import com.reandroid.arsc.base.Block;
 import com.reandroid.arsc.chunk.MainChunk;
@@ -34,7 +36,6 @@ import com.reandroid.arsc.refactor.ResourceMergeOption;
 import com.reandroid.utils.HexUtil;
 import com.reandroid.json.JSONConvert;
 import com.reandroid.json.JSONObject;
-import com.reandroid.utils.StringsUtil;
 import com.reandroid.xml.StyleDocument;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -336,7 +337,7 @@ public abstract class ValueItem extends BlockItem implements Value,
             return;
         }
         String value = decodeValue();
-        if(ignore_empty && StringsUtil.isEmpty(value)){
+        if (ignore_empty && TextUtils.isEmpty(value)) {
             return;
         }
         if(value == null){

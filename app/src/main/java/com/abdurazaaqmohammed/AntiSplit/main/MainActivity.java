@@ -2,6 +2,7 @@ package com.abdurazaaqmohammed.AntiSplit.main;
 
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
 import static android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
+import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.aboveSdk20;
 import static com.reandroid.apkeditor.merge.LogUtil.logEnabled;
 
 import android.Manifest;
@@ -104,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     private ArrayList<Uri> uris;
     private boolean urisAreSplitApks = true;
     public static boolean errorOccurred;
-    //public static boolean revanced;
     public static boolean checkForUpdates;
     public static String lang;
     public static int theme;
@@ -142,10 +142,12 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         lang = settings.getString("lang", "en");
         if(lang.equals(Locale.getDefault().getLanguage())) rss = getResources();
         else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources(), null);
-        getWindow().addFlags(FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        int transparent = rss.getColor(android.R.color.transparent);
-        getWindow().setNavigationBarColor(transparent);
-        getWindow().setStatusBarColor(transparent);
+        if(aboveSdk20) {
+            getWindow().addFlags(FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            int transparent = rss.getColor(android.R.color.transparent);
+            getWindow().setNavigationBarColor(transparent);
+            getWindow().setStatusBarColor(transparent);
+        }
 
         if (!LegacyUtils.supportsWriteExternalStorage) {
             EdgeToEdge.enable(this);
@@ -163,8 +165,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         sortMode = settings.getInt("sortMode", 0);
         LogUtil.setLogListener(this);
 
-
-        findViewById(R.id.fromAppsButton).setOnClickListener(v3 -> {
+        View selectFromInstalledApps = findViewById(R.id.fromAppsButton);
+        if(aboveSdk20) selectFromInstalledApps.setOnClickListener(v3 -> {
             AlertDialog ad = new MaterialAlertDialogBuilder(MainActivity.this).setNegativeButton(rss.getString(R.string.cancel), null).create();
             PackageManager pm = getPackageManager();
             List<PackageInfo> packageInfoList = pm.getInstalledPackages(0);
@@ -253,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             ad.setView(dialogView);
             styleAlertDialog(ad);
         });
+        else selectFromInstalledApps.setVisibility(View.GONE);
 
         findViewById(R.id.settingsButton).setOnClickListener(v -> {
             ScrollView settingsDialog = (ScrollView) LayoutInflater.from(this).inflate(R.layout.setty, null);
@@ -529,19 +532,15 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
     /** @noinspection ResultOfMethodCallIgnored*/
     private void cleanupAppFolder() {
-        if(!doesNotHaveStoragePerm(this)) {
-            File appFolder = new File(Environment.getExternalStorageDirectory(), "AntiSplit-M");
-            if(appFolder.exists()) {
-                File[] children = appFolder.listFiles();
-                if(children != null) {
-                    if (children.length == 0) appFolder.delete();
-                    else {
-                        for (File child : children) if (child.isFile() && child.length() == 0) child.delete();
-                        children = appFolder.listFiles();
-                        if (children.length == 0) appFolder.delete();
-                    }
-                }
-            }
+        if(doesNotHaveStoragePerm(this)) return;
+        File appFolder = new File(Environment.getExternalStorageDirectory(), "AntiSplit-M");
+        if(!appFolder.exists()) return;
+        File[] children = appFolder.listFiles();
+        if(children == null) return;
+        if (children.length == 0) appFolder.delete();
+        else {
+            for (File child : children) if (child.isFile() && child.length() == 0) child.delete();
+            if (appFolder.listFiles().length == 0) appFolder.delete();
         }
     }
 
@@ -830,7 +829,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     currentVer = null;
                 }
                 boolean newVer = false;
-                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '0', '7'} : currentVer.replace(".", "").toCharArray();
+                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '1', '1'} : currentVer.replace(".", "").toCharArray();
                 char[] latest = latestVersion.replace(".", "").toCharArray();
 
                 int maxLength = Math.max(curr.length, latest.length);
@@ -1012,12 +1011,20 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             errorOccurred = !mainErr.equals(rss.getString(R.string.sign_failed));
             toggleAnimation(this, false);
 
-            StringBuilder stackTrace = new StringBuilder().append(mainErr).append('\n');
-            for (StackTraceElement line : e.getStackTrace()) {
-                stackTrace.append(line).append('\n');
+            StringBuilder stackTrace = new StringBuilder(mainErr);
+
+            for (StackTraceElement line : e.getStackTrace()) stackTrace.append(line).append('\n');
+            StringBuilder fullLog = new StringBuilder(stackTrace).append('\n')
+                    .append("SDK ").append(Build.VERSION.SDK_INT).append('\n')
+                    .append(rss.getString(R.string.app_name)).append(' ');
+            String currentVer;
+            try {
+                currentVer = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            } catch (Exception ex) {
+                currentVer = "2.1.1";
             }
-            StringBuilder fullLog = new StringBuilder(stackTrace.toString());
-            fullLog.append('\n').append(logField.getText());
+            fullLog.append(currentVer).append('\n').append("Storage permission granted: ").append(!doesNotHaveStoragePerm(this))
+                    .append('\n').append(logField.getText());
 
             getHandler().post(() -> runOnUiThread(() -> {
                 View dialogView = getLayoutInflater().inflate(R.layout.dialog_button_layout, null);
