@@ -173,16 +173,8 @@ public abstract class InputSource {
     public static int compareDex(String dex1, String dex2){
         int d1 = getDexNumber(dex1);
         int d2 = getDexNumber(dex2);
-        if(d1 == d2){
-            return 0;
-        }
-        if(d1 < 0){
-            return 1;
-        }
-        if(d2 < 0){
-            return -1;
-        }
-        return Integer.compare(d1, d2);
+        return (d1 == d2) ? 0 : (d1 < 0) ? 1 : (d2 < 0) ? -1 : Integer.compare(d1, d2);
+
     }
     private static int getSortOrder(String[] alias){
         int length = alias.length;
