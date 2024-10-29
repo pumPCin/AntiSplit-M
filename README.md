@@ -11,7 +11,7 @@ Version 2.x - Material You design, support Android 4.4+
 
 Version 1.x - Support Android 1.6+
 
-# Usage
+## Usage
 Video - https://youtu.be/Vk566iMG6Gs
 
 There are 3 ways to open a split APK to be merged:
@@ -19,13 +19,11 @@ There are 3 ways to open a split APK to be merged:
 * Press (open) the file and select AntiSplit M in available options
 * Open the app from launcher and press the button then select the split APK file.
 
-There is also a menu in the app that allows selecting an app installed on the device as a split APK.
+There is also a menu in the app that allows selecting an app from those installed on the device as a split APK.
 
-Note: if you are planning to further modify the APK, you only need to sign it after the modifications.
+Note: An APK must be signed in order to install it (unless you have [Core Patch](https://github.com/LSPosed/CorePatch)). If you are planning to further modify the APK, you only need to sign it after the modifications. Some apps verify the signature of the APK or take other measures to check if the app was modified, which may cause it to crash on startup.
 
-Note: Some apps verify the signature of the APK or take other measures to check if the app was modified, which may cause it to crash on startup.
-
-# Screenshots
+## Screenshots
 | Main screen                                                                 | Settings                                                                    | Selecting from installed apps                                               |
 | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | ![Main screen](images/2.0%20mainscreen.jpg) | ![Settings](images/2.0%20settings.jpg) | ![Selecting from installed apps](images/2.0%20app%20list.jpg) |
@@ -34,13 +32,18 @@ Note: Some apps verify the signature of the APK or take other measures to check 
 | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | ![Dialog](images/2.0%20dialog.jpg) | ![Processing](images/2.0%20processing.jpg) | ![Result](images/2.0%20result.jpg) |
 
-# Used projects
+## Used projects
 
 ⭐ [APKEditor](https://github.com/REAndroid/APKEditor) by REAndroid, what makes it all possible
-* [simplezip](https://github.com/j506/simplezip) by j506 to help in fixing APK to patch with ReVanced
 * [Android port](https://github.com/MuntashirAkon/apksig-android) of apksig library by MuntashirAkon to sign APKs
 * [PseudoApkSigner](https://github.com/Aefyr/PseudoApkSigner) by Aefyr for backup signing on older Android versions
 * [AmbilWarna Color Picker](https://github.com/yukuku/ambilwarna)
 * [android-filepicker](https://github.com/singhangadin/android-filepicker) by Angad Singh for file picker on older Android versions
-  
-This project is tested with BrowserStack.
+
+## Permissions
+* Storage permissions - to be able to save files to the same directory as a split APK (this is an option in the app, the storage permission will only be requested upon selecting it)
+* QUERY_ALL_PACKAGES - to list apps installed on the device (see "Selecting from installed apps" in screenshots above)
+* REQUEST_INSTALL_PACKAGES - to show an install button allowing prompt to install an app after merging it
+* Internet permission - to check update for the app (can be disabled in settings)
+
+Feel free to request a build of the app with any of these permissions removed.
