@@ -10,8 +10,8 @@ android {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
         minSdk = 19
         targetSdk = 35
-        versionCode = 40
-        versionName = "2.1.2"
+        versionCode = 41
+        versionName = "2.1.3"
         multiDexEnabled = true
     }
 
@@ -34,7 +34,6 @@ android {
         viewBinding = false
     }
     dependencies {
-        implementation("org.apache.commons:commons-compress:1.24.0")
         coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
         implementation("com.google.android.material:material:1.12.0")
     }

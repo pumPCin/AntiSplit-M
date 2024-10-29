@@ -1,7 +1,6 @@
 package com.abdurazaaqmohammed.AntiSplit.main;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
@@ -9,24 +8,25 @@ import android.util.DisplayMetrics;
 
 import com.j256.simplezip.ZipFileInput;
 import com.j256.simplezip.format.ZipFileHeader;
+import com.reandroid.archive.ArchiveFile;
+import com.reandroid.archive.InputSource;
+import com.reandroid.archive.ZipEntryMap;
 import com.starry.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipFile;
+
 
 public class DeviceSpecsUtil {
 
     private final Context context;
     public final String lang;
     private final String densityType;
-    public static ZipFile zipFile = null;
+    public static ArchiveFile zipFile = null;
 
     public DeviceSpecsUtil(Context context) {
         this.context = context;
@@ -52,10 +52,10 @@ public class DeviceSpecsUtil {
             try(InputStream is = context.getContentResolver().openInputStream(splitAPKUri)) {
                 if(couldNotRead) FileUtils.copyFile(is, file = new File(context.getCacheDir(), file.getName()));
             }
-            Enumeration<ZipArchiveEntry> entries = (zipFile = new ZipFile(file)).getEntries();
+            ZipEntryMap entries = (zipFile = new ArchiveFile(file)).createZipEntryMap();
             // Do not close this ZipFile it could be used later in merger
-            while (entries.hasMoreElements()) {
-                String name = entries.nextElement().getName();
+            for(InputSource inputSource : entries.toArray()) {
+                String name = inputSource.getName();
                 if (name.endsWith(".apk"))  splits.add(name);
             }
         }
