@@ -8,14 +8,11 @@ on:
 
 jobs:
   build:
-    name: Release
-    permissions:
-      contents: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-      - uses: actions/checkout@v4
 
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
       - name: Set up JDK 8
         uses: actions/setup-java@v4
         with:
@@ -30,5 +27,5 @@ jobs:
         run: ./gradlew fatJar
       - uses: actions/upload-artifact@v4
         with:
-          name: APKEditor
+          name: AntiSplit-M
           path: build/libs
