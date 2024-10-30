@@ -26,7 +26,7 @@
     <string name="install">Install</string>
     <string name="label_parent_dir">…</string>
     <string name="label_parent_directory">Parent Directory</string>
-    <string name="lang">Language</string>
+    <string name="lang">Language (Язык)</string>
     <string name="lang_for_device">Select language for your device</string>
     <string name="last_edit">Last edited: </string>
     <string name="light_theme">Light theme</string>
