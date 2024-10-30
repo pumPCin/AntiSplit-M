@@ -27,6 +27,9 @@ jobs:
       - name: Cache Gradle
         uses: burrunan/gradle-cache-action@v2
 
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
       - name: Build
         run: ./gradlew fatJar
       - uses: actions/upload-artifact@v4
