@@ -29,6 +29,3 @@ jobs:
         with:
           name: app
           path: app/build/outputs/apk/*
-
-      - name: find apk
-        run: find / -type f -name "*.apk"
