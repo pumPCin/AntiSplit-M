@@ -1,88 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">AntiSplit M</string>
-    <string name="merge">Select split APK to Merge/AntiSplit</string>
-    <string name="success_saved">File saved successfully</string>
-    <string name="enable_logs" >Enable logs</string>
-    <string name="ask">Ask where to save the file each time (if disabled, save the merged APK to the same directory where the split file was from)</string>
-    <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
-    <string name="no_filepath">"Can\'t write to the filepath "</string>
-    <string name="output">"Output directory: "</string>
-    <string name="show_dialog">Show dialog allowing selection of which splits to include</string>
-    <string name="nothing">Nothing selected</string>
-    <string name="change_text_color">Change text color</string>
-    <string name="change_background_color">Change background color</string>
     <string name="all">Select All</string>
-    <string name="for_device">Select all splits for your device specifications</string>
-    <string name="lang_for_device">Select language for your device</string>
+    <string name="app_icon_list_label">App icon</string>
+    <string name="app_name">AntiSplit-M</string>
     <string name="arch_for_device">Select architecture for your device</string>
-    <string name="dpi_for_device">Select screen widths for your device</string>
-    <string name="select_splits">Select splits</string>
-    <string name="sign_apk">Sign the APK after merging</string>
+    <string name="ask">Ask where to save the file each time (if disabled, save the merged APK to the same directory where the split file was from)</string>
+    <string name="auto_update">Check for updates automatically</string>
     <string name="automatically_select">Automatically select splits for your device specifications</string>
-    <string name="sign_failed">Failed to sign APK, saving without signing</string>
-    <string name="signing">Signing APK…</string>
-    <string name="saving">Saving…</string>
+    <string name="black_theme">Black theme</string>
+    <string name="cancel">Cancel</string>
+    <string name="change_background_color">Change background color</string>
+    <string name="change_text_color">Change text color</string>
+    <string name="check_update_now">Check for update now</string>
+    <string name="close">Close</string>
+    <string name="copied_log">Copied log</string>
+    <string name="copy_log">Copy log</string>
+    <string name="create_issue">Create GitHub Issue</string>
+    <string name="dark_theme">Dark theme</string>
+    <string name="dl">Download</string>
+    <string name="dpi_for_device">Select screen widths for your device</string>
+    <string name="enable_logs" >Enable logs</string>
+    <string name="error_dir_access">Directory cannot be accessed</string>
+    <string name="for_device">Select all splits for your device specifications</string>
+    <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
+    <string name="install">Install</string>
+    <string name="label_parent_dir">…</string>
+    <string name="label_parent_directory">Parent Directory</string>
+    <string name="lang">Language</string>
+    <string name="lang_for_device">Select language for your device</string>
+    <string name="last_edit">Last edited: </string>
+    <string name="light_theme">Light theme</string>
+    <string name="merge">Select split APK to Merge/AntiSplit</string>
+    <string name="mismatch">The following splits (%1$s) have mismatched version codes. They are only language codes, so the app can run without them, but these languages will not work in the app. Do you want to continue with merging anyway?</string>
+    <string name="mismatch_base">" version code does not match that of base.apk"</string>
+    <string name="new_ver">New version of AntiSplit M is available</string>
+    <string name="no_filepath">"Can\'t write to the filepath "</string>
+    <string name="no_update_found">No update found</string>
+    <string name="not_apk">: Not an APK file</string>
+    <string name="nothing">Nothing selected</string>
+    <string name="output">"Output directory: "</string>
+    <string name="pairip_warning">The app you are trying to merge uses Pairip/Google加固 Integrity to protect it from modification. The merged version will crash on opening unless you know how to modify the APK to bypass it.</string>
+    <string name="pause">Pause button</string>
     <string name="removed_table_entry">"Removed table-entry : "</string>
     <string name="sanitizing_manifest">Sanitizing manifest…</string>
-    <string name="skipping">"Skipping "</string>
-    <string name="not_apk">: Not an APK file</string>
-    <string name="unselected">: Unselected</string>
+    <string name="saving">Saving…</string>
     <string name="searching">Searching apk files…</string>
-    <string name="cancel">Cancel</string>
     <string name="select">Select</string>
-    <string name="label_parent_directory">Parent Directory</string>
-    <string name="last_edit">Last edited: </string>
-    <string name="error_dir_access">Directory cannot be accessed</string>
-    <string name="lang" translatable="false">Language</string>
-    <string name="update">Update available</string>
-    <string name="new_ver">New version of AntiSplit M is available</string>
-    <string name="dl">Download</string>
-    <string name="auto_update">Check for updates automatically</string>
-    <string name="check_update_now">Check for update now</string>
-    <string name="no_update_found">No update found</string>
+    <string name="select_from_installed_apps">Select from Installed Apps</string>
+    <string name="select_splits">Select splits</string>
     <string name="settings">Settings</string>
-    <string name="close">Close</string>
-    <string name="mismatch">The following splits (%1$s) have mismatched version codes. They are only language codes, so the app can run without them, but these languages will not work in the app. Do you want to continue with merging anyway?</string>
+    <string name="show_dialog">Show dialog allowing selection of which splits to include</string>
+    <string name="sign_apk">Sign the APK after merging</string>
+    <string name="sign_failed">Failed to sign APK, saving without signing</string>
+    <string name="signing">Signing APK…</string>
+    <string name="skipping">"Skipping "</string>
+    <string name="success_saved">File saved successfully</string>
+    <string name="suffix">Suffix</string>
+    <string name="system_theme">System theme</string>
+    <string name="unselected">: Unselected</string>
+    <string name="update">Update available</string>
     <string name="warning">Warning</string>
-    <string name="mismatch_base">" version code does not match that of base.apk"</string>
     <string-array name="langs_display">
         <item>English</item>
-        <item>Español</item>
-        <item>Français</item>
-        <item>Bahasa Indonesia</item>
-        <item>Italiano</item>
-        <item>русский язык</item>
-        <item>Türkçe</item>
-        <item>українська мова</item>
-        <item>Português</item>
-        <item>العربية</item>
-        <item>Tiếng Việt</item>
+        <item>Русский</item>
     </string-array>
     <string-array name="langs">
         <item>en</item>
-        <item>es</item>
-        <item>fr</item>
-        <item>in</item>
-        <item>it</item>
         <item>ru</item>
-        <item>tr</item>
-        <item>uk</item>
-        <item>pt-BR</item>
-        <item>ar</item>
-        <item>vi</item>
     </string-array>
-    <string name="label_parent_dir" translatable="false">…</string>
-    <string name="create_issue">Create GitHub Issue</string>
-    <string name="copy_log">Copy log</string>
-    <string name="pause">Pause button</string>
-    <string name="copied_log">Copied log</string>
-    <string name="select_from_installed_apps">Select from Installed Apps</string>
-    <string name="app_icon_list_label">App icon</string>
-    <string name="install">Install</string>
-    <string name="black_theme">Black theme</string>
-    <string name="dark_theme">Dark theme</string>
-    <string name="light_theme">Light theme</string>
-    <string name="system_theme">System theme</string>
-    <string name="suffix">Suffix</string>
-    <string name="pairip_warning">The app you are trying to merge uses Pairip/Google加固 Integrity to protect it from modification. The merged version will crash on opening unless you know how to modify the APK to bypass it.</string>
 </resources>

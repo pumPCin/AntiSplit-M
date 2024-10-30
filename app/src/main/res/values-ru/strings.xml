@@ -1,38 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="all">Выбрать все</string>
-    <string name="arch_for_device">Выбор архитектуру для вашего устройства</string>
-    <string name="ask">Спрашивать где сохранить файл (если отключено, сохраняет APK в том же каталоге, из которого был Splits APK файл)</string>
-    <string name="automatically_select">Автоматический выбор в соответствии вашей архитектуры устройства</string>
+    <string name="all">Выбрать всё</string>
+    <string name="app_icon_list_label">Иконка приложения</string>
+    <string name="app_name">AntiSplit-M</string>
+    <string name="arch_for_device">Выбрать архитектуру под ваше устройство</string>
+    <string name="ask">Всегда спрашивать где сохранить файл (если отключено, сохраняет APK в каталоге Splits APK файла)</string>
+    <string name="auto_update">Автоматическая проверка обновлений</string>
+    <string name="automatically_select">Автоматически выбирать всё под ваше устройство</string>
+    <string name="black_theme">Чёрная</string>
     <string name="cancel">Отмена</string>
     <string name="change_background_color">Изменить цвет фона</string>
     <string name="change_text_color">Изменить цвет текста</string>
-    <string name="select">Выбрать</string>
-    <string name="dpi_for_device">Выбор ширину экрана для вашего устройства</string>
-    <string name="enable_logs">Включить журналы</string>
-    <string name="error_dir_access">Доступ к каталогу невозможен</string>
-    <string name="for_device">Выбор все в соответствии вашей архитектуры устройства</string>
-    <string name="grant_storage">Необходимо разрешение на хранение для сохранения в той же папке, что и выбранный файл</string>
+    <string name="check_update_now">Проверить обновления</string>
+    <string name="close">Закрыть</string>
+    <string name="copied_log">Журнал скопирован</string>
+    <string name="copy_log">Скопировать журнал</string>
+    <string name="create_issue">Создать Issue на GitHub</string>
+    <string name="dark_theme">Тёмная</string>
+    <string name="dl">Скачать</string>
+    <string name="dpi_for_device">Выбрать ширину экрана под ваше устройство</string>
+    <string name="enable_logs">Включить журнал</string>
+    <string name="error_dir_access">Нет доступа к каталогу</string>
+    <string name="for_device">Выбрать всё под ваше устройство</string>
+    <string name="grant_storage">Необходимо дать разрешение для сохранения в этой папке</string>
+    <string name="install">Установить</string>
+    <string name="label_parent_dir">..</string>
     <string name="label_parent_directory">Родительский каталог</string>
-	<string name="lang">Язык</string>								 
-    <string name="lang_for_device">Выбор язык для вашего устройства</string>
+    <string name="lang">Язык</string>
+    <string name="lang_for_device">Выбрать язык под ваше устройство</string>
     <string name="last_edit">Последнее редактирование:</string>
-    <string name="merge">Выберите (Split APK) для объединения/антиразделения</string>
+    <string name="light_theme">Светлая</string>
+    <string name="merge">Выберите Split APK для объединения/антиразделения</string>
+    <string name="mismatch">The following splits (%1$s) have mismatched version codes. They are only language codes, so the app can run without them, but these languages will not work in the app. Do you want to continue with merging anyway?</string>
+    <string name="mismatch_base">" version code does not match that of base.apk"</string>
+    <string name="new_ver">Доступна новая версия AntiSplit-M !!!</string>
     <string name="no_filepath">Не удалось найти путь к выбранному файлу</string>
-    <string name="not_apk">: Не APK-файл</string>
+    <string name="no_update_found">Обновление не найдено</string>
+    <string name="not_apk">: это не APK-файл</string>
     <string name="nothing">Ничего не выбрано</string>
     <string name="output">"Выходной каталог: "</string>
-    <string name="removed_table_entry">"Удалена запись в таблице : "</string>
-    <string name="sanitizing_manifest">Санитарная обработка манифеста…</string>
+    <string name="pairip_warning">The app you are trying to merge uses Pairip/Google加固 Integrity to protect it from modification. The merged version will crash on opening unless you know how to modify the APK to bypass it.</string>
+    <string name="pause">Пауза</string>
+    <string name="removed_table_entry">"Удалена запись в таблице: "</string>
+    <string name="sanitizing_manifest">Очистка manifest…</string>
     <string name="saving">Сохранение…</string>
-    <string name="searching">Поиск apk-файлов…</string>
+    <string name="searching">Поиск файлов APK…</string>
+    <string name="select">Выбрать</string>
+    <string name="select_from_installed_apps">Выбрать из уже установленных приложений</string>
     <string name="select_splits">Выбрать Splits</string>
-    <string name="show_dialog">Показать диалоговое окно, позволяющее выбрать, какие Splits APK включить</string>
+    <string name="settings">Настройки</string>
+    <string name="show_dialog">Показать диалоговое окно для выбора частей Splits</string>
     <string name="sign_apk">Подписать APK после слияния</string>
     <string name="sign_failed">Не удалось подписать APK, сохранено без подписи</string>
-    <string name="signing">Подпись APK…</string>
+    <string name="signing">Подписание APK…</string>
     <string name="skipping">"Пропуск "</string>
-    <string name="success_saved">Файл успешно сохранен</string>
-    <string name="unselected">: Не выбрано</string>
+    <string name="success_saved">Файл сохранён</string>
     <string name="suffix">Суффикс</string>
+    <string name="system_theme">Как в системе</string>
+    <string name="unselected">: не выбран</string>
+    <string name="update">Доступно обновление</string>
+    <string name="warning">Предупреждение</string>
+    <string-array name="langs_display">
+        <item>English</item>
+        <item>Русский</item>
+    </string-array>
+    <string-array name="langs">
+        <item>en</item>
+        <item>ru</item>
+    </string-array>
 </resources>
