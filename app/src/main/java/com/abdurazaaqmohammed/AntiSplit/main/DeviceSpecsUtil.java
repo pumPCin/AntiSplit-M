@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 
 public class DeviceSpecsUtil {
@@ -34,33 +35,40 @@ public class DeviceSpecsUtil {
         this.densityType = getDeviceDpi();
     }
 
+    private List<String> getListOfSplitsFromFile(File file) throws IOException {
+        List<String> splits = new ArrayList<>();
+        // Do not close this ZipFile it could be used later in merger
+        (zipFile = new ArchiveFile(file)).createZipEntryMap().forEach(inputSource -> {
+            String name = inputSource.getName();
+            if (name.endsWith(".apk")) splits.add(name);
+        });
+
+        return splits;
+    }
+
     public List<String> getListOfSplits(Uri splitAPKUri) throws IOException {
         List<String> splits = new ArrayList<>();
+        File file = new File(FileUtils.getPath(splitAPKUri, context));
+        if(file.canRead()) return getListOfSplitsFromFile(file);
 
-        try (InputStream is = FileUtils.getInputStream(splitAPKUri, context);
+        try (InputStream is = context.getContentResolver().openInputStream(splitAPKUri);
                 ZipFileInput zis = new ZipFileInput(is)) {
             ZipFileHeader header;
             while ((header = zis.readFileHeader()) != null) {
                 final String name = header.getFileName();
                 if (name.endsWith(".apk")) splits.add(name);
             }
-        }
-
-        if(splits.size() < 2) {
-            File file = new File(FileUtils.getPath(splitAPKUri, context));
-            boolean couldNotRead = !file.canRead();
+        } catch (Exception e) {
             try(InputStream is = context.getContentResolver().openInputStream(splitAPKUri)) {
-                if(couldNotRead) FileUtils.copyFile(is, file = new File(context.getCacheDir(), file.getName()));
-            }
-            ZipEntryMap entries = (zipFile = new ArchiveFile(file)).createZipEntryMap();
-            // Do not close this ZipFile it could be used later in merger
-            for(InputSource inputSource : entries.toArray()) {
-                String name = inputSource.getName();
-                if (name.endsWith(".apk"))  splits.add(name);
+                FileUtils.copyFile(is, file = new File(context.getCacheDir(), file.getName()));
+                return getListOfSplitsFromFile(file);
             }
         }
-
-        return splits;
+        if(splits.size() > 1) return splits;
+        try(InputStream is = context.getContentResolver().openInputStream(splitAPKUri)) {
+            FileUtils.copyFile(is, file = new File(context.getCacheDir(), file.getName()));
+            return getListOfSplitsFromFile(file);
+        }
     }
 
     public static boolean isArch(String thisSplit) {
