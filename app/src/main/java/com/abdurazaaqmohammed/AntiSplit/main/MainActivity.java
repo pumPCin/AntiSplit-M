@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
         boolean dark = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
         setTheme(theme = settings.getInt("theme", dark
-                    ? com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar));
+                ? com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar));
 
         DeviceSpecsUtil = new DeviceSpecsUtil(this);
 
@@ -208,9 +208,9 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             EditText searchBar = dialogView.findViewById(R.id.search_bar);
 
             View clearButton = dialogView.findViewById(R.id.clear_button);
-    //            if(theme == R.style.Theme_MyApp_Black)
+            //            if(theme == R.style.Theme_MyApp_Black)
             clearButton.setOnClickListener(v -> searchBar.setText(""));
-    //            else dialogView.<TextInputLayout>findViewById(R.id.tilly).setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
+            //            else dialogView.<TextInputLayout>findViewById(R.id.tilly).setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
 
             searchBar.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -290,9 +290,9 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             MaterialButtonToggleGroup themeButtons = settingsDialog.findViewById(R.id.themeToggleGroup);
             themeButtons.check(
                     systemTheme ? R.id.systemThemeButton :
-                    theme == com.google.android.material.R.style.Theme_Material3_Light_NoActionBar ? R.id.lightThemeButton :
-                    theme == com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar ? R.id.darkThemeButton :
-                    R.id.blackThemeButton
+                            theme == com.google.android.material.R.style.Theme_Material3_Light_NoActionBar ? R.id.lightThemeButton :
+                                    theme == com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar ? R.id.darkThemeButton :
+                                            R.id.blackThemeButton
             );
             themeButtons.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
                 if (isChecked) {
@@ -484,8 +484,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
     public static boolean doesNotHaveStoragePerm(Context context) {
         return Build.VERSION.SDK_INT > 22 && (LegacyUtils.supportsWriteExternalStorage ?
-            context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED :
-            !Environment.isExternalStorageManager());
+                context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED :
+                !Environment.isExternalStorageManager());
     }
 
     @Override
@@ -510,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
     NestedScrollView scrollView;
 
     @Override
-        public void onLog(CharSequence msg) {
+    public void onLog(CharSequence msg) {
         runOnUiThread(() -> {
             logField.append(new StringBuilder(msg).append('\n'));
             scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
@@ -641,12 +641,12 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                         }
                     }
                     Merger.run(
-                        activity.urisAreSplitApks ? activity.splitAPKUri : null,
-                        cacheDir,
-                        uris[0],
-                        activity,
-                        splits,
-                        signApk);
+                            activity.urisAreSplitApks ? activity.splitAPKUri : null,
+                            cacheDir,
+                            uris[0],
+                            activity,
+                            splits,
+                            signApk);
                 } else try(ApkBundle bundle = new ApkBundle()) {
                     bundle.loadApkDirectory(new File(activity.getPackageManager().getPackageInfo(packageNameFromAppList, 0).applicationInfo.sourceDir).getParentFile(), false, activity);
                     Merger.run(bundle, cacheDir, uris[0], activity, signApk);
@@ -686,7 +686,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             }
             else {
                 loadingImage.setVisibility(View.GONE);
-              //  loadingImage.clearAnimation();
+                //  loadingImage.clearAnimation();
             }
         });
     }
@@ -861,12 +861,12 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     title.setTextSize(size);
                     title.setGravity(Gravity.CENTER);
                     activity.runOnUiThread(new MaterialAlertDialogBuilder(activity).setCustomTitle(title).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
-                                    if (Build.VERSION.SDK_INT < 29) activity.checkStoragePerm();
-                                    ((DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(Uri.parse(link))
-                                    .setTitle(filename).setDescription(filename).setMimeType("application/vnd.android.package-archive")
-                                    .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
-                                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED));
-                                }).setNegativeButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest")))).setNeutralButton(rss.getString(R.string.cancel), null).create()::show);
+                        if (Build.VERSION.SDK_INT < 29) activity.checkStoragePerm();
+                        ((DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(Uri.parse(link))
+                                .setTitle(filename).setDescription(filename).setMimeType("application/vnd.android.package-archive")
+                                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
+                                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED));
+                    }).setNegativeButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest")))).setNeutralButton(rss.getString(R.string.cancel), null).create()::show);
                 } else if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show());
             } catch (Exception ignored) {
                 if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, "Failed to check for update", Toast.LENGTH_SHORT).show());
@@ -983,7 +983,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             styleAlertDialog(ad);
             for (int i = 5; i < apkNames.length; i++) {
                 if (com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isBaseApk(apkNames[i])) {
-                    ad.getListView().setItemChecked(i, true);
+                    ad.getListView().setItemChecked(i, checkedItems[i] = true);
                     break;
                 }
             }
