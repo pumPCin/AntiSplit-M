@@ -18,6 +18,7 @@ package com.android.apksig.internal.apk.v4;
 
 import static com.android.apksig.internal.apk.ApkSigningBlockUtils.toHex;
 
+import com.abdurazaaqmohammed.utils.FileUtils;
 import com.android.apksig.ApkVerifier;
 import com.android.apksig.ApkVerifier.Issue;
 import com.android.apksig.internal.apk.ApkSigningBlockUtils;
@@ -26,10 +27,8 @@ import com.android.apksig.internal.apk.SignatureAlgorithm;
 import com.android.apksig.internal.util.GuaranteedEncodedFormX509Certificate;
 import com.android.apksig.internal.util.X509CertificateUtils;
 import com.android.apksig.util.DataSource;
-import com.starry.FileUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidAlgorithmParameterException;

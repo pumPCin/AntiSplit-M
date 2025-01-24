@@ -22,6 +22,7 @@
     <string name="enable_logs" >Enable logs</string>
     <string name="error_dir_access">Directory cannot be accessed</string>
     <string name="for_device">Select all splits for your device specifications</string>
+    <string name="force">Force merging mismatched splits (with different versionCode or package name)</string>
     <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
     <string name="install">Install</string>
     <string name="label_parent_dir">…</string>

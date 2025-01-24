@@ -10,8 +10,8 @@ android {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
         minSdk = 19
         targetSdk = 35
-        versionCode = 42
-        versionName = "2.1.4"
+        versionCode = 43
+        versionName = "2.1.5"
         multiDexEnabled = true
     }
 
@@ -36,6 +36,7 @@ android {
     dependencies {
         coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
         implementation("com.google.android.material:material:1.12.0")
+        implementation(files("libs/APKEditor.jar"))
     }
     dependenciesInfo {
         // Disables dependency metadata when building APKs.

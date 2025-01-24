@@ -2,8 +2,7 @@ package com.abdurazaaqmohammed.AntiSplit.main;
 
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
 import static android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
-import static com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils.aboveSdk20;
-import static com.reandroid.apkeditor.merge.LogUtil.logEnabled;
+import static com.abdurazaaqmohammed.utils.LegacyUtils.aboveSdk20;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -64,6 +63,9 @@ import androidx.core.view.WindowCompat;
 import androidx.core.widget.NestedScrollView;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
+import com.abdurazaaqmohammed.utils.DeviceSpecsUtil;
+import com.abdurazaaqmohammed.utils.LegacyUtils;
+import com.abdurazaaqmohammed.utils.RunUtil;
 import com.fom.storage.media.AndroidXI;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.color.DynamicColors;
@@ -72,9 +74,8 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
+import com.reandroid.apk.APKLogger;
 import com.reandroid.apk.ApkBundle;
-import com.reandroid.apkeditor.merge.LogUtil;
-import com.reandroid.apkeditor.merge.Merger;
 import com.starry.FileUtils;
 
 import java.io.BufferedReader;
@@ -96,23 +97,26 @@ import java.util.Objects;
 import com.github.paul035.LocaleHelper;
 
 /** @noinspection deprecation*/
-public class MainActivity extends AppCompatActivity implements Merger.LogListener {
-    private static boolean ask = true;
-    private static boolean showDialog;
-    private static boolean signApk;
-    private static boolean selectSplitsForDevice;
+public class MainActivity extends AppCompatActivity {
+    private boolean ask = true;
+    private boolean showDialog;
+    private boolean signApk;
+    private boolean selectSplitsForDevice;
     private Uri splitAPKUri;
     private ArrayList<Uri> uris;
     private boolean urisAreSplitApks = true;
-    public static boolean errorOccurred;
-    public static boolean checkForUpdates;
-    public static String lang;
-    public static int theme;
-    public static int sortMode;
-    public DeviceSpecsUtil DeviceSpecsUtil;
+    private boolean errorOccurred;
+    private boolean checkForUpdates;
+    private boolean logEnabled;
+    private boolean force;
+    private String lang;
+    private int theme;
+    private int sortMode;
+    private DeviceSpecsUtil deviceSpecsUtil;
     private String pkgName;
-    private static String suffix;
+    private String suffix;
     private boolean systemTheme;
+    public static Resources rss;
 
     public Handler getHandler() {
         return handler;
@@ -132,12 +136,36 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         setTheme(theme = settings.getInt("theme", dark
                 ? com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar));
 
-        DeviceSpecsUtil = new DeviceSpecsUtil(this);
+        deviceSpecsUtil = new DeviceSpecsUtil(this);
 
         setContentView(R.layout.activity_main);
-        if(theme == R.style.Theme_MyApp_Black) findViewById(R.id.main).setBackgroundColor(Color.BLACK);
+
+        TextView logField = findViewById(R.id.logField);
         scrollView = findViewById(R.id.scrollView);
-        logField = findViewById(R.id.logField);
+        logger = new APKLogger() {
+            @Override
+            public void logMessage(String s) {
+                if(logEnabled) {
+                    handler.post(() -> logField.append(new StringBuilder(s).append('\n')));
+                    scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
+                }
+            }
+
+            @Override
+            public void logError(String s, Throwable throwable) {
+                showError(throwable);
+            }
+
+            @Override
+            public void logVerbose(String s) {
+                if(logEnabled) {
+                    handler.post(() -> logField.append(new StringBuilder(s).append('\n')));
+                    scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
+                }
+            }
+        };
+
+        if(theme == R.style.Theme_MyApp_Black) findViewById(R.id.main).setBackgroundColor(Color.BLACK);
         suffix = settings.getString("suffix", "_antisplit");
         lang = settings.getString("lang", "en");
         if(lang.equals(Locale.getDefault().getLanguage())) rss = getResources();
@@ -157,13 +185,13 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         // Fetch settings from SharedPreferences
         if(checkForUpdates = settings.getBoolean("checkForUpdates", true)) new CheckForUpdatesTask(this, false).execute();
         signApk = settings.getBoolean("signApk", true);
+        force = settings.getBoolean("force", false);
         showDialog = settings.getBoolean("showDialog", false);
         selectSplitsForDevice = settings.getBoolean("selectSplitsForDevice", false);
         logEnabled = settings.getBoolean("logEnabled", true);
         ask = settings.getBoolean("ask", true);
         systemTheme = settings.getBoolean("systemTheme", true);
         sortMode = settings.getInt("sortMode", 0);
-        LogUtil.setLogListener(this);
 
         View selectFromInstalledApps = findViewById(R.id.fromAppsButton);
         if(aboveSdk20) selectFromInstalledApps.setOnClickListener(v3 -> {
@@ -265,6 +293,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             ((TextView) settingsDialog.findViewById(R.id.ask)).setText(rss.getString(R.string.ask));
             ((TextView) settingsDialog.findViewById(R.id.showDialogToggle)).setText(rss.getString(R.string.show_dialog));
             ((TextView) settingsDialog.findViewById(R.id.signToggle)).setText(rss.getString(R.string.sign_apk));
+            ((TextView) settingsDialog.findViewById(R.id.forceToggle)).setText(rss.getString(R.string.force));
             ((TextView) settingsDialog.findViewById(R.id.selectSplitsForDeviceToggle)).setText(rss.getString(R.string.automatically_select));
             ((TextView) settingsDialog.findViewById(R.id.updateToggle)).setText(rss.getString(R.string.auto_update));
             ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.check_update_now));
@@ -294,6 +323,9 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                                     theme == com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar ? R.id.darkThemeButton :
                                             R.id.blackThemeButton
             );
+
+            //if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O) settingsDialog.findViewById(R.id.blackThemeButton).setVisibility(View.GONE);
+
             themeButtons.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
                 if (isChecked) {
                     systemTheme = false;
@@ -333,6 +365,10 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             CompoundButton signToggle = settingsDialog.findViewById(R.id.signToggle);
             signToggle.setChecked(signApk);
             signToggle.setOnCheckedChangeListener((buttonView, isChecked) -> signApk = isChecked);
+
+            CompoundButton forceToggle = settingsDialog.findViewById(R.id.forceToggle);
+            forceToggle.setChecked(force);
+            forceToggle.setOnCheckedChangeListener((buttonView, isChecked) -> force = isChecked);
 
             CompoundButton selectSplitsAutomaticallySwitch = settingsDialog.findViewById(R.id.selectSplitsForDeviceToggle);
             CompoundButton showDialogSwitch = settingsDialog.findViewById(R.id.showDialogToggle);
@@ -414,10 +450,16 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         Window w = ad.getWindow();
         if(w != null) {
             GradientDrawable border = new GradientDrawable();
-            border.setColor(theme == com.google.android.material.R.style.Theme_Material3_Light_NoActionBar ? Color.WHITE : Color.BLACK); // Background color
-            TypedValue typedValue = new TypedValue();
-            getTheme().resolveAttribute(android.R.attr.colorPrimary, typedValue, true);
-            border.setStroke(5, typedValue.data); // Border width and color
+            boolean light = theme == com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
+            border.setColor(light ? Color.WHITE : Color.BLACK); // Background color
+
+            // Border width and color
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                TypedValue typedValue = new TypedValue();
+                getTheme().resolveAttribute(android.R.attr.colorPrimary, typedValue, true);
+                border.setStroke(5, typedValue.data);
+            } else border.setStroke(5, light ? Color.BLACK : Color.WHITE);
+
             border.setCornerRadius(24);
             w.setBackgroundDrawable(border);
             double m = 0.8;
@@ -444,8 +486,6 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         }
     }
 
-    public static Resources rss;
-
     private void updateLang(Resources res, ScrollView settingsDialog) {
         rss = res;
         this.<TextView>findViewById(R.id.decodeButton).setText(res.getString(R.string.merge));
@@ -461,10 +501,11 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             ((TextView) settingsDialog.findViewById(R.id.ask)).setText(res.getString(R.string.ask));
             ((TextView) settingsDialog.findViewById(R.id.showDialogToggle)).setText(res.getString(R.string.show_dialog));
             ((TextView) settingsDialog.findViewById(R.id.signToggle)).setText(res.getString(R.string.sign_apk));
+            ((TextView) settingsDialog.findViewById(R.id.forceToggle)).setText(res.getString(R.string.sign_apk));
             ((TextView) settingsDialog.findViewById(R.id.selectSplitsForDeviceToggle)).setText(res.getString(R.string.automatically_select));
             ((TextView) settingsDialog.findViewById(R.id.updateToggle)).setText(res.getString(R.string.auto_update));
             ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(res.getString(R.string.check_update_now));
-            ((TextInputLayout) settingsDialog.findViewById(R.id.suffixLayout)).setHint(rss.getString(R.string.suffix));
+            ((TextInputLayout) settingsDialog.findViewById(R.id.suffixLayout)).setHint(res.getString(R.string.suffix));
         }
     }
 
@@ -495,6 +536,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 .putBoolean("ask", ask)
                 .putBoolean("showDialog", showDialog)
                 .putBoolean("signApk", signApk)
+                .putBoolean("force", force)
                 .putBoolean("systemTheme", systemTheme)
                 .putBoolean("selectSplitsForDevice", selectSplitsForDevice)
                 .putInt("theme", theme)
@@ -506,21 +548,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         super.onPause();
     }
 
-    TextView logField;
     NestedScrollView scrollView;
-
-    @Override
-    public void onLog(CharSequence msg) {
-        runOnUiThread(() -> {
-            logField.append(new StringBuilder(msg).append('\n'));
-            scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
-        });
-    }
-
-    @Override
-    public void onLog(int resID) {
-        onLog(rss.getString(resID));
-    }
 
     private Handler handler;
 
@@ -540,7 +568,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         if (children.length == 0) appFolder.delete();
         else {
             for (File child : children) if (child.isFile() && child.length() == 0) child.delete();
-            if (appFolder.listFiles().length == 0) appFolder.delete();
+            File[] remainingChildren = appFolder.listFiles();
+            if (remainingChildren == null || remainingChildren.length == 0) appFolder.delete();
         }
     }
 
@@ -553,31 +582,26 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
     private List<String> splitsToUse = null;
 
-    private static class ProcessTask extends AsyncTask<Uri, Void, Void> {
-        private final WeakReference<MainActivity> activityReference;
-        private final DeviceSpecsUtil DeviceSpecsUtil;
-        private final String packageNameFromAppList;
-        // only retain a weak reference to the activity
-        ProcessTask(MainActivity context, com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil deviceSpecsUtil, String fromAppList) {
-            activityReference = new WeakReference<>(context);
-            DeviceSpecsUtil = deviceSpecsUtil;
-            this.packageNameFromAppList = fromAppList;
-            toggleAnimation(context, true);
-        }
+    private RunUtil runUtil;
 
-        @Override
-        protected Void doInBackground(Uri... uris) {
-            MainActivity activity = activityReference.get();
-            if (activity == null) return null;
+    private RunUtil getRunUtil() {
+        if(runUtil == null) runUtil = new RunUtil(handler, this, null);
+        return runUtil;
+    }
 
-            final File cacheDir = activity.getCacheDir();
-            if (cacheDir != null && activity.urisAreSplitApks) deleteDir(cacheDir);
+    private void process(Uri outputUri) {
+        findViewById(R.id.installButton).setVisibility(View.GONE);
+
+        getRunUtil().runInBackground(() -> {
+            errorOccurred = false; // reset to make sure success message shows
+            final File cacheDir = MainActivity.this.getCacheDir();
+            if (cacheDir != null && MainActivity.this.urisAreSplitApks) deleteDir(cacheDir);
             try {
-                if(TextUtils.isEmpty(packageNameFromAppList)) {
-                    List<String> splits = activity.splitsToUse;
-                    if (activity.urisAreSplitApks) {
+                if (TextUtils.isEmpty(pkgName)) {
+                    List<String> splits = MainActivity.this.splitsToUse;
+                    if (MainActivity.this.urisAreSplitApks) {
                         if (selectSplitsForDevice) {
-                            splits = DeviceSpecsUtil.getListOfSplits(activity.splitAPKUri);
+                            splits = deviceSpecsUtil.getListOfSplits(MainActivity.this.splitAPKUri);
                             switch (splits.size()) {
                                 case 4:
                                 case 3:
@@ -590,26 +614,26 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                                     boolean splitApkContainsArch = false;
                                     for (int i = 0; i < splits.size(); i++) {
                                         final String thisSplit = splits.get(i);
-                                        if (!splitApkContainsArch && com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isArch(thisSplit)) {
+                                        if (!splitApkContainsArch && DeviceSpecsUtil.isArch(thisSplit)) {
                                             splitApkContainsArch = true;
                                         }
-                                        if (DeviceSpecsUtil.shouldIncludeSplit(thisSplit))
+                                        if (deviceSpecsUtil.shouldIncludeSplit(thisSplit))
                                             toRemove.add(thisSplit);
                                     }
                                     if (splitApkContainsArch) {
                                         boolean selectedSplitsContainsArch = false;
                                         for (int i = 0; i < copy.size(); i++) {
                                             final String thisSplit = copy.get(i);
-                                            if (com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isArch(thisSplit) && toRemove.contains(thisSplit)) {
+                                            if (DeviceSpecsUtil.isArch(thisSplit) && toRemove.contains(thisSplit)) {
                                                 selectedSplitsContainsArch = true;
                                                 break;
                                             }
                                         }
                                         if (!selectedSplitsContainsArch) {
-                                            LogUtil.logMessage("Could not find device architecture, selecting all architectures");
+                                            logger.logMessage("Could not find device architecture, selecting all architectures");
                                             for (int i = 0; i < splits.size(); i++) {
                                                 final String thisSplit = splits.get(i);
-                                                if (com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isArch(thisSplit))
+                                                if (DeviceSpecsUtil.isArch(thisSplit))
                                                     toRemove.add(thisSplit); // select all to be sure
                                             }
                                         }
@@ -626,7 +650,8 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                                     if (didNotFindDpi) {
                                         for (int i = 0; i < splits.size(); i++) {
                                             String thisSplit = splits.get(i);
-                                            if (thisSplit.contains("hdpi")) toRemove.add(thisSplit);
+                                            if (thisSplit.contains("hdpi"))
+                                                toRemove.add(thisSplit);
                                         }
                                     }
                                     splits.removeAll(toRemove);
@@ -634,47 +659,68 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                         }
                     } else {
                         // These are the splits from inside the APK, just copy the splits to cache folder
-                        for (Uri uri : activity.uris) {
-                            try (InputStream is = FileUtils.getInputStream(uri, activity)) {
-                                FileUtils.copyFile(is, new File(cacheDir, getOriginalFileName(activity, uri)));
+                        for (Uri uri : MainActivity.this.uris) {
+                            try (InputStream is = FileUtils.getInputStream(uri, MainActivity.this)) {
+                                com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, new File(cacheDir, getOriginalFileName(MainActivity.this, uri)));
                             }
                         }
                     }
-                    Merger.run(
-                            activity.urisAreSplitApks ? activity.splitAPKUri : null,
+                    com.reandroid.Merger.run(
+                            MainActivity.this.urisAreSplitApks ? MainActivity.this.splitAPKUri : null,
                             cacheDir,
-                            uris[0],
-                            activity,
+                            outputUri,
+                            MainActivity.this,
                             splits,
-                            signApk);
-                } else try(ApkBundle bundle = new ApkBundle()) {
-                    bundle.loadApkDirectory(new File(activity.getPackageManager().getPackageInfo(packageNameFromAppList, 0).applicationInfo.sourceDir).getParentFile(), false, activity);
-                    Merger.run(bundle, cacheDir, uris[0], activity, signApk);
+                            signApk, MainActivity.this.force);
+                } else try (ApkBundle bundle = new ApkBundle()) {
+                    bundle.loadApkDirectory(new File(MainActivity.this.getPackageManager().getPackageInfo(pkgName, 0).applicationInfo.sourceDir).getParentFile());
+                    com.reandroid.Merger.run(bundle, cacheDir, outputUri, MainActivity.this, signApk, MainActivity.this.force);
                 }
+                toggleAnimation(MainActivity.this, false);
+                return true;
             } catch (Exception e) {
-                activity.showError(e);
+                MainActivity.this.showError(e);
+                return false;
             }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            MainActivity activity = activityReference.get();
-            toggleAnimation(activity, false);
-            activity.pkgName = null;
-            if(activity.urisAreSplitApks) activity.getHandler().post(() -> {
+        }, () -> {
+            MainActivity.this.pkgName = null;
+            if(MainActivity.this.urisAreSplitApks) MainActivity.this.getHandler().post(() -> {
                 try {
-                    activity.uris.remove(0);
-                    activity.splitAPKUri = activity.uris.get(0);
-                    if(showDialog) activity.showApkSelectionDialog();
-                    else activity.selectDirToSaveAPKOrSaveNow();
+                    MainActivity.this.uris.remove(0);
+                    MainActivity.this.splitAPKUri = MainActivity.this.uris.get(0);
+                    if(showDialog) MainActivity.this.showApkSelectionDialog();
+                    else MainActivity.this.selectDirToSaveAPKOrSaveNow();
                 } catch (IndexOutOfBoundsException | NullPointerException ignored) {
                     // End of list, I don't know why but isEmpty is not working
-                    activity.showSuccess();
+                    MainActivity.this.showSuccess();
                 }
             });
-            else activity.showSuccess();
-        }
+            else MainActivity.this.showSuccess();
+        }, true);
+
+        LinearLayout fabs = findViewById(R.id.fabs);
+        fabs.setAlpha(0.5f);
+        View cancelButton = findViewById(R.id.cancelButton);
+        cancelButton.setVisibility(View.VISIBLE);
+        cancelButton.setOnClickListener(v -> {
+            try {
+                if(doesNotHaveStoragePerm(this)) AndroidXI.getInstance().with(this).delete(launcher, outputUri);
+                else if(new File(FileUtils.getPath(outputUri, this)).delete()) logger.logMessage("Cleaned output file " + getOriginalFileName(this, outputUri));
+            } catch (Exception ignored) {}
+            Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+            if (intent == null) {
+                intent = getIntent();
+                finish();
+                startActivity(intent);
+            } else {
+                startActivity(Intent.makeRestartActivityTask(intent.getComponent()));
+                Runtime.getRuntime().exit(0);
+            }
+        });
+
+        View copyButton = findViewById(R.id.copyButton);
+        copyButton.setVisibility(View.VISIBLE);
+        copyButton.setOnClickListener(v -> copyText(new StringBuilder().append(((TextView) findViewById(R.id.logField)).getText()).append('\n').append(((TextView) findViewById(R.id.errorField)).getText())));
     }
 
     public static void toggleAnimation(MainActivity context, boolean on) {
@@ -729,46 +775,16 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 break;
             case 2:
                 // going to process and save a file now
-                logField.setText("");
+                ((TextView) findViewById(R.id.logField)).setText("");
                 process(data.getData());
                 break;
         }
     }
     private final ActivityResultLauncher<IntentSenderRequest> launcher = registerForActivityResult(
-            new ActivityResultContracts.StartIntentSenderForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) LogUtil.logMessage("Deleted ");
-            });
-
-    private void process(Uri outputUri) {
-        findViewById(R.id.installButton).setVisibility(View.GONE);
-        ProcessTask processTask = new ProcessTask(this, DeviceSpecsUtil, pkgName);
-        processTask.execute(outputUri);
-        LinearLayout fabs = findViewById(R.id.fabs);
-        fabs.setAlpha(0.5f);
-        View cancelButton = findViewById(R.id.cancelButton);
-        cancelButton.setVisibility(View.VISIBLE);
-        cancelButton.setOnClickListener(v -> {
-            try {
-                if(doesNotHaveStoragePerm(this)) AndroidXI.getInstance().with(this).delete(launcher, outputUri);
-                else if(new File(FileUtils.getPath(outputUri, this)).delete()) LogUtil.logMessage("Cleaned output file " + getOriginalFileName(this, outputUri));
-            } catch (Exception ignored) {}
-            Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
-            if (intent == null) {
-                processTask.cancel(true);
-                intent = getIntent();
-                finish();
-                startActivity(intent);
-            } else {
-                startActivity(Intent.makeRestartActivityTask(intent.getComponent()));
-                Runtime.getRuntime().exit(0);
-            }
+        new ActivityResultContracts.StartIntentSenderForResult(),
+        result -> {
+            if (result.getResultCode() == Activity.RESULT_OK) logger.logMessage("Deleted ");
         });
-
-        View copyButton = findViewById(R.id.copyButton);
-        copyButton.setVisibility(View.VISIBLE);
-        copyButton.setOnClickListener(v -> copyText(new StringBuilder().append(logField.getText()).append('\n').append(((TextView) findViewById(R.id.errorField)).getText())));
-    }
 
     private static class CheckForUpdatesTask extends AsyncTask<Void, Void, String[]> {
         private final WeakReference<MainActivity> context;
@@ -876,7 +892,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
     public void showApkSelectionDialog() {
         try {
-            List<String> splits = DeviceSpecsUtil.getListOfSplits(splitAPKUri);
+            List<String> splits = deviceSpecsUtil.getListOfSplits(splitAPKUri);
             Collections.sort(splits, Comparator.comparing(splitName -> splitName.toLowerCase(Locale.ROOT)));
             final int initialSize = splits.size();
             String[] apkNames = new String[initialSize + 5];
@@ -902,7 +918,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     case 1:
                         // device specs option
                         for (int i = 5; i < checkedItems.length; i++) {
-                            ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = (isChecked && DeviceSpecsUtil.shouldIncludeSplit(apkNames[i])));
+                            ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = (isChecked && deviceSpecsUtil.shouldIncludeSplit(apkNames[i])));
                         }
                         boolean didNotFindAppropriateDpi = true;
                         for (int i = 5; i < checkedItems.length; i++) {
@@ -923,14 +939,14 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     case 2:
                         //arch for device
                         for (int i = 5; i < checkedItems.length; i++) {
-                            if (DeviceSpecsUtil.shouldIncludeArch(apkNames[i]))
+                            if (deviceSpecsUtil.shouldIncludeArch(apkNames[i]))
                                 ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
                         }
                         break;
                     case 3:
                         //dpi for device
                         for (int i = 5; i < checkedItems.length; i++) {
-                            if (DeviceSpecsUtil.shouldIncludeDpi(apkNames[i]))
+                            if (deviceSpecsUtil.shouldIncludeDpi(apkNames[i]))
                                 ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
                         }
                         boolean didNotFoundAppropriateDpi = true;
@@ -952,7 +968,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                     case 4:
                         //lang for device
                         for (int i = 5; i < checkedItems.length; i++) {
-                            if (DeviceSpecsUtil.shouldIncludeLang(apkNames[i]))
+                            if (deviceSpecsUtil.shouldIncludeLang(apkNames[i]))
                                 ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
                         }
                         break;
@@ -961,7 +977,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                         if (!isChecked)
                             listView.setItemChecked(0, checkedItems[0] = false); // Uncheck "Select All" if any individual item is unchecked
                         for (int i = 1; i <= 4; i++) {
-                            if (checkedItems[i] && !DeviceSpecsUtil.shouldIncludeSplit(apkNames[which])) {
+                            if (checkedItems[i] && !deviceSpecsUtil.shouldIncludeSplit(apkNames[which])) {
                                 listView.setItemChecked(i, checkedItems[i] = false); // uncheck device arch if non device arch selected
                             }
                         }
@@ -982,7 +998,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
             }).setNegativeButton("Cancel", null).create();
             styleAlertDialog(ad);
             for (int i = 5; i < apkNames.length; i++) {
-                if (com.abdurazaaqmohammed.AntiSplit.main.DeviceSpecsUtil.isBaseApk(apkNames[i])) {
+                if (DeviceSpecsUtil.isBaseApk(apkNames[i])) {
                     ad.getListView().setItemChecked(i, checkedItems[i] = true);
                     break;
                 }
@@ -998,15 +1014,15 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         if(errorOccurred) installButton.setVisibility(View.GONE);
         else {
             final String success = rss.getString(R.string.success_saved);
-            LogUtil.logMessage(success);
+            logger.logMessage(success);
             runOnUiThread(() -> Toast.makeText(this, success, Toast.LENGTH_SHORT).show());
-            if(signApk && Merger.signedApk != null) {
+            if(signApk && com.reandroid.Merger.signedApk != null) {
                 installButton.setVisibility(View.VISIBLE);
                 installButton.setOnClickListener(v ->          //if (supportsFileChannel && !getPackageManager().canRequestPackageInstalls()) startActivityForResult(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).setData(Uri.parse(String.format("package:%s", getPackageName()))), 1234);
                         startActivity(new Intent(Intent.ACTION_INSTALL_PACKAGE)
                                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                .setData(Merger.signedApk)));
+                                .setData(com.reandroid.Merger.signedApk)));
             } else installButton.setVisibility(View.GONE);
         }
     }
@@ -1016,12 +1032,14 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
         Toast.makeText(this, rss.getString(R.string.copied_log), Toast.LENGTH_SHORT).show();
     }
 
-    private void showError(Exception e) {
+    public static APKLogger logger;
+
+    public void showError(Throwable e) {
+        toggleAnimation(this, false);
         cleanupAppFolder();
         if (!(e instanceof ClosedByInterruptException)) {
             final String mainErr = e.toString();
             errorOccurred = !mainErr.equals(rss.getString(R.string.sign_failed));
-            toggleAnimation(this, false);
 
             StringBuilder stackTrace = new StringBuilder(mainErr);
 
@@ -1036,9 +1054,9 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 currentVer = "2.1.1";
             }
             fullLog.append(currentVer).append('\n').append("Storage permission granted: ").append(!doesNotHaveStoragePerm(this))
-                    .append('\n').append(logField.getText());
+                    .append('\n').append(((TextView) findViewById(R.id.logField)).getText());
 
-            getHandler().post(() -> runOnUiThread(() -> {
+            getHandler().post(() -> {
                 View dialogView = getLayoutInflater().inflate(R.layout.dialog_button_layout, null);
 
                 ((TextView) dialogView.findViewById(R.id.errorD)).setText(stackTrace);
@@ -1061,7 +1079,7 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                 ViewGroup.LayoutParams params = scrollView.getLayoutParams();
                 params.height = (int) (rss.getDisplayMetrics().heightPixels * 0.5);
                 scrollView.setLayoutParams(params);
-            }));
+            });
         }
     }
 
@@ -1077,24 +1095,28 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
 
     public static String getOriginalFileName(Context context, Uri uri) {
         String result = null;
-        try {
-            if (Objects.equals(uri.getScheme(), "content")) {
-                try (Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
-                    if (cursor != null && cursor.moveToFirst()) {
-                        result = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
-                    }
+
+        if ("content".equals(uri.getScheme())) {
+            try (Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
                 }
             }
-            if (result == null) {
-                result = uri.getPath();
-                int cut = Objects.requireNonNull(result).lastIndexOf('/'); // Ensure it throw the NullPointerException here to be caught
-                if (cut != -1) result = result.substring(cut + 1);
-            }
-            LogUtil.logMessage(result);
-            return result.replaceFirst("\\.(?:xapk|aspk|apk[sm])", suffix + ".apk");
-        } catch (Exception ignored) {
-            return "filename_not_found";
         }
+
+        if (TextUtils.isEmpty(result)) {
+            result = uri.getPath();
+            if (result != null) {
+                int cut = result.lastIndexOf('/');
+                if (cut != -1) {
+                    result = result.substring(cut + 1);
+                }
+            }
+        }
+
+        logger.logMessage(result);
+
+        return TextUtils.isEmpty(result) ? "filename_not_found" : result.replaceFirst("\\.(?:xapk|aspk|apk[sm])$", ".apk");
     }
 
     @SuppressLint("InlinedApi")
@@ -1138,9 +1160,9 @@ public class MainActivity extends AppCompatActivity implements Merger.LogListene
                         f = new File(getAntisplitMFolder(), newFilePath.substring(newFilePath.lastIndexOf(File.separator) + 1));
                         showError(rss.getString(R.string.no_filepath) + newFilePath);
                     } else f = new File(newFilePath);
-                    logField.setText("");
-                    while(f.exists() && f.length() > 99) f = new File(f.getPath().replace(".apk", "_1.apk"));
-                    LogUtil.logMessage(rss.getString(R.string.output) + f);
+                    ((TextView) findViewById(R.id.logField)).setText("");
+                    f = com.abdurazaaqmohammed.utils.FileUtils.getUnusedFile(f);
+                    logger.logMessage(rss.getString(R.string.output) + f);
                     process(Uri.fromFile(f));
                 }
 

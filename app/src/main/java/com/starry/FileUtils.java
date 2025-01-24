@@ -12,11 +12,7 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 
-import com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -49,67 +45,19 @@ public class FileUtils {
     https://github.com/starry-shivam/FileUtils/blob/main/file-utils/src/main/java/com/starry/file_utils/FileUtils.kt
      */
 
-
-    public static OutputStream getOutputStream(String filepath) throws IOException {
-        return getOutputStream(new File(filepath));
-    }
-
-    public static OutputStream getOutputStream(File file) throws IOException {
-        return LegacyUtils.supportsFileChannel ?
-                StupidOS.getOutputStream(file)
-                : new FileOutputStream(file);
-    }
-
-    public static void copyFile(File sourceFile, File destinationFile) throws IOException {
-        try (InputStream is = getInputStream(sourceFile);
-             OutputStream os = getOutputStream(destinationFile)) {
-            copyFile(is, os);
-        }
-    }
-
-    public static void copyFile(File in, OutputStream os) throws IOException {
-        try(InputStream is = getInputStream(in)) {
-            copyFile(is, os);
-        }
-    }
-
-    public static void copyFile(InputStream is, File destinationFile) throws IOException {
-        try (OutputStream os = getOutputStream(destinationFile)) {
-            copyFile(is, os);
-        }
-    }
-
-    public static void copyFile(InputStream is, OutputStream os) throws IOException {
-        if(LegacyUtils.supportsWriteExternalStorage) {
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = is.read(buffer)) > 0) os.write(buffer, 0, length);
-        } else android.os.FileUtils.copy(is, os);
-    }
-
     public static OutputStream getOutputStream(Uri uri, Context context) throws IOException {
         String uriPath;
         if(doesNotHaveStoragePerm(context) || (uriPath = uri.getPath()) == null || uriPath.startsWith("/document/msf:")) return context.getContentResolver().openOutputStream(uri);
         String filePath = getPath(uri, context);
         File file = filePath == null ? null : new File(filePath);
-        return file != null && file.canWrite() ? getOutputStream(file) : context.getContentResolver().openOutputStream(uri);
-    }
-
-    public static InputStream getInputStream(File file) throws IOException {
-        return LegacyUtils.supportsFileChannel ?
-                StupidOS.getInputStream(file)
-                : new FileInputStream(file);
-    }
-
-    public static InputStream getInputStream(String filePath) throws IOException {
-        return getInputStream(new File(filePath));
+        return file != null && file.canWrite() ? com.abdurazaaqmohammed.utils.FileUtils.getOutputStream(file) : context.getContentResolver().openOutputStream(uri);
     }
 
     public static InputStream getInputStream(Uri uri, Context context) throws IOException {
         if(doesNotHaveStoragePerm(context)) return context.getContentResolver().openInputStream(uri);
         String filePath = getPath(uri, context);
         File file = filePath == null ? null : new File(filePath);
-        return file != null && file.canRead() ? getInputStream(file) : context.getContentResolver().openInputStream(uri);
+        return file != null && file.canRead() ? com.abdurazaaqmohammed.utils.FileUtils.getInputStream(file) : context.getContentResolver().openInputStream(uri);
     }
 
     private static boolean fileExists(String filePath) {
@@ -258,7 +206,7 @@ public class FileUtils {
     public static File copyFileToInternalStorage(Uri uri, Context context) throws IOException {
         File output = new File(context.getCacheDir(), getOriginalFileName(context, uri));
         if(output.exists() && output.length() > 999) return output;
-        try (OutputStream outputStream = FileUtils.getOutputStream(output); InputStream cursor = context.getContentResolver().openInputStream(uri)) {
+        try (OutputStream outputStream = com.abdurazaaqmohammed.utils.FileUtils.getOutputStream(output); InputStream cursor = context.getContentResolver().openInputStream(uri)) {
             int read;
             byte[] buffers = new byte[1024];
             while ((read = cursor.read(buffers)) != -1) {

@@ -14,7 +14,8 @@ import android.provider.MediaStore;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 
-import com.starry.FileUtils;
+
+import com.abdurazaaqmohammed.utils.FileUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -149,7 +150,7 @@ public class AndroidXI {
 
         String input = getPathFromUri(uri);
 
-        try (InputStream inputStream = FileUtils.getInputStream(input); OutputStream out = FileUtils.getOutputStream(output, context)) {
+        try (InputStream inputStream = FileUtils.getInputStream(input); OutputStream out = com.starry.FileUtils.getOutputStream(output, context)) {
             byte[] buf = new byte[1024];
             int len;
             while ((len = inputStream.read(buf)) > 0) {

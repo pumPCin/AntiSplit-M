@@ -20,6 +20,7 @@ import static com.android.apksig.internal.apk.ApkSigningBlockUtils.encodeCertifi
 import static com.android.apksig.internal.apk.v2.V2SchemeConstants.APK_SIGNATURE_SCHEME_V2_BLOCK_ID;
 import static com.android.apksig.internal.apk.v3.V3SchemeConstants.APK_SIGNATURE_SCHEME_V3_BLOCK_ID;
 
+import com.abdurazaaqmohammed.utils.FileUtils;
 import com.android.apksig.apk.ApkUtils;
 import com.android.apksig.internal.apk.ApkSigningBlockUtils;
 import com.android.apksig.internal.apk.ContentDigestAlgorithm;
@@ -32,7 +33,6 @@ import com.android.apksig.internal.apk.v3.V3SchemeVerifier;
 import com.android.apksig.internal.util.Pair;
 import com.android.apksig.util.DataSource;
 import com.android.apksig.zip.ZipFormatException;
-import com.starry.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
