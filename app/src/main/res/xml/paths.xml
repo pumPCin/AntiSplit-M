@@ -4,6 +4,10 @@
         name="internal"
         path="."/>
     <external-path name="external_files" path="."/>
-    <external-path path="Android/data/${applicationId}/" name="files_root" />
-
+    <external-path path="Android/data/com.abdurazaaqmohammed.AntiSplit/" name="files_root1" />
+    <external-path path="/data/user/0/com.abdurazaaqmohammed.AntiSplit/" name="files_root2" />
+    <external-path path="/data/user/0/com.abdurazaaqmohammed.AntiSplit/cache" name="files_root3" />
+    <external-path path="/data/data/com.abdurazaaqmohammed.AntiSplit/" name="files_root4" />
+    <external-path path="/data/data/com.abdurazaaqmohammed.AntiSplit/cache" name="files_root5" />
+    <root-path name="root" path="." />
 </paths>

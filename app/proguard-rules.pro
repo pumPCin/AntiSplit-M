@@ -3,7 +3,11 @@
 -dontwarn android.content.res.**
 -dontwarn org.**
 
- -keep class org.apache.commons.compress.** { *; }
+-keep class org.apache.commons.compress.** { *; }
+-keep class android.content.** { *; }
+-keep class androidx.core.content.FileProvider { *; }
+-keep class **.model.** { *; }
+-keep class **.models.** { *; }
 -keepnames class * { *; }
 -keepnames interface * { *; }
 -keepnames enum * { *; }

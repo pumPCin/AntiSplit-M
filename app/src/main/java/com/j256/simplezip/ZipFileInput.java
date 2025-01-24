@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.abdurazaaqmohammed.utils.FileUtils;
 import com.j256.simplezip.codec.FileDataDecoder;
 import com.j256.simplezip.codec.InflatorFileDataDecoder;
 import com.j256.simplezip.codec.SimpleZipFileDataDecoder;
@@ -22,7 +23,6 @@ import com.j256.simplezip.format.ZipCentralDirectoryEnd;
 import com.j256.simplezip.format.ZipCentralDirectoryFileEntry;
 import com.j256.simplezip.format.ZipDataDescriptor;
 import com.j256.simplezip.format.ZipFileHeader;
-import com.starry.FileUtils;
 
 /**
  * Read in a Zip-file either from a {@link File} or an {@link InputStream}.
@@ -55,7 +55,7 @@ public class ZipFileInput implements Closeable {
 	 * Read a Zip-file from a file. You must call {@link #close()} to close the stream when you are done.
 	 */
 	public ZipFileInput(File file) throws IOException {
-		this(FileUtils.getInputStream(file));
+		this(com.abdurazaaqmohammed.utils.FileUtils.getInputStream(file));
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class ZipFileInput implements Closeable {
 	 * @return THe number of bytes written into the output-stream.
 	 */
 	public long readFileDataToFile(File outputFile) throws IOException {
-		try(OutputStream os = FileUtils.getOutputStream(outputFile)) {
+		try(OutputStream os = com.abdurazaaqmohammed.utils.FileUtils.getOutputStream(outputFile)) {
 			long numBytes = readFileData(os);
 			if (outputFileMap == null) {
 				outputFileMap = new HashMap<>();

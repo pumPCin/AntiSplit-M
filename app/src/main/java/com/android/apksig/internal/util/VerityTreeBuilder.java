@@ -18,9 +18,6 @@ package com.android.apksig.internal.util;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-import android.os.Build;
-
-import com.abdurazaaqmohammed.AntiSplit.main.LegacyUtils;
 import com.android.apksig.internal.zip.ZipUtils;
 import com.android.apksig.util.DataSink;
 import com.android.apksig.util.DataSource;
@@ -35,7 +32,6 @@ import java.security.NoSuchAlgorithmException;
 
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.ThreadPoolExecutor;
