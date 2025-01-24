@@ -22,6 +22,7 @@
     <string name="enable_logs">Включить журнал</string>
     <string name="error_dir_access">Нет доступа к каталогу</string>
     <string name="for_device">Выбрать всё под ваше устройство</string>
+    <string name="force">Объединять не совпадающие части split-apk (разная версия или имя пакета)</string>
     <string name="grant_storage">Необходимо дать разрешение на запись в данном каталоге</string>
     <string name="install">Установить</string>
     <string name="label_parent_dir">..</string>
