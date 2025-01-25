@@ -115,12 +115,16 @@ public class MainActivity extends AppCompatActivity {
     private String suffix;
     private boolean systemTheme;
 
+    public void setRss(Resources rss) {
+        this.rss = rss;
+    }
+
     private Resources rss;
-    private Handler handler;
 
     public Resources getRss() {
         return rss;
     }
+    private Handler handler;
 
     public Handler getHandler() {
         return handler;
@@ -140,15 +144,18 @@ public class MainActivity extends AppCompatActivity {
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
-        lang = settings.getString("lang", "en");
+
+        setContentView(R.layout.activity_main);
+
+        String deviceLang = Locale.getDefault().getLanguage();
+        boolean supportedLang = deviceLang.equals("ar") || deviceLang.equals("es") || deviceLang.equals("fr") || deviceLang.equals("in") || deviceLang.equals("it") || deviceLang.equals("pt-rBR") || deviceLang.equals("ru") || deviceLang.equals("tr") || deviceLang.equals("uk") || deviceLang.equals("vi");
+        lang = settings.getString("lang", supportedLang ? deviceLang : "en");
         if(lang.equals(Locale.getDefault().getLanguage())) rss = getResources();
-        else LanguageUtil.updateMain(rss = LocaleHelper.setLocale(this, lang).getResources(), this);
+        else LanguageUtil.updateMain(LocaleHelper.setLocale(this, lang).getResources(), this);
 
         boolean dark = (rss.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
         setTheme(theme = settings.getInt("theme", dark
                 ? com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar));
-
-        setContentView(R.layout.activity_main);
 
         if(theme == R.style.Theme_MyApp_Black) findViewById(R.id.main).setBackgroundColor(Color.BLACK);
         deviceSpecsUtil = new DeviceSpecsUtil(this);
