@@ -59,8 +59,8 @@ public class SignUtil {
         signDebugKey(c, inputApk, output, true, true, true);
     }
 
-    public static void signPseudoApkSigner(File temp, Context context, Uri out, Exception e) throws IOException {
-        String msg = com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss.getString(R.string.sign_failed);
+    public static void signPseudoApkSigner(File temp, MainActivity context, Uri out, Exception e) throws IOException {
+        String msg = context.getRss().getString(R.string.sign_failed);
         if(Build.VERSION.SDK_INT < 30) {
             // When I tried signing with apksig in AVD with sdk 10 java.security is throwing some error saying something not found
             // Apparently 11 is the last version that supports v1 signing alone.
@@ -81,14 +81,14 @@ public class SignUtil {
                     PseudoApkSigner.sign(is, os, pastFile, privateKeyFile);
                 }
             } catch (Exception e2) {
-                MainActivity.logger.logMessage(msg);
+                context.getLogger().logMessage(msg);
                 try(OutputStream os = FileUtils.getOutputStream(out, context)) {
                     com.abdurazaaqmohammed.utils.FileUtils.copyFile(temp, os);
                 }
                 throw(new RuntimeException(msg, e)); // for showError
             }
         } else {
-            MainActivity.logger.logMessage(msg);
+            context.getLogger().logMessage(msg);
             try(OutputStream os = FileUtils.getOutputStream(out, context)) {
                 com.abdurazaaqmohammed.utils.FileUtils.copyFile(temp, os);
             }

@@ -28,6 +28,12 @@ public class RunUtil {
         this.msg = msg;
     }
 
+    public static void runInBackground(Runnable runnable) {
+        try {
+            Executors.newSingleThreadExecutor().submit(runnable).get();
+        } catch (Exception ignored) { }
+    }
+
     public void runInBackground(Callable<Boolean> callable) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<Boolean> future = executor.submit(callable);

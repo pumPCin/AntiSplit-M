@@ -1,6 +1,5 @@
 package com.abdurazaaqmohammed.AntiSplit.main;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,13 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AppListArrayAdapter extends ArrayAdapter<AppInfo> implements Filterable {
-    private final Context context;
+    private final MainActivity context;
     private final List<AppInfo> originalAppInfoList;
     public List<AppInfo> filteredAppInfoList;
     private final boolean showIcon;
     private AppInfoFilter filter;
 
-    public AppListArrayAdapter(Context context, List<AppInfo> appInfoList, boolean showIcon) {
+    public AppListArrayAdapter(MainActivity context, List<AppInfo> appInfoList, boolean showIcon) {
         super(context, R.layout.list_item, appInfoList);
         this.context = context;
         this.originalAppInfoList = new ArrayList<>(appInfoList);
@@ -55,7 +54,7 @@ public class AppListArrayAdapter extends ArrayAdapter<AppInfo> implements Filter
         if (showIcon) {
             iconView.setImageDrawable(appInfo.icon);
             iconView.setVisibility(View.VISIBLE);
-            iconView.setContentDescription(MainActivity.rss.getString(R.string.app_icon_list_label));
+            iconView.setContentDescription(context.getRss().getString(R.string.app_icon_list_label));
         } else iconView.setVisibility(View.GONE);
 
         return convertView;

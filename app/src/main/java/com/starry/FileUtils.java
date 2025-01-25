@@ -1,7 +1,6 @@
 package com.starry;
 
-import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.doesNotHaveStoragePerm;
-import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.getOriginalFileName;
+import static com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -11,6 +10,8 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+
+import com.abdurazaaqmohammed.AntiSplit.main.MainActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +46,7 @@ public class FileUtils {
     https://github.com/starry-shivam/FileUtils/blob/main/file-utils/src/main/java/com/starry/file_utils/FileUtils.kt
      */
 
-    public static OutputStream getOutputStream(Uri uri, Context context) throws IOException {
+    public static OutputStream getOutputStream(Uri uri, MainActivity context) throws IOException {
         String uriPath;
         if(doesNotHaveStoragePerm(context) || (uriPath = uri.getPath()) == null || uriPath.startsWith("/document/msf:")) return context.getContentResolver().openOutputStream(uri);
         String filePath = getPath(uri, context);
@@ -53,7 +54,7 @@ public class FileUtils {
         return file != null && file.canWrite() ? com.abdurazaaqmohammed.utils.FileUtils.getOutputStream(file) : context.getContentResolver().openOutputStream(uri);
     }
 
-    public static InputStream getInputStream(Uri uri, Context context) throws IOException {
+    public static InputStream getInputStream(Uri uri, MainActivity context) throws IOException {
         if(doesNotHaveStoragePerm(context)) return context.getContentResolver().openInputStream(uri);
         String filePath = getPath(uri, context);
         File file = filePath == null ? null : new File(filePath);
@@ -109,7 +110,7 @@ public class FileUtils {
     }
 
     @SuppressLint("NewApi")
-    public static String getPath(Uri uri, Context context) throws IOException {
+    public static String getPath(Uri uri, MainActivity context) throws IOException {
         String selection;
         String[] selectionArgs;
 
@@ -199,12 +200,12 @@ public class FileUtils {
         return copyFileToInternalStorageAndGetPath(uri, context);
     }
 
-    public static String copyFileToInternalStorageAndGetPath(Uri uri, Context context) throws IOException {
+    public static String copyFileToInternalStorageAndGetPath(Uri uri, MainActivity context) throws IOException {
         return copyFileToInternalStorage(uri, context).getPath();
     }
 
-    public static File copyFileToInternalStorage(Uri uri, Context context) throws IOException {
-        File output = new File(context.getCacheDir(), getOriginalFileName(context, uri));
+    public static File copyFileToInternalStorage(Uri uri, MainActivity context) throws IOException {
+        File output = new File(context.getCacheDir(), context.getOriginalFileName(uri));
         if(output.exists() && output.length() > 999) return output;
         try (OutputStream outputStream = com.abdurazaaqmohammed.utils.FileUtils.getOutputStream(output); InputStream cursor = context.getContentResolver().openInputStream(uri)) {
             int read;

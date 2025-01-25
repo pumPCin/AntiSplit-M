@@ -23,7 +23,6 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -45,7 +44,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.ScrollView;
@@ -57,25 +55,26 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.core.widget.NestedScrollView;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
+import com.abdurazaaqmohammed.utils.CompareUtils;
 import com.abdurazaaqmohammed.utils.DeviceSpecsUtil;
+import com.abdurazaaqmohammed.utils.LanguageUtil;
 import com.abdurazaaqmohammed.utils.LegacyUtils;
 import com.abdurazaaqmohammed.utils.RunUtil;
 import com.fom.storage.media.AndroidXI;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
-import com.reandroid.apk.APKLogger;
 import com.reandroid.apk.ApkBundle;
+import com.reandroid.apkeditor.Util;
 import com.starry.FileUtils;
 
 import java.io.BufferedReader;
@@ -83,16 +82,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.channels.ClosedByInterruptException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.UUID;
 
 import com.github.paul035.LocaleHelper;
 
@@ -107,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean urisAreSplitApks = true;
     private boolean errorOccurred;
     private boolean checkForUpdates;
-    private boolean logEnabled;
+    boolean logEnabled;
     private boolean force;
     private String lang;
     private int theme;
@@ -116,10 +114,21 @@ public class MainActivity extends AppCompatActivity {
     private String pkgName;
     private String suffix;
     private boolean systemTheme;
-    public static Resources rss;
+
+    private Resources rss;
+    private Handler handler;
+
+    public Resources getRss() {
+        return rss;
+    }
 
     public Handler getHandler() {
         return handler;
+    }
+
+    private MyAPKLogger logger;
+    public MyAPKLogger getLogger() {
+        return logger;
     }
 
     /** @noinspection AssignmentUsedAsCondition*/
@@ -129,47 +138,27 @@ public class MainActivity extends AppCompatActivity {
         DynamicColors.applyToActivitiesIfAvailable(getApplication());
         handler = new Handler(Looper.getMainLooper());
 
-        deleteDir(getCacheDir());
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
-        boolean dark = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        lang = settings.getString("lang", "en");
+        if(lang.equals(Locale.getDefault().getLanguage())) rss = getResources();
+        else LanguageUtil.updateMain(rss = LocaleHelper.setLocale(this, lang).getResources(), this);
+
+        boolean dark = (rss.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
         setTheme(theme = settings.getInt("theme", dark
                 ? com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar));
 
-        deviceSpecsUtil = new DeviceSpecsUtil(this);
-
         setContentView(R.layout.activity_main);
 
-        TextView logField = findViewById(R.id.logField);
-        scrollView = findViewById(R.id.scrollView);
-        logger = new APKLogger() {
-            @Override
-            public void logMessage(String s) {
-                if(logEnabled) {
-                    handler.post(() -> logField.append(new StringBuilder(s).append('\n')));
-                    scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
-                }
-            }
-
-            @Override
-            public void logError(String s, Throwable throwable) {
-                showError(throwable);
-            }
-
-            @Override
-            public void logVerbose(String s) {
-                if(logEnabled) {
-                    handler.post(() -> logField.append(new StringBuilder(s).append('\n')));
-                    scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
-                }
-            }
-        };
-
         if(theme == R.style.Theme_MyApp_Black) findViewById(R.id.main).setBackgroundColor(Color.BLACK);
-        suffix = settings.getString("suffix", "_antisplit");
-        lang = settings.getString("lang", "en");
-        if(lang.equals(Locale.getDefault().getLanguage())) rss = getResources();
-        else updateLang(LocaleHelper.setLocale(MainActivity.this, lang).getResources(), null);
+        deviceSpecsUtil = new DeviceSpecsUtil(this);
+
+        TextView logField = findViewById(R.id.logField);
+        NestedScrollView scrollView = findViewById(R.id.scrollView);
+        logger = new MyAPKLogger(this, logField, scrollView);
+
+        RunUtil.runInBackground(() -> Util.deleteDir(getCacheDir()));
+
         if(aboveSdk20) {
             getWindow().addFlags(FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             int transparent = rss.getColor(android.R.color.transparent);
@@ -182,8 +171,9 @@ public class MainActivity extends AppCompatActivity {
             getWindow().setStatusBarContrastEnforced(true);
             getWindow().setNavigationBarContrastEnforced(true);
         }
+
         // Fetch settings from SharedPreferences
-        if(checkForUpdates = settings.getBoolean("checkForUpdates", true)) new CheckForUpdatesTask(this, false).execute();
+        if(checkForUpdates = settings.getBoolean("checkForUpdates", true)) checkForUpdates(false);
         signApk = settings.getBoolean("signApk", true);
         force = settings.getBoolean("force", false);
         showDialog = settings.getBoolean("showDialog", false);
@@ -192,236 +182,19 @@ public class MainActivity extends AppCompatActivity {
         ask = settings.getBoolean("ask", true);
         systemTheme = settings.getBoolean("systemTheme", true);
         sortMode = settings.getInt("sortMode", 0);
+        suffix = settings.getString("suffix", "_antisplit");
 
         View selectFromInstalledApps = findViewById(R.id.fromAppsButton);
-        if(aboveSdk20) selectFromInstalledApps.setOnClickListener(v3 -> {
-            AlertDialog ad = new MaterialAlertDialogBuilder(MainActivity.this).setNegativeButton(rss.getString(R.string.cancel), null).create();
-            PackageManager pm = getPackageManager();
-            List<PackageInfo> packageInfoList = pm.getInstalledPackages(0);
-
-            List<AppInfo> appInfoList = new ArrayList<>();
-
-            for (PackageInfo packageInfo : packageInfoList) {
-                try {
-                    String packageName = packageInfo.packageName;
-                    ApplicationInfo ai = pm.getApplicationInfo(packageName, 0);
-                    if (ai.splitSourceDirs != null) {
-                        appInfoList.add(new AppInfo(
-                                (String) pm.getApplicationLabel(ai),
-                                pm.getApplicationIcon(ai),
-                                packageName,
-                                packageInfo.lastUpdateTime,
-                                packageInfo.firstInstallTime));
-                    }
-                } catch (PackageManager.NameNotFoundException ignored) {}
-            }
-            if(sortMode == 0) Collections.sort(appInfoList, Comparator.comparing((AppInfo p) -> p.name.toLowerCase(Locale.ROOT)));
-            else Collections.sort(appInfoList, Comparator.comparing((AppInfo p) -> sortMode == 1 ? p.lastUpdated : p.firstInstall).reversed());
-
-            LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
-            View dialogView = layoutInflater.inflate(R.layout.dialog_search, null);
-
-            ListView listView = dialogView.findViewById(R.id.list_view);
-            final AppListArrayAdapter adapter = new AppListArrayAdapter(MainActivity.this, appInfoList, true);
-            listView.setAdapter(adapter);
-
-            listView.setOnItemClickListener((parent, view, position, id) -> {
-                ad.dismiss();
-                boolean realAskValue = ask;
-                ask = true;
-                pkgName = adapter.filteredAppInfoList.get(position).packageName;
-                selectDirToSaveAPKOrSaveNow();
-                ask = realAskValue;
-            });
-            EditText searchBar = dialogView.findViewById(R.id.search_bar);
-
-            View clearButton = dialogView.findViewById(R.id.clear_button);
-            //            if(theme == R.style.Theme_MyApp_Black)
-            clearButton.setOnClickListener(v -> searchBar.setText(""));
-            //            else dialogView.<TextInputLayout>findViewById(R.id.tilly).setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
-
-            searchBar.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    // No action needed here
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    clearButton.setVisibility(TextUtils.isEmpty(s) ? View.GONE : View.VISIBLE);
-                    adapter.getFilter().filter(s);
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    // No action needed here
-                }
-            });
-            dialogView.findViewById(R.id.filter_button).setOnClickListener(v -> {
-                PopupMenu popupMenu = new PopupMenu(this, v);
-                popupMenu.getMenuInflater().inflate(R.menu.sort_menu, popupMenu.getMenu());
-
-                popupMenu.setOnMenuItemClickListener(item -> {
-                    int itemId = item.getItemId();
-                    if (itemId == R.id.sort_name) {
-                        sortMode = 0;
-                        Collections.sort(appInfoList, Comparator.comparing((AppInfo p) -> p.name.toLowerCase(Locale.ROOT)));
-                    } else if (itemId == R.id.date_updated) {
-                        sortMode = 1;
-                        Collections.sort(appInfoList, Comparator.comparing((AppInfo p) ->  p.lastUpdated).reversed());
-                    } else {
-                        Collections.sort(appInfoList, Comparator.comparing((AppInfo p) ->  p.firstInstall).reversed());
-                        sortMode = 2;
-                    }
-                    listView.setAdapter(new AppListArrayAdapter(MainActivity.this, appInfoList, true));
-                    return true;
-                });
-
-                popupMenu.show();
-            });
-
-            ad.setView(dialogView);
-            styleAlertDialog(ad);
-        });
+        if(aboveSdk20) selectFromInstalledApps.setOnClickListener(this::installedAppsClickListener);
         else selectFromInstalledApps.setVisibility(View.GONE);
 
-        findViewById(R.id.settingsButton).setOnClickListener(v -> {
-            ScrollView settingsDialog = (ScrollView) LayoutInflater.from(this).inflate(R.layout.setty, null);
-
-            ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(rss.getString(R.string.lang));
-            ((TextView) settingsDialog.findViewById(R.id.logToggle)).setText(rss.getString(R.string.enable_logs));
-            ((TextView) settingsDialog.findViewById(R.id.ask)).setText(rss.getString(R.string.ask));
-            ((TextView) settingsDialog.findViewById(R.id.showDialogToggle)).setText(rss.getString(R.string.show_dialog));
-            ((TextView) settingsDialog.findViewById(R.id.signToggle)).setText(rss.getString(R.string.sign_apk));
-            ((TextView) settingsDialog.findViewById(R.id.forceToggle)).setText(rss.getString(R.string.force));
-            ((TextView) settingsDialog.findViewById(R.id.selectSplitsForDeviceToggle)).setText(rss.getString(R.string.automatically_select));
-            ((TextView) settingsDialog.findViewById(R.id.updateToggle)).setText(rss.getString(R.string.auto_update));
-            ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(rss.getString(R.string.check_update_now));
-            ((TextInputLayout) settingsDialog.findViewById(R.id.suffixLayout)).setHint(rss.getString(R.string.suffix));
-            TextInputEditText suffixInput = settingsDialog.findViewById(R.id.suffixInput);
-            suffixInput.setText(suffix);
-            suffixInput.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    suffix = s.toString();
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-
-                }
-            });
-            MaterialButtonToggleGroup themeButtons = settingsDialog.findViewById(R.id.themeToggleGroup);
-            themeButtons.check(
-                    systemTheme ? R.id.systemThemeButton :
-                            theme == com.google.android.material.R.style.Theme_Material3_Light_NoActionBar ? R.id.lightThemeButton :
-                                    theme == com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar ? R.id.darkThemeButton :
-                                            R.id.blackThemeButton
-            );
-
-            //if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O) settingsDialog.findViewById(R.id.blackThemeButton).setVisibility(View.GONE);
-
-            themeButtons.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-                if (isChecked) {
-                    systemTheme = false;
-                    if (checkedId == R.id.lightThemeButton) {
-                        themeButtons.check(R.id.lightThemeButton);
-                        theme = com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
-                    } else if (checkedId == R.id.darkThemeButton) {
-                        themeButtons.findViewById(R.id.darkThemeButton);
-                        theme = com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar;
-                    } else if (checkedId == R.id.blackThemeButton) {
-                        themeButtons.check(R.id.blackThemeButton);
-                        theme = R.style.Theme_MyApp_Black;
-                    } else {
-                        systemTheme = true;
-                        themeButtons.check(R.id.systemThemeButton);
-                        theme = ((rss.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) ?
-                                com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
-                    }
-
-                    settings.edit().putInt("theme", theme).apply();
-                    setTheme(theme);
-                    recreate();
-                }
-            });
-
-            Button checkUpdateNow = settingsDialog.findViewById(R.id.checkUpdateNow);
-            CompoundButton updateSwitch = settingsDialog.findViewById(R.id.updateToggle);
-            updateSwitch.setChecked(checkForUpdates);
-            updateSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> checkUpdateNow.setVisibility((checkForUpdates = isChecked) ? View.GONE : View.VISIBLE));
-            checkUpdateNow.setVisibility(checkForUpdates ? View.GONE : View.VISIBLE);
-            checkUpdateNow.setOnClickListener(v1 -> new CheckForUpdatesTask(this, true).execute());
-
-            CompoundButton logSwitch = settingsDialog.findViewById(R.id.logToggle);
-            logSwitch.setChecked(logEnabled);
-            logSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> logEnabled = isChecked);
-
-            CompoundButton signToggle = settingsDialog.findViewById(R.id.signToggle);
-            signToggle.setChecked(signApk);
-            signToggle.setOnCheckedChangeListener((buttonView, isChecked) -> signApk = isChecked);
-
-            CompoundButton forceToggle = settingsDialog.findViewById(R.id.forceToggle);
-            forceToggle.setChecked(force);
-            forceToggle.setOnCheckedChangeListener((buttonView, isChecked) -> force = isChecked);
-
-            CompoundButton selectSplitsAutomaticallySwitch = settingsDialog.findViewById(R.id.selectSplitsForDeviceToggle);
-            CompoundButton showDialogSwitch = settingsDialog.findViewById(R.id.showDialogToggle);
-
-            showDialogSwitch.setChecked(showDialog);
-            showDialogSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if(showDialog = isChecked) selectSplitsAutomaticallySwitch.setChecked(selectSplitsForDevice = false);
-            });
-
-            selectSplitsAutomaticallySwitch.setChecked(selectSplitsForDevice);
-            selectSplitsAutomaticallySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if(selectSplitsForDevice = isChecked) showDialogSwitch.setChecked(showDialog = false);
-            });
-
-            CompoundButton askSwitch = settingsDialog.findViewById(R.id.ask);
-            askSwitch.setChecked(ask);
-            askSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if(!(ask = isChecked)) checkStoragePerm();
-            });
-
-            settingsDialog.findViewById(R.id.langPicker).setOnClickListener(v2 -> {
-                String[] langs = rss.getStringArray(R.array.langs);
-                String[] display = rss.getStringArray(R.array.langs_display);
-
-                AlertDialog ad = new MaterialAlertDialogBuilder(this).setSingleChoiceItems(display, -1, (dialog, which) -> {
-                    updateLang(LocaleHelper.setLocale(this, lang = langs[which]).getResources(), settingsDialog);
-                    dialog.dismiss();
-                }).create();
-                styleAlertDialog(ad);
-                ad.getListView().setAdapter(new ArrayAdapter<>(this, android.R.layout.select_dialog_singlechoice, display));
-                for (int i = 0; i < langs.length; i++) {
-                    if (Objects.equals(lang, langs[i])) {
-                        ad.getListView().setItemChecked(i, true);
-                        break;
-                    }
-                }
-            });
-            MaterialTextView title = new MaterialTextView(this);
-            title.setText(rss.getString(R.string.settings));
-            int size = 20;
-            title.setPadding(size,size,size,size);
-            title.setTextSize(size);
-            title.setGravity(Gravity.CENTER);
-            styleAlertDialog(new MaterialAlertDialogBuilder(this).setCustomTitle(title).setView(settingsDialog)
-                    .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create());
-        });
+        findViewById(R.id.settingsButton).setOnClickListener(this::settingsButtonListener);
 
         findViewById(R.id.decodeButton).setOnClickListener(v -> startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
-                        .addCategory(Intent.CATEGORY_OPENABLE)
-                        .setType("*/*")
-                        .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                        .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/zip", "application/vnd.android.package-archive", "application/octet-stream"})
-                , 1) // XAPK is octet-stream
+            .addCategory(Intent.CATEGORY_OPENABLE)
+            .setType("*/*")
+            .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/zip", "application/vnd.android.package-archive", "application/octet-stream"}), 1) // XAPK is octet-stream
         );
 
         // Check if user shared or opened file with the app.
@@ -486,47 +259,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void updateLang(Resources res, ScrollView settingsDialog) {
-        rss = res;
-        this.<TextView>findViewById(R.id.decodeButton).setText(res.getString(R.string.merge));
-        this.<TextView>findViewById(R.id.fromAppsButton).setText(res.getString(R.string.select_from_installed_apps));
-        findViewById(R.id.settingsButton).setContentDescription(res.getString(R.string.settings));
-        findViewById(R.id.installButton).setContentDescription(res.getString(R.string.install));
-        findViewById(R.id.cancelButton).setContentDescription(res.getString(R.string.cancel));
-        findViewById(R.id.copyButton).setContentDescription(res.getString(R.string.copy_log));
-
-        if(settingsDialog != null) {
-            ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(res.getString(R.string.lang));
-            ((TextView) settingsDialog.findViewById(R.id.logToggle)).setText(res.getString(R.string.enable_logs));
-            ((TextView) settingsDialog.findViewById(R.id.ask)).setText(res.getString(R.string.ask));
-            ((TextView) settingsDialog.findViewById(R.id.showDialogToggle)).setText(res.getString(R.string.show_dialog));
-            ((TextView) settingsDialog.findViewById(R.id.signToggle)).setText(res.getString(R.string.sign_apk));
-            ((TextView) settingsDialog.findViewById(R.id.forceToggle)).setText(res.getString(R.string.sign_apk));
-            ((TextView) settingsDialog.findViewById(R.id.selectSplitsForDeviceToggle)).setText(res.getString(R.string.automatically_select));
-            ((TextView) settingsDialog.findViewById(R.id.updateToggle)).setText(res.getString(R.string.auto_update));
-            ((TextView) settingsDialog.findViewById(R.id.checkUpdateNow)).setText(res.getString(R.string.check_update_now));
-            ((TextInputLayout) settingsDialog.findViewById(R.id.suffixLayout)).setHint(res.getString(R.string.suffix));
-        }
-    }
-
-    final File getAntisplitMFolder() {
-        final File antisplitMFolder = new File(Environment.getExternalStorageDirectory(), "AntiSplit-M");
-        return antisplitMFolder.exists() || antisplitMFolder.mkdir() ? antisplitMFolder : new File(Environment.getExternalStorageDirectory(), "Download");
-    }
-
     @TargetApi(Build.VERSION_CODES.M)
     private void checkStoragePerm() {
-        if(doesNotHaveStoragePerm(this)) {
+        if(com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this)) {
             Toast.makeText(this, rss.getString(R.string.grant_storage), Toast.LENGTH_LONG).show();
-            if(LegacyUtils.supportsWriteExternalStorage) requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
-            else startActivityForResult(new Intent(ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + getPackageName())), 0);
+            if(LegacyUtils.supportsWriteExternalStorage) requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 9);
+            else startActivityForResult(new Intent(ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + getPackageName())), 9);
         }
-    }
-
-    public static boolean doesNotHaveStoragePerm(Context context) {
-        return Build.VERSION.SDK_INT > 22 && (LegacyUtils.supportsWriteExternalStorage ?
-                context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED :
-                !Environment.isExternalStorageManager());
     }
 
     @Override
@@ -548,19 +287,9 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    NestedScrollView scrollView;
-
-    private Handler handler;
-
-    /** @noinspection ResultOfMethodCallIgnored, DataFlowIssue */
-    public static void deleteDir(File dir) {
-        // There should never be folders in here.
-        for (String child : dir.list()) new File(dir, child).delete();
-    }
-
     /** @noinspection ResultOfMethodCallIgnored*/
     private void cleanupAppFolder() {
-        if(doesNotHaveStoragePerm(this)) return;
+        if(com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this)) return;
         File appFolder = new File(Environment.getExternalStorageDirectory(), "AntiSplit-M");
         if(!appFolder.exists()) return;
         File[] children = appFolder.listFiles();
@@ -575,116 +304,54 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        deleteDir(getCacheDir());
+        Util.deleteDir(getCacheDir());
         cleanupAppFolder();
         super.onDestroy();
-    }
-
-    private List<String> splitsToUse = null;
-
-    private RunUtil runUtil;
-
-    private RunUtil getRunUtil() {
-        if(runUtil == null) runUtil = new RunUtil(handler, this, null);
-        return runUtil;
     }
 
     private void process(Uri outputUri) {
         findViewById(R.id.installButton).setVisibility(View.GONE);
 
-        getRunUtil().runInBackground(() -> {
+        final boolean urisAreSplitApks = MainActivity.this.urisAreSplitApks;
+        final Uri splitAPKUri = MainActivity.this.splitAPKUri;
+        new RunUtil(handler, this, null).runInBackground(() -> {
             errorOccurred = false; // reset to make sure success message shows
             final File cacheDir = MainActivity.this.getCacheDir();
-            if (cacheDir != null && MainActivity.this.urisAreSplitApks) deleteDir(cacheDir);
+            //if (cacheDir != null && MainActivity.this.urisAreSplitApks) Util.deleteDir(cacheDir); // Now that using different folder for each app, no need to clear the whole cache dir
             try {
                 if (TextUtils.isEmpty(pkgName)) {
-                    List<String> splits = MainActivity.this.splitsToUse;
-                    if (MainActivity.this.urisAreSplitApks) {
-                        if (selectSplitsForDevice) {
-                            splits = deviceSpecsUtil.getListOfSplits(MainActivity.this.splitAPKUri);
-                            switch (splits.size()) {
-                                case 4:
-                                case 3:
-                                case 2:
-                                    splits.clear();
-                                    break;
-                                default:
-                                    List<String> copy = List.copyOf(splits);
-                                    List<String> toRemove = new ArrayList<>();
-                                    boolean splitApkContainsArch = false;
-                                    for (int i = 0; i < splits.size(); i++) {
-                                        final String thisSplit = splits.get(i);
-                                        if (!splitApkContainsArch && DeviceSpecsUtil.isArch(thisSplit)) {
-                                            splitApkContainsArch = true;
-                                        }
-                                        if (deviceSpecsUtil.shouldIncludeSplit(thisSplit))
-                                            toRemove.add(thisSplit);
-                                    }
-                                    if (splitApkContainsArch) {
-                                        boolean selectedSplitsContainsArch = false;
-                                        for (int i = 0; i < copy.size(); i++) {
-                                            final String thisSplit = copy.get(i);
-                                            if (DeviceSpecsUtil.isArch(thisSplit) && toRemove.contains(thisSplit)) {
-                                                selectedSplitsContainsArch = true;
-                                                break;
-                                            }
-                                        }
-                                        if (!selectedSplitsContainsArch) {
-                                            logger.logMessage("Could not find device architecture, selecting all architectures");
-                                            for (int i = 0; i < splits.size(); i++) {
-                                                final String thisSplit = splits.get(i);
-                                                if (DeviceSpecsUtil.isArch(thisSplit))
-                                                    toRemove.add(thisSplit); // select all to be sure
-                                            }
-                                        }
-                                    }
+                    //selected from anything except app list
+                    File folder = new File(cacheDir, UUID.randomUUID().toString());
+                    if(!folder.mkdir()) folder = cacheDir;
 
-                                    boolean didNotFindDpi = true;
-                                    for (int i = 0; i < copy.size(); i++) {
-                                        String thisSplit = copy.get(i);
-                                        if (thisSplit.contains("dpi") && toRemove.contains(thisSplit)) {
-                                            didNotFindDpi = false;
-                                            break;
-                                        }
-                                    }
-                                    if (didNotFindDpi) {
-                                        for (int i = 0; i < splits.size(); i++) {
-                                            String thisSplit = splits.get(i);
-                                            if (thisSplit.contains("hdpi"))
-                                                toRemove.add(thisSplit);
-                                        }
-                                    }
-                                    splits.removeAll(toRemove);
-                            }
-                        }
-                    } else {
+                    if (!urisAreSplitApks) for (Uri uri : MainActivity.this.uris) {
                         // These are the splits from inside the APK, just copy the splits to cache folder
-                        for (Uri uri : MainActivity.this.uris) {
-                            try (InputStream is = FileUtils.getInputStream(uri, MainActivity.this)) {
-                                com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, new File(cacheDir, getOriginalFileName(MainActivity.this, uri)));
-                            }
+                        try (InputStream is = FileUtils.getInputStream(uri, MainActivity.this)) {
+                            com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, new File(folder, getOriginalFileName(uri)));
                         }
                     }
+
                     com.reandroid.Merger.run(
-                            MainActivity.this.urisAreSplitApks ? MainActivity.this.splitAPKUri : null,
-                            cacheDir,
+                            urisAreSplitApks ? splitAPKUri : null,
+                            folder,
                             outputUri,
                             MainActivity.this,
-                            splits,
+                            urisAreSplitApks ? selectSplitsForDevice ? deviceSpecsUtil.getSplitsForDevice(splitAPKUri) : MainActivity.this.splitsToUse : null,
                             signApk, MainActivity.this.force);
                 } else try (ApkBundle bundle = new ApkBundle()) {
+                    // Selected from apps list
                     bundle.loadApkDirectory(new File(MainActivity.this.getPackageManager().getPackageInfo(pkgName, 0).applicationInfo.sourceDir).getParentFile());
                     com.reandroid.Merger.run(bundle, cacheDir, outputUri, MainActivity.this, signApk, MainActivity.this.force);
                 }
-                toggleAnimation(MainActivity.this, false);
+                toggleAnimation(false);
                 return true;
             } catch (Exception e) {
                 MainActivity.this.showError(e);
                 return false;
             }
         }, () -> {
-            MainActivity.this.pkgName = null;
-            if(MainActivity.this.urisAreSplitApks) MainActivity.this.getHandler().post(() -> {
+            MainActivity.this.pkgName = null; // reset
+            if(urisAreSplitApks) MainActivity.this.getHandler().post(() -> {
                 try {
                     MainActivity.this.uris.remove(0);
                     MainActivity.this.splitAPKUri = MainActivity.this.uris.get(0);
@@ -695,26 +362,22 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.this.showSuccess();
                 }
             });
-            else MainActivity.this.showSuccess();
+            else MainActivity.this.showSuccess(); // multiple splits from inside the APK, can only be one go
         }, true);
 
-        LinearLayout fabs = findViewById(R.id.fabs);
-        fabs.setAlpha(0.5f);
+        findViewById(R.id.fabs).setAlpha(0.5f);
         View cancelButton = findViewById(R.id.cancelButton);
         cancelButton.setVisibility(View.VISIBLE);
         cancelButton.setOnClickListener(v -> {
             try {
-                if(doesNotHaveStoragePerm(this)) AndroidXI.getInstance().with(this).delete(launcher, outputUri);
-                else if(new File(FileUtils.getPath(outputUri, this)).delete()) logger.logMessage("Cleaned output file " + getOriginalFileName(this, outputUri));
+                if(com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this)) AndroidXI.getInstance().with(this).delete(launcher, outputUri);
+                else if(new File(FileUtils.getPath(outputUri, this)).delete()) logger.logMessage("Cleaned output file " + getOriginalFileName(outputUri));
             } catch (Exception ignored) {}
-            Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
-            if (intent == null) {
-                intent = getIntent();
-                finish();
-                startActivity(intent);
-            } else {
-                startActivity(Intent.makeRestartActivityTask(intent.getComponent()));
+            try {
+                startActivity(Intent.makeRestartActivityTask(Objects.requireNonNull(getPackageManager().getLaunchIntentForPackage(getPackageName())).getComponent()));
                 Runtime.getRuntime().exit(0);
+            } catch (Exception e) {
+                recreate();
             }
         });
 
@@ -723,54 +386,43 @@ public class MainActivity extends AppCompatActivity {
         copyButton.setOnClickListener(v -> copyText(new StringBuilder().append(((TextView) findViewById(R.id.logField)).getText()).append('\n').append(((TextView) findViewById(R.id.errorField)).getText())));
     }
 
-    public static void toggleAnimation(MainActivity context, boolean on) {
-        LinearProgressIndicator loadingImage = context.findViewById(R.id.progressIndicator);
-        context.runOnUiThread(() -> {
-            if(on) {
-                loadingImage.setVisibility(View.VISIBLE);
-                //loadingImage.startAnimation(AnimationUtils.loadAnimation(context, R.anim.loading));
-            }
-            else {
-                loadingImage.setVisibility(View.GONE);
-                //  loadingImage.clearAnimation();
-            }
-        });
-    }
-
     private void processOneSplitApkUri(Uri uri) {
         splitAPKUri = uri;
         if (showDialog) showApkSelectionDialog();
         else selectDirToSaveAPKOrSaveNow();
     }
 
+    public void toggleAnimation(boolean on) {
+        runOnUiThread(() -> findViewById(R.id.progressIndicator).setVisibility(on ? View.VISIBLE : View.GONE));
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && data != null) switch (requestCode) {
-            case 0:
-                checkStoragePerm();
-                break;
+        if(requestCode == 9 && com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this)) ask = true;
+        else if (resultCode == RESULT_OK && data != null) switch (requestCode) {
             case 1:
                 // opened through button in the app
-
                 ClipData clipData = data.getClipData();
                 if (clipData == null) processOneSplitApkUri(data.getData());
                 else {
                     //multiple files selected
                     Uri first = clipData.getItemAt(0).getUri();
                     String path = first.getPath();
+                    uris = new ArrayList<>();
                     if (path != null && path.endsWith(".apk")) {
                         urisAreSplitApks = false;
-                        uris = new ArrayList<>();
-                        uris.add(first);
-                    } else processOneSplitApkUri(first);
+                    } //else processOneSplitApkUri(first);
+                    uris.add(first);
 
                     for (int i = 1; i < clipData.getItemCount(); i++) {
                         Uri uri = clipData.getItemAt(i).getUri();
-                        if (urisAreSplitApks) processOneSplitApkUri(uri);
-                        else uris.add(uri);
+//                        if (urisAreSplitApks) processOneSplitApkUri(uri);
+//                        else
+                            uris.add(uri);
                     }
-                    if (!urisAreSplitApks) selectDirToSaveAPKOrSaveNow();
+                   if (urisAreSplitApks) processOneSplitApkUri(first);
+                   else selectDirToSaveAPKOrSaveNow();
                 }
                 break;
             case 2:
@@ -786,17 +438,8 @@ public class MainActivity extends AppCompatActivity {
             if (result.getResultCode() == Activity.RESULT_OK) logger.logMessage("Deleted ");
         });
 
-    private static class CheckForUpdatesTask extends AsyncTask<Void, Void, String[]> {
-        private final WeakReference<MainActivity> context;
-        private final boolean toast;
-
-        CheckForUpdatesTask(MainActivity context, boolean toast) {
-            this.context = new WeakReference<>(context);
-            this.toast = toast;
-        }
-
-        @Override
-        protected String[] doInBackground(Void... voids) {
+    private void checkForUpdates(boolean toast) {
+        new Thread(() -> {
             try {
                 HttpURLConnection conn = (HttpURLConnection) new URL("https://api.github.com/repos/AbdurazaaqMohammed/AntiSplit-M/releases").openConnection();
                 conn.setRequestMethod("GET");
@@ -807,93 +450,80 @@ public class MainActivity extends AppCompatActivity {
                      InputStreamReader in = new InputStreamReader(inputStream);
                      BufferedReader reader = new BufferedReader(in)) {
                     String line;
-                    String ver = "";
+                    String latestVersion = "";
                     String changelog = "";
                     String dl = "";
+                    // return new String[]{ver, changelog, dl};
                     boolean rightBranch = false;
                     while ((line = reader.readLine()) != null) {
                         if(line.contains("browser_download_url")) {
                             dl = line.split("\"")[3];
-                            ver = line.split("/")[7];
-                            rightBranch = ver.charAt(0) == '2';
+                            latestVersion = line.split("/")[7];
+                            rightBranch = latestVersion.charAt(0) == '2';
                         } else if(line.contains("body") && rightBranch) {
                             changelog = line.split("\"")[3];
                             break;
                         }
                     }
+                    String currentVer;
+                    try {
+                        currentVer = (MainActivity.this).getPackageManager().getPackageInfo((MainActivity.this).getPackageName(), 0).versionName;
+                    } catch (Exception e) {
+                        currentVer = null;
+                    }
+                    boolean newVer = false;
+                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '1', '6'} : currentVer.replace(".", "").toCharArray();
+                    char[] latest = latestVersion.replace(".", "").toCharArray();
 
-                    return new String[]{ver, changelog, dl};
+                    int maxLength = Math.max(curr.length, latest.length);
+                    for (int i = 0; i < maxLength; i++) {
+                        char currChar = i < curr.length ? curr[i] : '0';
+                        char latestChar = i < latest.length ? latest[i] : '0';
+
+                        if (latestChar > currChar) {
+                            newVer = true;
+                            break;
+                        } else if (latestChar < currChar) {
+                            break;
+                        }
+                    }
+
+                    if(newVer) {
+                        String ending = ".apk";
+                        String filename = "AntiSplit-M.v" + latestVersion + ending;
+                        String link = dl.endsWith(ending) ? dl : dl + File.separator + filename;
+                        MaterialTextView changelogText = new MaterialTextView(MainActivity.this);
+                        String linebreak = "<br />";
+                        changelogText.setText(Html.fromHtml(rss.getString(R.string.new_ver) + " (" + latestVersion  + ")" + linebreak + linebreak + "Changelog:" + linebreak + changelog.replace("\\r\\n", linebreak)));
+                        int padding = 16;
+                        changelogText.setPadding(padding, padding, padding, padding);
+                        MaterialTextView title = new MaterialTextView(MainActivity.this);
+                        title.setText(rss.getString(R.string.update));
+                        int size = 20;
+                        title.setPadding(size,size,size,size);
+                        title.setTextSize(size);
+                        title.setGravity(Gravity.CENTER);
+                       getHandler().post(() -> runOnUiThread(new MaterialAlertDialogBuilder(MainActivity.this).setCustomTitle(title).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
+                           if (Build.VERSION.SDK_INT < 29) MainActivity.this.checkStoragePerm();
+                           ((DownloadManager) MainActivity.this.getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(Uri.parse(link))
+                                   .setTitle(filename).setDescription(filename).setMimeType("application/vnd.android.package-archive")
+                                   .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
+                                   .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED));
+                       }).setNegativeButton("Go to GitHub Release", (dialog, which) -> MainActivity.this.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest")))).setNeutralButton(rss.getString(R.string.cancel), null).create()::show));
+                    } else if (toast) getHandler().post(() -> MainActivity.this.runOnUiThread(() -> Toast.makeText(MainActivity.this, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show()));
+                    // return new String[]{ver, changelog, dl};
                 }
             } catch (Exception e) {
-                return null;
+                showError(e);
+                if (toast) runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to check for update", Toast.LENGTH_SHORT).show());
             }
-        }
-
-
-        @SuppressLint("UnspecifiedRegisterReceiverFlag")
-        @Override
-        protected void onPostExecute(String[] result) {
-            MainActivity activity = context.get();
-            if(result == null) {
-                if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, "Failed to check for update", Toast.LENGTH_SHORT).show());
-            } else try {
-                String latestVersion = result[0];
-                String currentVer;
-                try {
-                    currentVer = ((Context) activity).getPackageManager().getPackageInfo(((Context) activity).getPackageName(), 0).versionName;
-                } catch (Exception e) {
-                    currentVer = null;
-                }
-                boolean newVer = false;
-                char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '1', '1'} : currentVer.replace(".", "").toCharArray();
-                char[] latest = latestVersion.replace(".", "").toCharArray();
-
-                int maxLength = Math.max(curr.length, latest.length);
-                for (int i = 0; i < maxLength; i++) {
-                    char currChar = i < curr.length ? curr[i] : '0';
-                    char latestChar = i < latest.length ? latest[i] : '0';
-
-                    if (latestChar > currChar) {
-                        newVer = true;
-                        break;
-                    } else if (latestChar < currChar) {
-                        break;
-                    }
-                }
-
-                if(newVer) {
-                    String ending = ".apk";
-                    String filename = "AntiSplit-M.v" + latestVersion + ending;
-                    String link = result[2].endsWith(ending) ? result[2] : result[2] + File.separator + filename;
-                    MaterialTextView changelogText = new MaterialTextView(activity);
-                    String linebreak = "<br />";
-                    changelogText.setText(Html.fromHtml(rss.getString(R.string.new_ver) + " (" + latestVersion  + ")" + linebreak + linebreak + "Changelog:" + linebreak + result[1].replace("\\r\\n", linebreak)));
-                    int padding = 16;
-                    changelogText.setPadding(padding, padding, padding, padding);
-                    MaterialTextView title = new MaterialTextView(activity);
-                    title.setText(rss.getString(R.string.update));
-                    int size = 20;
-                    title.setPadding(size,size,size,size);
-                    title.setTextSize(size);
-                    title.setGravity(Gravity.CENTER);
-                    activity.runOnUiThread(new MaterialAlertDialogBuilder(activity).setCustomTitle(title).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
-                        if (Build.VERSION.SDK_INT < 29) activity.checkStoragePerm();
-                        ((DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(Uri.parse(link))
-                                .setTitle(filename).setDescription(filename).setMimeType("application/vnd.android.package-archive")
-                                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
-                                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED));
-                    }).setNegativeButton("Go to GitHub Release", (dialog, which) -> activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest")))).setNeutralButton(rss.getString(R.string.cancel), null).create()::show);
-                } else if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show());
-            } catch (Exception ignored) {
-                if (toast) activity.runOnUiThread(() -> Toast.makeText(activity, "Failed to check for update", Toast.LENGTH_SHORT).show());
-            }
-        }
+        }).start();
     }
 
     public void showApkSelectionDialog() {
         try {
             List<String> splits = deviceSpecsUtil.getListOfSplits(splitAPKUri);
-            Collections.sort(splits, Comparator.comparing(splitName -> splitName.toLowerCase(Locale.ROOT)));
+            Collections.sort(splits, CompareUtils::compareByName);
             final int initialSize = splits.size();
             String[] apkNames = new String[initialSize + 5];
             boolean[] checkedItems = new boolean[initialSize + 5];
@@ -1008,6 +638,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private List<String> splitsToUse;
+
     private void showSuccess() {
         findViewById(R.id.cancelButton).setVisibility(View.GONE);
         View installButton = findViewById(R.id.installButton);
@@ -1032,11 +664,8 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, rss.getString(R.string.copied_log), Toast.LENGTH_SHORT).show();
     }
 
-    public static APKLogger logger;
-
     public void showError(Throwable e) {
-        toggleAnimation(this, false);
-        cleanupAppFolder();
+        toggleAnimation(false);
         if (!(e instanceof ClosedByInterruptException)) {
             final String mainErr = e.toString();
             errorOccurred = !mainErr.equals(rss.getString(R.string.sign_failed));
@@ -1053,7 +682,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception ex) {
                 currentVer = "2.1.1";
             }
-            fullLog.append(currentVer).append('\n').append("Storage permission granted: ").append(!doesNotHaveStoragePerm(this))
+            fullLog.append(currentVer).append('\n').append("Storage permission granted: ").append(!com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this))
                     .append('\n').append(((TextView) findViewById(R.id.logField)).getText());
 
             getHandler().post(() -> {
@@ -1081,10 +710,11 @@ public class MainActivity extends AppCompatActivity {
                 scrollView.setLayoutParams(params);
             });
         }
+        cleanupAppFolder();
     }
 
     private void showError(String err) {
-        toggleAnimation(this, false);
+        toggleAnimation(false);
         runOnUiThread(() -> {
             TextView errorBox = findViewById(R.id.errorField);
             errorBox.setVisibility(View.VISIBLE);
@@ -1093,11 +723,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public static String getOriginalFileName(Context context, Uri uri) {
+    public String getOriginalFileName(Uri uri) {
         String result = null;
 
         if ("content".equals(uri.getScheme())) {
-            try (Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
+            try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
                 }
@@ -1116,14 +746,14 @@ public class MainActivity extends AppCompatActivity {
 
         logger.logMessage(result);
 
-        return TextUtils.isEmpty(result) ? "filename_not_found" : result.replaceFirst("\\.(?:xapk|aspk|apk[sm])$", ".apk");
+        return TextUtils.isEmpty(result) ? "filename_not_found" : result.replaceFirst("\\.(?:xapk|aspk|apk[sm])$", suffix + ".apk");
     }
 
     @SuppressLint("InlinedApi")
     private void selectDirToSaveAPKOrSaveNow() {
         if (ask) {
             String filename;
-            if(TextUtils.isEmpty(pkgName)) filename = (urisAreSplitApks ? getOriginalFileName(this, splitAPKUri) : getNameFromNonSplitApks());
+            if(TextUtils.isEmpty(pkgName)) filename = (urisAreSplitApks ? getOriginalFileName(splitAPKUri) : getNameFromNonSplitApks());
             else {
                 String versionName;
                 try {
@@ -1141,23 +771,23 @@ public class MainActivity extends AppCompatActivity {
         } else {
             checkStoragePerm();
             try {
-                if(splitAPKUri == null) process(Uri.fromFile(new File(getAntisplitMFolder(), "output.apk")));
+                if(splitAPKUri == null) process(Uri.fromFile(new File(com.abdurazaaqmohammed.utils.FileUtils.getAntisplitMFolder(), "output.apk")));
                 else {
                     String originalFilePath;
                     if(urisAreSplitApks) originalFilePath = FileUtils.getPath(splitAPKUri, this);
                     else {
                         String path = FileUtils.getPath(uris.get(0), this);
-                        originalFilePath = (TextUtils.isEmpty(path) ? getAntisplitMFolder() : path.substring(0, path.lastIndexOf(File.separator))) + File.separator + getNameFromNonSplitApks();
+                        originalFilePath = (TextUtils.isEmpty(path) ? com.abdurazaaqmohammed.utils.FileUtils.getAntisplitMFolder() : path.substring(0, path.lastIndexOf(File.separator))) + File.separator + getNameFromNonSplitApks();
                     }
                     File f;
                     String newFilePath = TextUtils.isEmpty(originalFilePath) ?
-                            getAntisplitMFolder() + File.separator + getOriginalFileName(this, splitAPKUri) // If originalFilePath is null urisAreSplitApks must be true because getNameFromNonSplitApks will always return something
+                            com.abdurazaaqmohammed.utils.FileUtils.getAntisplitMFolder() + File.separator + getOriginalFileName(splitAPKUri) // If originalFilePath is null urisAreSplitApks must be true because getNameFromNonSplitApks will always return something
                             : originalFilePath.replaceFirst("\\.(?:xapk|aspk|apk[sm])", suffix + ".apk");
                     if(TextUtils.isEmpty(newFilePath) ||
                             newFilePath.startsWith("/data/")
                         // || !(f = new File(newFilePath)).createNewFile() || f.canWrite()
                     ) {
-                        f = new File(getAntisplitMFolder(), newFilePath.substring(newFilePath.lastIndexOf(File.separator) + 1));
+                        f = new File(com.abdurazaaqmohammed.utils.FileUtils.getAntisplitMFolder(), newFilePath.substring(newFilePath.lastIndexOf(File.separator) + 1));
                         showError(rss.getString(R.string.no_filepath) + newFilePath);
                     } else f = new File(newFilePath);
                     ((TextView) findViewById(R.id.logField)).setText("");
@@ -1174,9 +804,10 @@ public class MainActivity extends AppCompatActivity {
 
     private String getNameFromNonSplitApks() {
         String realName = null;
+        String base = "base.apk";
         for(Uri uri : uris) {
-            final String fileName = getOriginalFileName(this, uri);
-            if (fileName.equals("base.apk")) {
+            final String fileName = getOriginalFileName(uri);
+            if (base.equals(fileName)) {
                 try {
                     realName = Objects.requireNonNull(getPackageManager().getPackageArchiveInfo(Objects.requireNonNull(FileUtils.getPath(uri, this)), 0)).packageName;
                     break;
@@ -1187,6 +818,239 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
         }
-        return (TextUtils.isEmpty(realName) ? "unknown" : realName.replace(".apk", "")) + suffix + ".apk";
+        return (TextUtils.isEmpty(realName) ? "unknown" : realName.replaceFirst("\\.apk$", suffix + ".apk"));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void installedAppsClickListener(View v3) {
+        AlertDialog ad = new MaterialAlertDialogBuilder(MainActivity.this).setNegativeButton(rss.getString(R.string.cancel), null).create();
+        PackageManager pm = getPackageManager();
+
+        List<PackageInfo> packageInfoList = pm.getInstalledPackages(0);
+        List<AppInfo> appInfoList = new ArrayList<>();
+
+        for (PackageInfo packageInfo : packageInfoList) {
+            try {
+                String packageName = packageInfo.packageName;
+                ApplicationInfo ai = pm.getApplicationInfo(packageName, 0);
+                if (ai.splitSourceDirs != null) {
+                    appInfoList.add(new AppInfo(
+                            (String) pm.getApplicationLabel(ai),
+                            pm.getApplicationIcon(ai),
+                            packageName,
+                            packageInfo.lastUpdateTime,
+                            packageInfo.firstInstallTime));
+                }
+            } catch (PackageManager.NameNotFoundException ignored) {
+            }
+        }
+        if (sortMode == 0) Collections.sort(appInfoList, CompareUtils::compareAppInfoByName);
+        else Collections.sort(appInfoList, (p1, p2) -> {
+            long field1 = (sortMode == 1) ? p1.lastUpdated : p1.firstInstall;
+            long field2 = (sortMode == 1) ? p2.lastUpdated : p2.firstInstall;
+            return Long.compare(field2, field1);
+        });
+
+        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+        View dialogView = layoutInflater.inflate(R.layout.dialog_search, null);
+
+        ListView listView = dialogView.findViewById(R.id.list_view);
+        final AppListArrayAdapter adapter = new AppListArrayAdapter(MainActivity.this, appInfoList, true);
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            ad.dismiss();
+            boolean realAskValue = ask;
+            ask = true;
+            pkgName = adapter.filteredAppInfoList.get(position).packageName;
+            selectDirToSaveAPKOrSaveNow();
+            ask = realAskValue;
+        });
+        EditText searchBar = dialogView.findViewById(R.id.search_bar);
+
+        View clearButton = dialogView.findViewById(R.id.clear_button);
+        clearButton.setOnClickListener(v -> searchBar.setText(""));
+
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // No action needed here
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                clearButton.setVisibility(TextUtils.isEmpty(s) ? View.GONE : View.VISIBLE);
+                adapter.getFilter().filter(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // No action needed here
+            }
+        });
+
+        dialogView.findViewById(R.id.filter_button).setOnClickListener(v -> {
+            PopupMenu popupMenu = new PopupMenu(this, v);
+            popupMenu.getMenuInflater().inflate(R.menu.sort_menu, popupMenu.getMenu());
+
+            popupMenu.setOnMenuItemClickListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.sort_name) {
+                    sortMode = 0;
+                    Collections.sort(appInfoList, CompareUtils::compareAppInfoByName);
+                } else if (itemId == R.id.date_updated) {
+                    sortMode = 1;
+                    Collections.sort(appInfoList, (p1, p2) -> {
+                        long field1 = p1.lastUpdated;
+                        long field2 = p2.lastUpdated;
+                        return Long.compare(field2, field1);
+                    });
+                } else {
+                    sortMode = 2;
+                    Collections.sort(appInfoList, (p1, p2) -> {
+                        long field1 = p1.firstInstall;
+                        long field2 = p2.firstInstall;
+                        return Long.compare(field2, field1);
+                    });
+                }
+                listView.setAdapter(new AppListArrayAdapter(MainActivity.this, appInfoList, true));
+                return true;
+            });
+
+            popupMenu.show();
+        });
+
+        ad.setView(dialogView);
+        styleAlertDialog(ad);
+    }
+
+    /** @noinspection AssignmentUsedAsCondition*/
+    private void settingsButtonListener(View v) {
+        ScrollView settingsDialog = (ScrollView) LayoutInflater.from(MainActivity.this).inflate(R.layout.setty, null);
+        settingsDialog.setId(R.id.icon_view);
+        LanguageUtil.updateSettingsDialog(settingsDialog, rss);
+
+        TextInputEditText suffixInput = settingsDialog.findViewById(R.id.suffixInput);
+        suffixInput.setText(suffix);
+        suffixInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                suffix = s.toString();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        MaterialButtonToggleGroup themeButtons = settingsDialog.findViewById(R.id.themeToggleGroup);
+        themeButtons.check(
+                systemTheme ? R.id.systemThemeButton :
+                        theme == com.google.android.material.R.style.Theme_Material3_Light_NoActionBar ? R.id.lightThemeButton :
+                                theme == com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar ? R.id.darkThemeButton :
+                                        R.id.blackThemeButton
+        );
+
+        //if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O) settingsDialog.findViewById(R.id.blackThemeButton).setVisibility(View.GONE);
+
+        themeButtons.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                systemTheme = false;
+                if (checkedId == R.id.lightThemeButton) {
+                    themeButtons.check(R.id.lightThemeButton);
+                    theme = com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
+                } else if (checkedId == R.id.darkThemeButton) {
+                    themeButtons.findViewById(R.id.darkThemeButton);
+                    theme = com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar;
+                } else if (checkedId == R.id.blackThemeButton) {
+                    themeButtons.check(R.id.blackThemeButton);
+                    theme = R.style.Theme_MyApp_Black;
+                } else {
+                    systemTheme = true;
+                    themeButtons.check(R.id.systemThemeButton);
+                    theme = ((rss.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) ?
+                            com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
+                }
+
+                getSharedPreferences("set", Context.MODE_PRIVATE).edit().putInt("theme", theme).apply();
+                MainActivity.this.setTheme(theme);
+                MainActivity.this.recreate();
+            }
+        });
+
+        Button checkUpdateNow = settingsDialog.findViewById(R.id.checkUpdateNow);
+        CompoundButton updateSwitch = settingsDialog.findViewById(R.id.updateToggle);
+        updateSwitch.setChecked(checkForUpdates);
+        updateSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> checkUpdateNow.setVisibility((checkForUpdates = isChecked) ? View.GONE : View.VISIBLE));
+        checkUpdateNow.setVisibility(checkForUpdates ? View.GONE : View.VISIBLE);
+        checkUpdateNow.setOnClickListener(v1 -> MainActivity.this.checkForUpdates(true));
+
+        CompoundButton logSwitch = settingsDialog.findViewById(R.id.logToggle);
+        logSwitch.setChecked(logEnabled);
+        logSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> logEnabled = isChecked);
+
+        CompoundButton signToggle = settingsDialog.findViewById(R.id.signToggle);
+        signToggle.setChecked(signApk);
+        signToggle.setOnCheckedChangeListener((buttonView, isChecked) -> signApk = isChecked);
+
+        CompoundButton forceToggle = settingsDialog.findViewById(R.id.forceToggle);
+        forceToggle.setChecked(force);
+        forceToggle.setOnCheckedChangeListener((buttonView, isChecked) -> force = isChecked);
+
+        CompoundButton selectSplitsAutomaticallySwitch = settingsDialog.findViewById(R.id.selectSplitsForDeviceToggle);
+        CompoundButton showDialogSwitch = settingsDialog.findViewById(R.id.showDialogToggle);
+
+        showDialogSwitch.setChecked(showDialog);
+        showDialogSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (showDialog = isChecked)
+                selectSplitsAutomaticallySwitch.setChecked(selectSplitsForDevice = false);
+        });
+
+        selectSplitsAutomaticallySwitch.setChecked(selectSplitsForDevice);
+        selectSplitsAutomaticallySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (selectSplitsForDevice = isChecked)
+                showDialogSwitch.setChecked(showDialog = false);
+        });
+
+        settingsDialog.findViewById(R.id.langPicker).setOnClickListener(v2 -> {
+            String[] langs = rss.getStringArray(R.array.langs);
+            String[] display = rss.getStringArray(R.array.langs_display);
+
+            AlertDialog ad = new MaterialAlertDialogBuilder(MainActivity.this).setSingleChoiceItems(display, -1, (dialog, which) -> {
+                LanguageUtil.updateLang(LocaleHelper.setLocale(MainActivity.this, lang = langs[which]).getResources(), settingsDialog, MainActivity.this);
+                dialog.dismiss();
+            }).create();
+            MainActivity.this.styleAlertDialog(ad);
+            ad.getListView().setAdapter(new ArrayAdapter<>(MainActivity.this, android.R.layout.select_dialog_singlechoice, display));
+            for (int i = 0; i < langs.length; i++) {
+                if (lang.equals(langs[i])) {
+                    ad.getListView().setItemChecked(i, true);
+                    break;
+                }
+            }
+        });
+        MaterialTextView title = new MaterialTextView(MainActivity.this);
+        title.setText(rss.getString(R.string.settings));
+        int size = 20;
+        title.setPadding(size, size, size, size);
+        title.setTextSize(size);
+        title.setGravity(Gravity.CENTER);
+        AlertDialog ad = new MaterialAlertDialogBuilder(MainActivity.this).setCustomTitle(title).setView(settingsDialog)
+                .setPositiveButton(rss.getString(R.string.close), (dialog, which) -> dialog.dismiss()).create();
+        MainActivity.this.styleAlertDialog(ad);
+        CompoundButton askSwitch = settingsDialog.findViewById(R.id.ask);
+        askSwitch.setChecked(ask);
+        askSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (!(ask = isChecked) && com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this)) {
+                MainActivity.this.checkStoragePerm();
+                ad.dismiss();
+            }
+        });
     }
 }
