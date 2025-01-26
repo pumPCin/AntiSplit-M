@@ -1,7 +1,11 @@
 package com.abdurazaaqmohammed.utils;
 
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Environment;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -28,7 +32,7 @@ public class FileUtils {
             i++;
             String fileName = file.getName();
             String extension = FilenameUtils.getExtension(fileName);
-            file = new File(file.getParentFile(), fileName.replace(extension, "").replaceFirst("_\\d+$", "") + '_' + i + '.' + extension);
+            file = new File(file.getParentFile(), fileName.replace('.' + extension, "").replaceFirst("_\\d+$", "") + '_' + i + '.' + extension);
         }
         return file;
     }
@@ -82,5 +86,16 @@ public class FileUtils {
         return LegacyUtils.supportsFileChannel ?
                 StreamBackups.getOutputStream(file)
                 : new FileOutputStream(file);
+    }
+
+    public static boolean doesNotHaveStoragePerm(Context context) {
+        return Build.VERSION.SDK_INT > 22 && (LegacyUtils.supportsWriteExternalStorage ?
+                context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED :
+                !Environment.isExternalStorageManager());
+    }
+
+    public static File getAntisplitMFolder() {
+        final File antisplitMFolder = new File(Environment.getExternalStorageDirectory(), "AntiSplit-M");
+        return antisplitMFolder.exists() || antisplitMFolder.mkdir() ? antisplitMFolder : new File(Environment.getExternalStorageDirectory(), "Download");
     }
 }

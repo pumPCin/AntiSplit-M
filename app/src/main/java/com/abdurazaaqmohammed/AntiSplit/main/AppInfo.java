@@ -3,11 +3,11 @@ package com.abdurazaaqmohammed.AntiSplit.main;
 import android.graphics.drawable.Drawable;
 
 public class AppInfo {
-    String name;
+    public String name;
     String packageName;
     Drawable icon;
-    long lastUpdated;
-    long firstInstall;
+    public long lastUpdated;
+    public long firstInstall;
 
     public AppInfo(String name, Drawable icon, String packageName, long lastUpdated, long firstInstall) {
         this.name = name;

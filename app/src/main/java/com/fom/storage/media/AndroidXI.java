@@ -4,7 +4,6 @@ import android.app.PendingIntent;
 import android.app.RecoverableSecurityException;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.IntentSender;
 import android.database.Cursor;
 import android.net.Uri;
@@ -15,6 +14,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 
 
+import com.abdurazaaqmohammed.AntiSplit.main.MainActivity;
 import com.abdurazaaqmohammed.utils.FileUtils;
 
 import java.io.IOException;
@@ -37,13 +37,13 @@ import java.util.Collection;
  */
 public class AndroidXI {
 
-    private Context context;
+    private MainActivity context;
 
     public static AndroidXI getInstance() {
         return new AndroidXI();
     }
 
-    public AndroidXI with(Context context) {
+    public AndroidXI with(MainActivity context) {
         this.context = context;
         return this;
     }

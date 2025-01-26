@@ -15,14 +15,14 @@
  */
 package com.reandroid;
 
-import static com.abdurazaaqmohammed.AntiSplit.main.MainActivity.rss;
-
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 
 import com.abdurazaaqmohammed.AntiSplit.R;
+import com.abdurazaaqmohammed.AntiSplit.main.MyAPKLogger;
 import com.abdurazaaqmohammed.utils.DeviceSpecsUtil;
 import com.abdurazaaqmohammed.AntiSplit.main.MainActivity;
 import com.abdurazaaqmohammed.utils.SignUtil;
@@ -58,9 +58,9 @@ import java.util.concurrent.CountDownLatch;
 public class Merger {
 
     /** @noinspection ResultOfMethodCallIgnored*/
-    private static void extractAndLoad(Uri in, File cacheDir, MainActivity context, List<String> splits, ApkBundle bundle) throws IOException {
-        MainActivity.logger.logMessage(in.getPath());
-        //bundle.setAPKLogger(MainActivity.logger); // This spams the log
+    private static void extractAndLoad(Uri in, File cacheDir, MainActivity context, List<String> splits, ApkBundle bundle, MyAPKLogger logger) throws IOException {
+        logger.logMessage(in.getPath());
+        //bundle.setAPKLogger(context.getLogger()); // This spams the log
         boolean checkSplits = splits != null && !splits.isEmpty();
         try (InputStream is = FileUtils.getInputStream(in, context);
              ZipFileInput zis = new ZipFileInput(is)) {
@@ -69,17 +69,16 @@ public class Merger {
                 String name = header.getFileName();
                 if (name.endsWith(".apk")) {
                     if ((checkSplits && splits.contains(name)))
-                        MainActivity.logger.logMessage(rss.getString(R.string.skipping) + name + rss.getString(R.string.unselected));
+                        logger.logMessage(context.getRss().getString(R.string.skipping) + name + context.getRss().getString(R.string.unselected));
                     else {
                         File file = new File(cacheDir, name);
                         if (file.getCanonicalPath().startsWith(cacheDir.getCanonicalPath() + File.separator))
                             zis.readFileDataToFile(file);
                         else throw new IOException("Zip entry is outside of the target dir: " + name);
 
-                        MainActivity.logger.logMessage("Extracted " + name);
+                        logger.logMessage("Extracted " + name);
                     }
-                } else
-                    MainActivity.logger.logMessage(rss.getString(R.string.skipping) + name + rss.getString(R.string.not_apk));
+                } else logger.logMessage(context.getRss().getString(R.string.skipping) + name + context.getRss().getString(R.string.not_apk));
             }
             bundle.loadApkDirectory(cacheDir);
         } catch (Exception e) {
@@ -92,17 +91,18 @@ public class Merger {
                 File input = new File(FileUtils.getPath(in, context));
                 boolean couldNotRead = !input.canRead();
                 if (couldNotRead) try(InputStream is = context.getContentResolver().openInputStream(in)) {
-                    com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, input = new File(cacheDir, input.getName()));
+                    File parentFile = cacheDir.getParentFile();
+                    com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, input = new File(parentFile != null && parentFile.canRead() ? parentFile : cacheDir, input.getName()));
                 }
                 ArchiveFile zf = new ArchiveFile(input);
-                extractZipFile(zf, checkSplits, splits, cacheDir, MainActivity.logger);
+                extractZipFile(zf, checkSplits, splits, cacheDir, logger, context.getRss());
                 if (couldNotRead) input.delete();
-            } else extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splits, cacheDir, MainActivity.logger);
+            } else extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splits, cacheDir, logger, context.getRss());
             bundle.loadApkDirectory(cacheDir);
         }
     }
 
-    private static void extractZipFile(ArchiveFile zf, boolean checkSplits, List<String> splits, File cacheDir, APKLogger logger) throws IOException {
+    private static void extractZipFile(ArchiveFile zf, boolean checkSplits, List<String> splits, File cacheDir, APKLogger logger, Resources rss) throws IOException {
         for(InputSource archiveEntry : zf.getInputSources()) {
             String name = archiveEntry.getName();
             if (name.endsWith(".apk")) {
@@ -113,10 +113,12 @@ public class Merger {
                 }
             } else logger.logMessage(rss.getString(R.string.skipping) + name + rss.getString(R.string.not_apk));
         }
+        zf.close();
     }
 
     public static void run(ApkBundle bundle, File cacheDir, Uri out, MainActivity context, boolean signApk, boolean force) throws IOException, InterruptedException {
-        MainActivity.logger.logMessage("Found modules: " + bundle.getApkModuleList().size());
+        MyAPKLogger logger = context.getLogger();
+        logger.logMessage("Found modules: " + bundle.getApkModuleList().size());
         final boolean[] saveToCacheDir = {true}; // I found writeApk(OutputStream) is really slow and writing to file and copying is actually faster
         final boolean[] sign = {signApk};
         for(File split : cacheDir.listFiles()) {
@@ -131,17 +133,16 @@ public class Merger {
                 if (zf.containsFile("lib" + File.separator + arch + File.separator + "libpairipcore.so")) {
                     final CountDownLatch latch = new CountDownLatch(1);
                     context.getHandler().post(() ->
-                            context.runOnUiThread(new MaterialAlertDialogBuilder(context).setTitle(rss.getString(R.string.warning)).setMessage(R.string.pairip_warning)
-                                    .setPositiveButton("OK", (dialog, which) -> {
-                                        saveToCacheDir[0] = true;
-                                        sign[0] = false;
-                                        latch.countDown();
-                                    }).setNegativeButton(rss.getString(R.string.cancel), (dialog, which) -> {
-                                        context.startActivity(new Intent(context, MainActivity.class));
-                                        context.finishAffinity();
-                                        latch.countDown();
-                                    })
-                                    .create()::show));
+                        context.runOnUiThread(new MaterialAlertDialogBuilder(context).setTitle(context.getRss().getString(R.string.warning)).setMessage(R.string.pairip_warning)
+                        .setPositiveButton("OK", (dialog, which) -> {
+                            saveToCacheDir[0] = true;
+                            sign[0] = false;
+                            latch.countDown();
+                        }).setNegativeButton(context.getRss().getString(R.string.cancel), (dialog, which) -> {
+                            context.startActivity(new Intent(context, MainActivity.class));
+                            context.finishAffinity();
+                            latch.countDown();
+                        }).create()::show));
                     latch.await();
                     break;
                 }
@@ -150,24 +151,24 @@ public class Merger {
         try (ApkModule mergedModule = bundle.mergeModules(!force)) { // I guess force meant force throw ..
             if (mergedModule.hasAndroidManifest()) {
                 AndroidManifestBlock manifest = mergedModule.getAndroidManifest();
-                MainActivity.logger.logMessage(rss.getString(R.string.sanitizing_manifest));
+                logger.logMessage((R.string.sanitizing_manifest));
 
                 AndroidManifestHelper.removeAttributeFromManifestById(manifest,
-                        AndroidManifest.ID_requiredSplitTypes, MainActivity.logger);
+                        AndroidManifest.ID_requiredSplitTypes, logger);
                 AndroidManifestHelper.removeAttributeFromManifestById(manifest,
-                        AndroidManifest.ID_splitTypes, MainActivity.logger);
+                        AndroidManifest.ID_splitTypes, logger);
                 AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
-                        AndroidManifest.NAME_splitTypes, MainActivity.logger);
+                        AndroidManifest.NAME_splitTypes, logger);
 
                 AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
-                        AndroidManifest.NAME_requiredSplitTypes, MainActivity.logger);
+                        AndroidManifest.NAME_requiredSplitTypes, logger);
                 AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
-                        AndroidManifest.NAME_splitTypes, MainActivity.logger);
+                        AndroidManifest.NAME_splitTypes, logger);
                 AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
-                        AndroidManifest.ID_extractNativeLibs, MainActivity.logger, AndroidManifest.NAME_extractNativeLibs
+                        AndroidManifest.ID_extractNativeLibs, logger, AndroidManifest.NAME_extractNativeLibs
                 );
                 AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
-                        AndroidManifest.ID_isSplitRequired, MainActivity.logger,AndroidManifest.NAME_isSplitRequired
+                        AndroidManifest.ID_isSplitRequired, logger,AndroidManifest.NAME_isSplitRequired
                 );
 
                 ResXmlElement application = manifest.getApplicationElement();
@@ -202,7 +203,7 @@ public class Merger {
                                                     continue;
                                                 }
                                                 String path = resValue.getValueAsString();
-                                                MainActivity.logger.logMessage(rss.getString(R.string.removed_table_entry) + " " + path);
+                                                logger.logMessage((R.string.removed_table_entry) + " " + path);
                                                 //Remove file entry
                                                 zipEntryMap.remove(path);
                                                 // It's not safe to destroy entry, resource id might be used in dex code.
@@ -220,18 +221,18 @@ public class Merger {
                         }
                         splits_removed = result;
                     }
-                    MainActivity.logger. logMessage("Removed-element : <" + meta.getName() + "> name=\"" + AndroidManifestBlock.getAndroidNameValue(meta) + "\"");
+                    logger. logMessage("Removed-element : <" + meta.getName() + "> name=\"" + AndroidManifestBlock.getAndroidNameValue(meta) + "\"");
                     application.remove(meta);
                 }
                 manifest.refresh();
             }
-            MainActivity.logger.logMessage(rss.getString(R.string.saving));
+            logger.logMessage((R.string.saving));
 
             File temp;
             if (sign[0]) {
                 mergedModule.writeApk(temp = new File(cacheDir, "temp.apk"));
-                MainActivity.logger.logMessage(rss.getString(R.string.signing));
-                boolean saveToCache = MainActivity.doesNotHaveStoragePerm(context);
+                logger.logMessage((R.string.signing));
+                boolean saveToCache = com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(context);
                 String p;
                 File signed = new File(saveToCache || (saveToCache = TextUtils.isEmpty(p = FileUtils.getPath(out, context))) ? (cacheDir + File.separator + "signed.apk") : p);
                 try {
@@ -259,10 +260,11 @@ public class Merger {
     public static Uri signedApk;
 
     public static void run(Uri in, File cacheDir, Uri out, MainActivity context, List<String> splits, boolean signApk, boolean force) throws Exception {
-        MainActivity.logger.logMessage(rss.getString(R.string.searching));
+        MyAPKLogger logger = context.getLogger();
+        logger.logMessage((R.string.searching));
         try (ApkBundle bundle = new ApkBundle()) {
             if (in == null) bundle.loadApkDirectory(cacheDir); // Multiple splits from a split apk, already copied to cache dir
-            else extractAndLoad(in, cacheDir, context, splits, bundle);
+            else extractAndLoad(in, cacheDir, context, splits, bundle, logger);
             run(bundle, cacheDir, out, context, signApk, force);
         }
     }

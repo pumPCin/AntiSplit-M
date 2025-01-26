@@ -10,8 +10,8 @@ android {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
         minSdk = 19
         targetSdk = 35
-        versionCode = 43
-        versionName = "2.1.5"
+        versionCode = 45
+        versionName = "2.1.7"
         multiDexEnabled = true
     }
 
@@ -26,7 +26,7 @@ android {
         }
     }
     compileOptions {
-        isCoreLibraryDesugaringEnabled = true
+        isCoreLibraryDesugaringEnabled = false
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -34,7 +34,6 @@ android {
         viewBinding = false
     }
     dependencies {
-        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
         implementation("com.google.android.material:material:1.12.0")
         implementation(files("libs/APKEditor.jar"))
     }

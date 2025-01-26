@@ -1,7 +1,6 @@
 package com.github.paul035;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
@@ -26,11 +25,7 @@ public class LocaleHelper {
     }
 
     private static void persist(Context context, String language) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(SELECTED_LANGUAGE, language);
-        if(Build.VERSION.SDK_INT > 8) editor.apply();
-        else editor.commit();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(SELECTED_LANGUAGE, language).apply();
     }
 
     // Method to update the language of the application by creating
@@ -57,9 +52,7 @@ public class LocaleHelper {
         Configuration configuration = resources.getConfiguration();
         configuration.locale = locale;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            configuration.setLayoutDirection(locale);
-        }
+        configuration.setLayoutDirection(locale);
 
         resources.updateConfiguration(configuration, resources.getDisplayMetrics());
 
