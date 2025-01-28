@@ -1,6 +1,5 @@
 package com.abdurazaaqmohammed.AntiSplit.main;
 
-import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
 import static android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
 import static com.abdurazaaqmohammed.utils.LegacyUtils.aboveSdk20;
 
@@ -29,6 +28,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.OpenableColumns;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean urisAreSplitApks = true;
     private boolean errorOccurred;
     private boolean checkForUpdates;
+    private String lastVerChecked;
     boolean logEnabled;
     private boolean force;
     private String lang;
@@ -114,10 +115,6 @@ public class MainActivity extends AppCompatActivity {
     private String pkgName;
     private String suffix;
     private boolean systemTheme;
-
-    public void setRss(Resources rss) {
-        this.rss = rss;
-    }
 
     private Resources rss;
 
@@ -145,17 +142,19 @@ public class MainActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
 
-        setContentView(R.layout.activity_main);
-
         String deviceLang = Locale.getDefault().getLanguage();
         boolean supportedLang = deviceLang.equals("ar") || deviceLang.equals("es") || deviceLang.equals("fr") || deviceLang.equals("in") || deviceLang.equals("it") || deviceLang.equals("pt-rBR") || deviceLang.equals("ru") || deviceLang.equals("tr") || deviceLang.equals("uk") || deviceLang.equals("vi");
         lang = settings.getString("lang", supportedLang ? deviceLang : "en");
-        if(lang.equals(Locale.getDefault().getLanguage())) rss = getResources();
-        else LanguageUtil.updateMain(LocaleHelper.setLocale(this, lang).getResources(), this);
+        boolean useDeviceRss = lang.equals(deviceLang);
+        rss = useDeviceRss ? getResources() : LocaleHelper.setLocale(this, lang).getResources();
 
         boolean dark = (rss.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
         setTheme(theme = settings.getInt("theme", dark
                 ? com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar));
+
+        setContentView(R.layout.activity_main);
+
+        if(!useDeviceRss) LanguageUtil.updateMain(rss, this);
 
         if(theme == R.style.Theme_MyApp_Black) findViewById(R.id.main).setBackgroundColor(Color.BLACK);
         deviceSpecsUtil = new DeviceSpecsUtil(this);
@@ -180,7 +179,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Fetch settings from SharedPreferences
-        if(checkForUpdates = settings.getBoolean("checkForUpdates", true)) checkForUpdates(false);
+        lastVerChecked = getSharedPreferences("set", Context.MODE_PRIVATE).getString("lastVerChecked", null);
+        if((checkForUpdates = settings.getBoolean("checkForUpdates", true))) checkForUpdates(false);
         signApk = settings.getBoolean("signApk", true);
         force = settings.getBoolean("force", false);
         showDialog = settings.getBoolean("showDialog", false);
@@ -267,30 +267,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private void checkStoragePerm() {
+    private void checkStoragePerm(int requestCode) {
         if(com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this)) {
             Toast.makeText(this, rss.getString(R.string.grant_storage), Toast.LENGTH_LONG).show();
-            if(LegacyUtils.supportsWriteExternalStorage) requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 9);
-            else startActivityForResult(new Intent(ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + getPackageName())), 9);
+            if(LegacyUtils.supportsWriteExternalStorage) requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
+            else startActivityForResult(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + getPackageName())), requestCode);
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 10 && grantResults[0] == PackageManager.PERMISSION_GRANTED) checkUpdateAfterStoragePermission.run();
+        else if (requestCode == 9 && com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this)) ask = true;
     }
 
     @Override
     protected void onPause() {
         getSharedPreferences("set", Context.MODE_PRIVATE).edit()
-                .putBoolean("logEnabled", logEnabled)
-                .putBoolean("ask", ask)
-                .putBoolean("showDialog", showDialog)
-                .putBoolean("signApk", signApk)
-                .putBoolean("force", force)
-                .putBoolean("systemTheme", systemTheme)
-                .putBoolean("selectSplitsForDevice", selectSplitsForDevice)
-                .putInt("theme", theme)
-                .putInt("sortMode", sortMode)
-                .putBoolean("checkForUpdates", checkForUpdates)
-                .putString("lang", lang)
-                .putString("suffix", suffix)
-                .apply();
+            .putBoolean("logEnabled", logEnabled)
+            .putBoolean("ask", ask)
+            .putBoolean("showDialog", showDialog)
+            .putBoolean("signApk", signApk)
+            .putBoolean("force", force)
+            .putBoolean("systemTheme", systemTheme)
+            .putBoolean("selectSplitsForDevice", selectSplitsForDevice)
+            .putInt("theme", theme)
+            .putInt("sortMode", sortMode)
+            .putBoolean("checkForUpdates", checkForUpdates)
+            .putString("lang", lang)
+            .putString("lastVerChecked", lastVerChecked)
+            .putString("suffix", suffix)
+            .apply();
         super.onPause();
     }
 
@@ -479,7 +487,7 @@ public class MainActivity extends AppCompatActivity {
                         currentVer = null;
                     }
                     boolean newVer = false;
-                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '1', '6'} : currentVer.replace(".", "").toCharArray();
+                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '1', '1'} : currentVer.replace(".", "").toCharArray();
                     char[] latest = latestVersion.replace(".", "").toCharArray();
 
                     int maxLength = Math.max(curr.length, latest.length);
@@ -496,6 +504,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     if(newVer) {
+                        if (!toast && !TextUtils.isEmpty(lastVerChecked) && lastVerChecked.equals(latestVersion)) return;
                         String ending = ".apk";
                         String filename = "AntiSplit-M.v" + latestVersion + ending;
                         String link = dl.endsWith(ending) ? dl : dl + File.separator + filename;
@@ -510,22 +519,34 @@ public class MainActivity extends AppCompatActivity {
                         title.setPadding(size,size,size,size);
                         title.setTextSize(size);
                         title.setGravity(Gravity.CENTER);
-                       getHandler().post(() -> runOnUiThread(new MaterialAlertDialogBuilder(MainActivity.this).setCustomTitle(title).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
-                           if (Build.VERSION.SDK_INT < 29) MainActivity.this.checkStoragePerm();
-                           ((DownloadManager) MainActivity.this.getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(Uri.parse(link))
-                                   .setTitle(filename).setDescription(filename).setMimeType("application/vnd.android.package-archive")
-                                   .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
-                                   .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED));
-                       }).setNegativeButton("Go to GitHub Release", (dialog, which) -> MainActivity.this.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest")))).setNeutralButton(rss.getString(R.string.cancel), null).create()::show));
+
+                        String finalLatestVersion = latestVersion;
+                        getHandler().post(() -> {
+                            AlertDialog alertDialog = new MaterialAlertDialogBuilder(MainActivity.this).setCustomTitle(title).setView(changelogText).setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
+                                if (checkUpdateAfterStoragePermission == null)
+                                    checkUpdateAfterStoragePermission = () ->
+                                            ((DownloadManager) MainActivity.this.getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(Uri.parse(link))
+                                                    .setTitle(filename).setDescription(filename).setMimeType("application/vnd.android.package-archive")
+                                                    .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
+                                                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED));
+                                if (Build.VERSION.SDK_INT < 29 && com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this))
+                                    MainActivity.this.checkStoragePerm(10);
+                                else checkUpdateAfterStoragePermission.run();
+                            }).setNegativeButton("Go to GitHub Release", (dialog, which) -> MainActivity.this.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest")))).setNeutralButton(rss.getString(R.string.cancel), null).create();
+                            alertDialog.setOnDismissListener(dialog -> lastVerChecked = finalLatestVersion);
+                            MainActivity.this.runOnUiThread(alertDialog::show);
+                        });
                     } else if (toast) getHandler().post(() -> MainActivity.this.runOnUiThread(() -> Toast.makeText(MainActivity.this, rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show()));
                     // return new String[]{ver, changelog, dl};
                 }
             } catch (Exception e) {
-                showError(e);
+              //  showError(e);
                 if (toast) runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to check for update", Toast.LENGTH_SHORT).show());
             }
         }).start();
     }
+
+    private Runnable checkUpdateAfterStoragePermission;
 
     public void showApkSelectionDialog() {
         try {
@@ -776,7 +797,7 @@ public class MainActivity extends AppCompatActivity {
                     .setType("application/vnd.android.package-archive")
                     .putExtra(Intent.EXTRA_TITLE, filename), 2);
         } else {
-            checkStoragePerm();
+            checkStoragePerm(9);
             try {
                 if(splitAPKUri == null) process(Uri.fromFile(new File(com.abdurazaaqmohammed.utils.FileUtils.getAntisplitMFolder(), "output.apk")));
                 else {
@@ -1030,17 +1051,16 @@ public class MainActivity extends AppCompatActivity {
             String[] display = rss.getStringArray(R.array.langs_display);
 
             AlertDialog ad = new MaterialAlertDialogBuilder(MainActivity.this).setSingleChoiceItems(display, -1, (dialog, which) -> {
-                LanguageUtil.updateLang(LocaleHelper.setLocale(MainActivity.this, lang = langs[which]).getResources(), settingsDialog, MainActivity.this);
+                LanguageUtil.updateLang(rss = LocaleHelper.setLocale(MainActivity.this, lang = langs[which]).getResources(), settingsDialog, MainActivity.this);
                 dialog.dismiss();
             }).create();
             MainActivity.this.styleAlertDialog(ad);
             ad.getListView().setAdapter(new ArrayAdapter<>(MainActivity.this, android.R.layout.select_dialog_singlechoice, display));
-            for (int i = 0; i < langs.length; i++) {
+            for (int i = 0; i < langs.length; i++)
                 if (lang.equals(langs[i])) {
                     ad.getListView().setItemChecked(i, true);
                     break;
                 }
-            }
         });
         MaterialTextView title = new MaterialTextView(MainActivity.this);
         title.setText(rss.getString(R.string.settings));
@@ -1055,7 +1075,7 @@ public class MainActivity extends AppCompatActivity {
         askSwitch.setChecked(ask);
         askSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (!(ask = isChecked) && com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this)) {
-                MainActivity.this.checkStoragePerm();
+                MainActivity.this.checkStoragePerm(9);
                 ad.dismiss();
             }
         });

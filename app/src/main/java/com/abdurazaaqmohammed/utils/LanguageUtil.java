@@ -15,7 +15,6 @@ public class LanguageUtil {
     }
 
     public static void updateMain(Resources res, MainActivity context) {
-        context.setRss(res);
         context.<TextView>findViewById(R.id.decodeButton).setText(res.getString(R.string.merge));
         context.<TextView>findViewById(R.id.fromAppsButton).setText(res.getString(R.string.select_from_installed_apps));
         context.findViewById(R.id.settingsButton).setContentDescription(res.getString(R.string.settings));
