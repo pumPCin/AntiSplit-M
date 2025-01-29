@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(aboveSdk20) {
             getWindow().addFlags(FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            int transparent = rss.getColor(android.R.color.transparent);
+            int transparent = Color.TRANSPARENT;
             getWindow().setNavigationBarColor(transparent);
             getWindow().setStatusBarColor(transparent);
         }
