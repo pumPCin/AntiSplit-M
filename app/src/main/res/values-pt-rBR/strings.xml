@@ -2,7 +2,8 @@
     <string name="merge">Selecione split APK para mesclar/AntiSplit</string>
     <string name="success_saved">Arquivo salvo com sucesso</string>
     <string name="enable_logs" >Ativar logs</string>
-    <string name="ask">Pergunte onde salvar o arquivo a cada vez (se desabilitado, salve o APK mesclado no mesmo diretório de onde veio o arquivo dividido)</string>
+    <string name="ask">Pergunte onde salvar o arquivo a cada vez</string>
+    <string name="same">salve o APK mesclado no mesmo diretório de onde veio o arquivo dividido</string>
     <string name="grant_storage">Permissão de armazenamento necessária para salvar no mesmo diretório do arquivo selecionado</string>
     <string name="no_filepath">"Não é possível gravar no caminho do arquivo "</string>
     <string name="output">"Diretório de saída: "</string>

@@ -3,7 +3,8 @@
     <string name="merge">Seleccionar APK divididos para Fusionar/AntiSplit</string>
     <string name="success_saved">Archivo guardado exitosamente</string>
     <string name="enable_logs">Habilitar registros.</string>
-    <string name="ask">Preguntar dónde guardar (si está deshabilitado, guarda en el directorio del archivo split).</string>
+    <string name="ask">Preguntar dónde guardar</string>
+    <string name="same">guarda en el directorio del archivo split</string>
     <string name="grant_storage">Se requiere permiso para guardar en el mismo directorio del archivo.</string>
     <string name="no_filepath">"No se puede escribir en la ruta del archivo "</string>
     <string name="output">"Directorio de salida: "</string>

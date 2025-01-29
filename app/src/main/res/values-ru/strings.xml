@@ -2,7 +2,8 @@
 <resources>
     <string name="all">Выбрать все</string>
     <string name="arch_for_device">Выбор архитектуру для вашего устройства</string>
-    <string name="ask">Спрашивать где сохранить файл (если отключено, сохраняет APK в том же каталоге, из которого был Splits APK файл)</string>
+    <string name="ask">Спрашивать где сохранить файл</string>
+    <string name="same">сохраняет APK в том же каталоге, из которого был Splits APK файл</string>
     <string name="automatically_select">Автоматический выбор в соответствии вашей архитектуры устройства</string>
     <string name="cancel">Отмена</string>
     <string name="change_background_color">Изменить цвет фона</string>

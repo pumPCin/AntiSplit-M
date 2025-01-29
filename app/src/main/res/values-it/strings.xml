@@ -2,7 +2,8 @@
     <string name="merge">Seleziona l\'APK suddiviso da unire</string>
     <string name="success_saved">Esportazione file APK unito completata</string>
     <string name="enable_logs" >Attiva registro eventi</string>
-    <string name="ask">Chiedi ogni volta dove salvare il file (se disattivato, il file APK unito verrà esportato nella medesima cartella del file APK suddiviso)</string>
+    <string name="ask">Chiedi ogni volta dove salvare il file</string>
+    <string name="same">il file APK unito verrà esportato nella medesima cartella del file APK suddiviso</string>
     <string name="grant_storage">È richiesto il permesso di accesso alla memoria interna per effettuare il salvataggio nella stessa cartella del file suddiviso selezionato</string>
     <string name="no_filepath">"Impossibile salvare nel percorso "</string>
     <string name="output">"Cartella di salvataggio: "</string>

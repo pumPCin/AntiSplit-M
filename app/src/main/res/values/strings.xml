@@ -3,7 +3,8 @@
     <string name="merge">Select split APK to Merge/AntiSplit</string>
     <string name="success_saved">File saved successfully</string>
     <string name="enable_logs" >Enable logs</string>
-    <string name="ask">Ask where to save the file each time (if disabled, save the merged APK to the same directory where the split file was from)</string>
+    <string name="ask">Ask each time</string>
+    <string name="same">Same directory as selected file</string>
     <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
     <string name="no_filepath">"Can\'t write to the filepath "</string>
     <string name="output">"Output directory: "</string>
@@ -86,4 +87,6 @@
     <string name="suffix">Suffix</string>
     <string name="pairip_warning">The app you are trying to merge uses Pairip/Google加固 Integrity to protect it from modification. The merged version will crash on opening unless you know how to modify the APK to bypass it.</string>
     <string name="force">Force merging mismatched splits (with different versionCode or package name)</string>
+    <string name="file_save_method">File save method</string>
+    <string name="pick_folder">Enter folder</string>
 </resources>

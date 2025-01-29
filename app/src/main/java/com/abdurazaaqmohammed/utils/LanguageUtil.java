@@ -26,7 +26,7 @@ public class LanguageUtil {
     public static void updateSettingsDialog(ScrollView settingsDialog, Resources res) {
         ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(res.getString(R.string.lang));
         ((TextView) settingsDialog.findViewById(R.id.logToggle)).setText(res.getString(R.string.enable_logs));
-        ((TextView) settingsDialog.findViewById(R.id.ask)).setText(res.getString(R.string.ask));
+       // ((TextView) settingsDialog.findViewById(R.id.ask)).setText(res.getString(R.string.ask));
         ((TextView) settingsDialog.findViewById(R.id.showDialogToggle)).setText(res.getString(R.string.show_dialog));
         ((TextView) settingsDialog.findViewById(R.id.signToggle)).setText(res.getString(R.string.sign_apk));
         ((TextView) settingsDialog.findViewById(R.id.forceToggle)).setText(res.getString(R.string.force));

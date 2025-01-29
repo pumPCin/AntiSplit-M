@@ -3,7 +3,8 @@
     <string name="all">Chọn hết</string>
     <string name="app_icon_list_label">App icon</string>
     <string name="arch_for_device">Chọn kiến trúc cho thiết bị của bạn</string>
-    <string name="ask">Hỏi nơi lưu tệp mỗi lần (nếu bị tắt, hãy lưu APK đã hợp nhất vào cùng thư mục nơi chứa tệp được chia)</string>
+    <string name="ask">Hỏi nơi lưu tệp mỗi lần</string>
+    <string name="same">hãy lưu APK đã hợp nhất vào cùng thư mục nơi chứa tệp được chia</string>
     <string name="auto_update">Kiểm tra cập nhật tự động</string>
     <string name="automatically_select">Tự động chọn phần chia cho thông số kỹ thuật thiết bị của bạn</string>
     <string name="black_theme">Chủ đề màu đen</string>

@@ -2,7 +2,8 @@
     <string name="merge">Birleştirmek/Ayrıştırmak için split APK\'yı seçin.</string>
     <string name="success_saved">Dosya başarıyla kaydedildi.</string>
     <string name="enable_logs">Kayıtları etkinleştir</string>
-    <string name="ask">Her seferinde dosyanın nereye kaydedileceğini sor (devre dışı bırakılırsa, birleştirilmiş APK, split APK\'nın bulunduğu klasöre kaydedilir)</string>
+    <string name="ask">Her seferinde dosyanın nereye kaydedileceğini sor</string>
+    <string name="same">birleştirilmiş APK, split APK\'nın bulunduğu klasöre kaydedilir</string>
     <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
     <string name="no_filepath">Seçilen dosyanın dosya yolu bulunamadı</string>
     <string name="output">"Çıktı klasörü: "</string>

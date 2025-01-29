@@ -2,7 +2,8 @@
 <resources>
     <string name="all">Обрати все</string>
     <string name="arch_for_device">Вибір архітектури для вашого пристрою</string>
-    <string name="ask">Запитувати де зберегти файл (якщо вимкнено, зберігає APK у тому ж каталозі, з якого був Splits APK файл)</string>
+    <string name="ask">Запитувати де зберегти файл</string>
+    <string name="same">зберігає APK у тому ж каталозі, з якого був Splits APK файл</string>
     <string name="automatically_select">Автоматичний вибір відповідно до вашої архітектури пристрою</string>
     <string name="cancel">Відміна</string>
     <string name="change_background_color">Змінити колір тла</string>

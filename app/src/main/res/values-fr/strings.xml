@@ -2,7 +2,8 @@
     <string name="merge">Sélectionner des APK fractionnés pour Fusionner/AntiSplit</string>
     <string name="success_saved">Fichier enregistré avec succès</string>
     <string name="enable_logs">Activer les logs</string>
-    <string name="ask">Demander où enregistrer le fichier à chaque fois (si désactivé, enregistrer l\'APK fusionné dans le même répertoire que celui d\'où provient le fichier fractionné).</string>
+    <string name="ask">Demander où enregistrer le fichier à chaque fois</string>
+    <string name="same">enregistrer l\'APK fusionné dans le même répertoire que celui d\'où provient le fichier fractionné</string>
     <string name="grant_storage">Autorisation de stockage nécessaire pour enregistrer dans le même répertoire que le fichier sélectionné</string>
     <string name="no_filepath">"Impossible d'écrire dans le chemin du fichier "</string>
     <string name="output">"Répertoire de sortie : "</string>

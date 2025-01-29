@@ -106,6 +106,7 @@
             android:layout_height="wrap_content"
             android:elevation="0dp"
             app:elevation="0dp"
+            app:backgroundTint="@color/secondary_600"
             android:contentDescription="@string/copy_log"
             android:src="@drawable/copy"
             android:layout_marginBottom="5dp"
