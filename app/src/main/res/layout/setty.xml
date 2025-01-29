@@ -113,7 +113,7 @@
                 android:id="@+id/auto_complete_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
+                android:inputType="none"
                 android:singleLine="false"
                 android:lines="2"
                 android:maxLines="3"/>
