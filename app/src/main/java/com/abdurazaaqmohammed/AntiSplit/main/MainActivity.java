@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
         boolean dark = (rss.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
         setTheme(theme = settings.getInt("theme", dark
-                ? com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar));
+                ? R.style.Theme_MyApp_Dark : R.style.Theme_MyApp_Light));
 
         setContentView(R.layout.activity_main);
 
@@ -201,7 +201,10 @@ public class MainActivity extends AppCompatActivity {
             .addCategory(Intent.CATEGORY_OPENABLE)
             .setType("*/*")
             .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/zip", "application/vnd.android.package-archive", "application/octet-stream"}), 1) // XAPK is octet-stream
+            .putExtra(Intent.EXTRA_MIME_TYPES, com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this) ?
+                new String[]{"application/zip", "application/vnd.android.package-archive", "application/octet-stream"} :
+                new String[]{"application/zip", "application/vnd.android.package-archive", "application/octet-stream", ""}) // XAPK usually octet-stream
+            , 1)
         );
 
         // Check if user shared or opened file with the app.
@@ -230,15 +233,11 @@ public class MainActivity extends AppCompatActivity {
         Window w = ad.getWindow();
         if(w != null) {
             GradientDrawable border = new GradientDrawable();
-            boolean light = theme == com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
+            boolean light = theme == R.style.Theme_MyApp_Light;
             border.setColor(light ? Color.WHITE : Color.BLACK); // Background color
 
             // Border width and color
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                TypedValue typedValue = new TypedValue();
-                getTheme().resolveAttribute(android.R.attr.colorPrimary, typedValue, true);
-                border.setStroke(5, typedValue.data);
-            } else border.setStroke(5, light ? Color.BLACK : Color.WHITE);
+            border.setStroke(5, rss.getColor(R.color.main_500));
 
             border.setCornerRadius(24);
             w.setBackgroundDrawable(border);
@@ -257,10 +256,10 @@ public class MainActivity extends AppCompatActivity {
         if(systemTheme) {
             int currentNightMode = newConfig.uiMode & Configuration.UI_MODE_NIGHT_MASK;
             if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
-                setTheme(theme = com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar);
+                setTheme(theme = R.style.Theme_MyApp_Dark);
                 recreate();
             } else if (currentNightMode == Configuration.UI_MODE_NIGHT_NO) {
-                setTheme(theme = com.google.android.material.R.style.Theme_Material3_Light_NoActionBar);
+                setTheme(theme = R.style.Theme_MyApp_Light);
                 recreate();
             }
         }
@@ -540,7 +539,7 @@ public class MainActivity extends AppCompatActivity {
                     // return new String[]{ver, changelog, dl};
                 }
             } catch (Exception e) {
-              //  showError(e);
+              //ra  showError(e);
                 if (toast) runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to check for update", Toast.LENGTH_SHORT).show());
             }
         }).start();
@@ -980,8 +979,8 @@ public class MainActivity extends AppCompatActivity {
         MaterialButtonToggleGroup themeButtons = settingsDialog.findViewById(R.id.themeToggleGroup);
         themeButtons.check(
                 systemTheme ? R.id.systemThemeButton :
-                        theme == com.google.android.material.R.style.Theme_Material3_Light_NoActionBar ? R.id.lightThemeButton :
-                                theme == com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar ? R.id.darkThemeButton :
+                        theme == R.style.Theme_MyApp_Light ? R.id.lightThemeButton :
+                                theme == R.style.Theme_MyApp_Dark ? R.id.darkThemeButton :
                                         R.id.blackThemeButton
         );
 
@@ -992,10 +991,10 @@ public class MainActivity extends AppCompatActivity {
                 systemTheme = false;
                 if (checkedId == R.id.lightThemeButton) {
                     themeButtons.check(R.id.lightThemeButton);
-                    theme = com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
+                    theme = R.style.Theme_MyApp_Light;
                 } else if (checkedId == R.id.darkThemeButton) {
                     themeButtons.findViewById(R.id.darkThemeButton);
-                    theme = com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar;
+                    theme = R.style.Theme_MyApp_Dark;
                 } else if (checkedId == R.id.blackThemeButton) {
                     themeButtons.check(R.id.blackThemeButton);
                     theme = R.style.Theme_MyApp_Black;
@@ -1003,7 +1002,7 @@ public class MainActivity extends AppCompatActivity {
                     systemTheme = true;
                     themeButtons.check(R.id.systemThemeButton);
                     theme = ((rss.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) ?
-                            com.google.android.material.R.style.Theme_Material3_Dark_NoActionBar : com.google.android.material.R.style.Theme_Material3_Light_NoActionBar;
+                            R.style.Theme_MyApp_Dark : R.style.Theme_MyApp_Light;
                 }
 
                 getSharedPreferences("set", Context.MODE_PRIVATE).edit().putInt("theme", theme).apply();
