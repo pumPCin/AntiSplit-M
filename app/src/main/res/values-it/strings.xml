@@ -2,8 +2,8 @@
     <string name="merge">Seleziona l\'APK suddiviso da unire</string>
     <string name="success_saved">Esportazione file APK unito completata</string>
     <string name="enable_logs" >Attiva registro eventi</string>
-    <string name="ask">Chiedi ogni volta dove salvare il file</string>
-    <string name="same">il file APK unito verrà esportato nella medesima cartella del file APK suddiviso</string>
+    <string name="ask">Chiedi ogni volta</string>
+    <string name="same">Stesso percorso dell\`APK suddiviso</string>
     <string name="grant_storage">È richiesto il permesso di accesso alla memoria interna per effettuare il salvataggio nella stessa cartella del file suddiviso selezionato</string>
     <string name="no_filepath">"Impossibile salvare nel percorso "</string>
     <string name="output">"Cartella di salvataggio: "</string>
@@ -20,7 +20,7 @@
     <string name="sign_apk">Firma l\'APK dopo l\'unione</string>
     <string name="automatically_select">Seleziona automaticamente le suddivisioni in base alle specifiche del tuo dispositivo</string>
     <string name="sign_failed">Errore durante la firma del file APK, il file salvato  non sarà firmato</string>
-    <string name="signing">Applicazione Firma APK…</string>
+    <string name="signing">Firma APK…</string>
     <string name="saving">Salvataggio…</string>
     <string name="removed_table_entry">"Rimozione corrispondenze-tabella: "</string>
     <string name="sanitizing_manifest">Pulizia file manifest…</string>
@@ -53,4 +53,7 @@
     <string name="app_icon_list_label">Icona app</string>
     <string name="install">Installa</string>
     <string name="suffix">Suffisso</string>
+    <string name="force">Forza unificazione delle suddivisioni non corrispondenti (con differente versionCode o nome pacchetto)</string>
+    <string name="file_save_method">Opzioni di salvataggio file</string>
+    <string name="pick_folder">Inserisci percorso</string>
 </resources>
