@@ -5,7 +5,6 @@
     <string name="app_name">AntiSplit-M</string>
     <string name="arch_for_device">Select architecture for your device</string>
     <string name="ask">Ask each time</string>
-    <string name="ask">Ask where to save the file each time (if disabled, save the merged APK to the same directory where the split file was from)</string>
     <string name="auto_update">Check for updates automatically</string>
     <string name="automatically_select">Automatically select splits for your device specifications</string>
     <string name="black_theme">Black theme</string>
