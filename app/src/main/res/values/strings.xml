@@ -4,6 +4,7 @@
     <string name="app_icon_list_label">App icon</string>
     <string name="app_name">AntiSplit-M</string>
     <string name="arch_for_device">Select architecture for your device</string>
+    <string name="ask">Ask each time</string>
     <string name="ask">Ask where to save the file each time (if disabled, save the merged APK to the same directory where the split file was from)</string>
     <string name="auto_update">Check for updates automatically</string>
     <string name="automatically_select">Automatically select splits for your device specifications</string>
@@ -21,10 +22,12 @@
     <string name="dpi_for_device">Select screen widths for your device</string>
     <string name="enable_logs" >Enable logs</string>
     <string name="error_dir_access">Directory cannot be accessed</string>
+    <string name="file_save_method">File save method</string>
     <string name="for_device">Select all splits for your device specifications</string>
     <string name="force">Force merging mismatched splits (with different versionCode or package name)</string>
     <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
     <string name="install">Install</string>
+    <string name="label_parent_dir" translatable="false">…</string>
     <string name="label_parent_dir">…</string>
     <string name="label_parent_directory">Parent Directory</string>
     <string name="lang">Language (Язык)</string>
@@ -42,7 +45,9 @@
     <string name="output">"Output directory: "</string>
     <string name="pairip_warning">The app you are trying to merge uses Pairip/Google加固 Integrity to protect it from modification. The merged version will crash on opening unless you know how to modify the APK to bypass it.</string>
     <string name="pause">Pause button</string>
+    <string name="pick_folder">Enter folder</string>
     <string name="removed_table_entry">"Removed table-entry : "</string>
+    <string name="same">Same directory as selected file</string>
     <string name="sanitizing_manifest">Sanitizing manifest…</string>
     <string name="saving">Saving…</string>
     <string name="searching">Searching apk files…</string>

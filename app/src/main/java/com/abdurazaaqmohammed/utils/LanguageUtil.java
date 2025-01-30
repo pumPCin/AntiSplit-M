@@ -15,7 +15,6 @@ public class LanguageUtil {
     }
 
     public static void updateMain(Resources res, MainActivity context) {
-        context.setRss(res);
         context.<TextView>findViewById(R.id.decodeButton).setText(res.getString(R.string.merge));
         context.<TextView>findViewById(R.id.fromAppsButton).setText(res.getString(R.string.select_from_installed_apps));
         context.findViewById(R.id.settingsButton).setContentDescription(res.getString(R.string.settings));
@@ -27,7 +26,7 @@ public class LanguageUtil {
     public static void updateSettingsDialog(ScrollView settingsDialog, Resources res) {
         ((TextView) settingsDialog.findViewById(R.id.langPicker)).setText(res.getString(R.string.lang));
         ((TextView) settingsDialog.findViewById(R.id.logToggle)).setText(res.getString(R.string.enable_logs));
-        ((TextView) settingsDialog.findViewById(R.id.ask)).setText(res.getString(R.string.ask));
+       // ((TextView) settingsDialog.findViewById(R.id.ask)).setText(res.getString(R.string.ask));
         ((TextView) settingsDialog.findViewById(R.id.showDialogToggle)).setText(res.getString(R.string.show_dialog));
         ((TextView) settingsDialog.findViewById(R.id.signToggle)).setText(res.getString(R.string.sign_apk));
         ((TextView) settingsDialog.findViewById(R.id.forceToggle)).setText(res.getString(R.string.force));

@@ -4,7 +4,7 @@
     <string name="app_icon_list_label">Иконка приложения</string>
     <string name="app_name">AntiSplit-M</string>
     <string name="arch_for_device">Выбрать архитектуру под ваше устройство</string>
-    <string name="ask">Cпрашивать где сохранить файл, иначе будет сохранен в каталоге splits-apk</string>
+    <string name="ask">Спрашивать где сохранить файл</string>
     <string name="auto_update">Автоматически проверять обновление</string>
     <string name="automatically_select">Автоматически выбирать всё под ваше устройство</string>
     <string name="black_theme">Чёрная</string>
@@ -43,6 +43,7 @@
     <string name="pairip_warning">The app you are trying to merge uses Pairip/Google加固 Integrity to protect it from modification. The merged version will crash on opening unless you know how to modify the apk to bypass it.</string>
     <string name="pause">Пауза</string>
     <string name="removed_table_entry">"Удалена запись в таблице: "</string>
+    <string name="same">сохраняет APK в том же каталоге, из которого был Splits APK файл</string>
     <string name="sanitizing_manifest">Очистка manifest…</string>
     <string name="saving">Сохранение…</string>
     <string name="searching">Поиск apk…</string>

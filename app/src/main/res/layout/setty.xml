@@ -95,12 +95,29 @@
             android:layout_height="1dp"
             android:background="?android:attr/listDivider" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
+<!--        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/ask"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/ask" />
+            android:text="@string/ask" />!-->
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/dropdown_menu"
+            style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Select Item">
+
+            <AutoCompleteTextView
+                android:id="@+id/auto_complete_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:singleLine="false"
+                android:lines="2"
+                android:maxLines="3"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <View
             android:layout_width="match_parent"
