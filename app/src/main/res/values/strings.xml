@@ -26,7 +26,6 @@
     <string name="force">Force merging mismatched splits (with different versionCode or package name)</string>
     <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
     <string name="install">Install</string>
-    <string name="label_parent_dir" translatable="false">…</string>
     <string name="label_parent_dir">…</string>
     <string name="label_parent_directory">Parent Directory</string>
     <string name="lang">Language (Язык)</string>
