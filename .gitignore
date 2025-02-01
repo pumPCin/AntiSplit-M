@@ -14,3 +14,9 @@
 .cxx
 local.properties
 /images
+/app/release
+.idea/runConfigurations.xml
+.idea/gradle.xml
+.idea/vcs.xml
+.idea/gradle.xml
+.idea/deploymentTargetSelector.xml

@@ -105,8 +105,9 @@ public class DeviceSpecsUtil {
 
     public List<String> getListOfSplits(Uri splitAPKUri) throws IOException {
         List<String> splits = new ArrayList<>();
-        File file = new File(FileUtils.getPath(splitAPKUri, context));
-        if(file.canRead()) return getListOfSplitsFromFile(file);
+        String path = FileUtils.getPath(splitAPKUri, context);
+        File file;
+        if(!TextUtils.isEmpty(path) && (file = new File(path)) != null && file.canRead()) return getListOfSplitsFromFile(file);
 
         try (InputStream is = context.getContentResolver().openInputStream(splitAPKUri);
                 ZipFileInput zis = new ZipFileInput(is)) {
@@ -116,14 +117,16 @@ public class DeviceSpecsUtil {
                 if (name.endsWith(".apk")) splits.add(name);
             }
         } catch (Exception e) {
+            String uriString = splitAPKUri.toString();
             try(InputStream is = context.getContentResolver().openInputStream(splitAPKUri)) {
-                com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, file = new File(context.getCacheDir(), file.getName()));
+                com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, file = new File(context.getCacheDir(), uriString.substring(uriString.lastIndexOf('/') + 1)));
                 return getListOfSplitsFromFile(file);
             }
         }
         if(splits.size() > 1) return splits;
         try(InputStream is = context.getContentResolver().openInputStream(splitAPKUri)) {
-            com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, file = new File(context.getCacheDir(), file.getName()));
+            String uriString = splitAPKUri.toString();
+            com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, file = new File(context.getCacheDir(), uriString.substring(uriString.lastIndexOf('/') + 1)));
             return getListOfSplitsFromFile(file);
         }
     }
