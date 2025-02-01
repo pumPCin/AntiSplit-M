@@ -26,6 +26,7 @@
     <string name="force">Force merging mismatched splits (with different versionCode or package name)</string>
     <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
     <string name="install">Install</string>
+    <string name="label_parent_dir" translatable="false">…</string>
     <string name="label_parent_dir">…</string>
     <string name="label_parent_directory">Parent Directory</string>
     <string name="lang">Language (Язык)</string>
@@ -39,6 +40,7 @@
     <string name="no_filepath">"Can\'t write to the filepath "</string>
     <string name="no_update_found">No update found</string>
     <string name="not_apk">: Not an APK file</string>
+    <string name="not_split">This does not seem to be a split APK</string>
     <string name="nothing">Nothing selected</string>
     <string name="output">"Output directory: "</string>
     <string name="pairip_warning">The app you are trying to merge uses Pairip/Google加固 Integrity to protect it from modification. The merged version will crash on opening unless you know how to modify the APK to bypass it.</string>
