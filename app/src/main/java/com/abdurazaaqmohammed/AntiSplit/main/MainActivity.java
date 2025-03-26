@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
     public MyAPKLogger getLogger() {
         return logger;
     }
+    private String openedFile;
 
     /** @noinspection AssignmentUsedAsCondition*/
     @Override
@@ -443,9 +444,12 @@ public class MainActivity extends AppCompatActivity {
                 if (clipData == null) {
                     Uri uri = data.getData();
                     if(uri == null) showError("input Uri null");
-                    else if(uri.toString().endsWith(".apk")) {
-                        showError(rss.getString(R.string.not_split));
-                    } else processOneSplitApkUri(uri);
+                    else {
+                        String uriString = uri.toString();
+                        if(uriString.endsWith(".apk")) {
+                            showError(rss.getString(R.string.not_split, uriString));
+                        } else processOneSplitApkUri(uri);
+                    }
                 }
                 else {
                     //multiple files selected
@@ -546,7 +550,7 @@ public class MainActivity extends AppCompatActivity {
                         currentVer = null;
                     }
                     boolean newVer = false;
-                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '2', '1'} : currentVer.replace(".", "").toCharArray();
+                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '2', '2'} : currentVer.replace(".", "").toCharArray();
                     char[] latest = latestVersion.replace(".", "").toCharArray();
 
                     int maxLength = Math.max(curr.length, latest.length);
@@ -757,7 +761,10 @@ public class MainActivity extends AppCompatActivity {
             errorOccurred = !mainErr.equals(rss.getString(R.string.sign_failed));
 
             StringBuilder stackTrace = new StringBuilder(mainErr);
-
+            if(!TextUtils.isEmpty(openedFile)) {
+                stackTrace.append(openedFile).append('\n');
+                openedFile = null;
+            }
             for (StackTraceElement line : e.getStackTrace()) stackTrace.append(line).append('\n');
             StringBuilder fullLog = new StringBuilder(stackTrace).append('\n')
                     .append("SDK ").append(Build.VERSION.SDK_INT).append('\n')
@@ -766,7 +773,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 currentVer = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             } catch (Exception ex) {
-                currentVer = "2.1.1";
+                currentVer = "2.2.2";
             }
             fullLog.append(currentVer).append('\n').append("Storage permission granted: ").append(!com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this))
                     .append('\n').append(((TextView) findViewById(R.id.logField)).getText());
@@ -830,7 +837,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        logger.logMessage(result);
+        logger.logMessage(openedFile = result);
 
         return TextUtils.isEmpty(result) ? "filename_not_found" : result.replaceFirst("\\.(?:zip|xapk|aspk|apk[sm])$", suffix + ".apk");
     }

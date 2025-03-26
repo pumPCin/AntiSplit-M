@@ -1,9 +1,9 @@
 <resources>
-    <string name="merge">Bölünmüş APK'yı birleştirin</string>
+    <string name="merge">Bölünmüş APK\'yı birleştirin</string>
     <string name="success_saved">Birleştirilen APK dosyasının dışa aktarımı tamamlandı</string>
     <string name="enable_logs">Etkinlik kaydını etkinleştir</string>
     <string name="ask">Her seferinde sor</string>
-    <string name="same">Bölünmüş APK'nın aynı yolu</string>
+    <string name="same">Bölünmüş APK\'nın aynı yolu</string>
     <string name="grant_storage">Seçilen bölünmüş dosyanın aynı klasörüne kaydetmek için dahili depolama erişim izni gereklidir</string>
     <string name="no_filepath">"Yola kaydedilemiyor "</string>
     <string name="output">"Kayıt klasörü: "</string>
@@ -17,7 +17,7 @@
     <string name="arch_for_device">Cihazınız için mimariyi seçin</string>
     <string name="dpi_for_device">Cihazınız için ekran boyutunu seçin</string>
     <string name="select_splits">Bölünmeleri seçin</string>
-    <string name="sign_apk">Birleştirmeden sonra APK'yı imzala</string>
+    <string name="sign_apk">Birleştirmeden sonra APK\'yı imzala</string>
     <string name="automatically_select">Cihazınızın özelliklerine göre bölünmeleri otomatik olarak seçin</string>
     <string name="sign_failed">APK dosyası imzalanırken hata oluştu, kaydedilen dosya imzalanmamış olacak</string>
     <string name="signing">APK imzalanıyor…</string>
@@ -45,7 +45,7 @@
     <string name="mismatch">Aşağıdaki bölünmelerin (%1$s) sürüm kodu uyuşmuyor. Bunlar yalnızca diğer diller için çeviriler içeriyor, bu nedenle uygulama yine de çalışabilir.</string>
     <string name="warning">Uyarı</string>
     <string name="mismatch_base">" sürüm kodu temel APK dosyasıyla eşleşmiyor."</string>
-    <string name="create_issue">GitHub'da sorun bildir</string>
+    <string name="create_issue">GitHub\'da sorun bildir</string>
     <string name="copy_log">Etkinlik kaydını kopyala</string>
     <string name="pause">Duraklatma düğmesi</string>
     <string name="copied_log">Etkinlik kaydı kopyalandı</string>
