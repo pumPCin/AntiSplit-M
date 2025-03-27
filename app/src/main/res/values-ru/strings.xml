@@ -39,7 +39,7 @@
     <string name="no_filepath">Не удалось найти путь к выбранному файлу</string>
     <string name="no_update_found">Обновление не найдено</string>
     <string name="not_apk">: это не apk</string>
-    <string name="not_split">Похоже это не split-apk</string>
+    <string name="not_split">Похоже это не split-apk (%1$s)</string>
     <string name="nothing">Ничего не выбрано</string>
     <string name="output">"Выходной каталог: "</string>
     <string name="pairip_warning">The app you are trying to merge uses Pairip/Google加固 Integrity to protect it from modification. The merged version will crash on opening unless you know how to modify the apk to bypass it.</string>

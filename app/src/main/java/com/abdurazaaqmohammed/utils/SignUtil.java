@@ -85,7 +85,10 @@ public class SignUtil {
                 try(OutputStream os = FileUtils.getOutputStream(out, context)) {
                     com.abdurazaaqmohammed.utils.FileUtils.copyFile(temp, os);
                 }
-                throw(new RuntimeException(msg, e)); // for showError
+                StringBuilder errs = new StringBuilder(e2.toString());
+                for(StackTraceElement stackTraceElement : e2.getStackTrace()) errs.append('\n').append(stackTraceElement);
+                for(StackTraceElement stackTraceElement : e.getStackTrace()) errs.append('\n').append(stackTraceElement);
+                throw(new RuntimeException(errs.toString())); // for showError
             }
         } else {
             context.getLogger().logMessage(msg);
