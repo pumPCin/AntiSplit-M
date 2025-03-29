@@ -47,34 +47,6 @@
     <string name="mismatch">以下splits（%1$s）的版本代碼不符。它們只是語言代碼，因此應用程式可以在沒有它們的情況下運行，但這些語言將無法在應用程式中運行。您是否仍想繼續合併？</string>
     <string name="warning">Warning</string>
     <string name="mismatch_base">" 版本代碼與 base.apk 不符"</string>
-    <string-array name="langs_display">
-        <item>English</item>
-        <item>Español</item>
-        <item>Français</item>
-        <item>Bahasa Indonesia</item>
-        <item>Italiano</item>
-        <item>русский язык</item>
-        <item>Türkçe</item>
-        <item>українська мова</item>
-        <item>Português</item>
-        <item>العربية</item>
-        <item>Tiếng Việt</item>
-        <item>繁體中文(台灣)</item>
-    </string-array>
-    <string-array name="langs">
-        <item>en</item>
-        <item>es</item>
-        <item>fr</item>
-        <item>in</item>
-        <item>it</item>
-        <item>ru</item>
-        <item>tr</item>
-        <item>uk</item>
-        <item>pt-BR</item>
-        <item>ar</item>
-        <item>vi</item>
-        <item>zh-tw</item>
-    </string-array>
     <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">在 GitHub 建立問題</string>
     <string name="copy_log">複製日誌</string>

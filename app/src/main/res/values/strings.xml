@@ -47,30 +47,32 @@
     <string name="warning">Warning</string>
     <string name="mismatch_base">" version code does not match that of base.apk"</string>
     <string-array name="langs_display">
-        <item>English</item>
-        <item>Español</item>
-        <item>Français</item>
-        <item>Bahasa Indonesia</item>
-        <item>Italiano</item>
-        <item>русский язык</item>
-        <item>Türkçe</item>
-        <item>українська мова</item>
-        <item>Português</item>
-        <item>العربية</item>
-        <item>Tiếng Việt</item>
+        <item>العربية</item>  <!-- ar -->
+        <item>English</item>   <!-- en -->
+        <item>Español</item>   <!-- es -->
+        <item>Français</item>  <!-- fr -->
+        <item>Bahasa Indonesia</item>  <!-- id -->
+        <item>Italiano</item>  <!-- it -->
+        <item>Português</item> <!-- pt -->
+        <item>русский язык</item>  <!-- ru -->
+        <item>Türkçe</item>    <!-- tr -->
+        <item>українська мова</item>  <!-- uk -->
+        <item>Tiếng Việt</item>  <!-- vi -->
+        <item>繁體中文(台灣)</item>  <!-- zh-tw -->
     </string-array>
     <string-array name="langs">
-        <item>en</item>
-        <item>es</item>
-        <item>fr</item>
-        <item>in</item>
-        <item>it</item>
-        <item>ru</item>
-        <item>tr</item>
-        <item>uk</item>
-        <item>pt-BR</item>
-        <item>ar</item>
-        <item>vi</item>
+        <item>ar</item>      <!-- Arabic -->
+        <item>en</item>      <!-- English -->
+        <item>es</item>      <!-- Spanish -->
+        <item>fr</item>      <!-- French -->
+        <item>in</item>      <!-- Indonesian (for some reason) -->
+        <item>it</item>      <!-- Italian -->
+        <item>pt-BR</item>   <!-- Portuguese (Brazil) -->
+        <item>ru</item>      <!-- Russian -->
+        <item>tr</item>      <!-- Turkish -->
+        <item>uk</item>      <!-- Ukrainian -->
+        <item>vi</item>      <!-- Vietnamese -->
+        <item>zh-TW</item>   <!-- Chinese (Taiwan, Traditional) -->
     </string-array>
     <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">Create GitHub Issue</string>
