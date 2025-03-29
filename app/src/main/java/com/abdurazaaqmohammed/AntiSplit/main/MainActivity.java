@@ -550,7 +550,7 @@ public class MainActivity extends AppCompatActivity {
                         currentVer = null;
                     }
                     boolean newVer = false;
-                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '2', '2'} : currentVer.replace(".", "").toCharArray();
+                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '2', '3'} : currentVer.replace(".", "").toCharArray();
                     char[] latest = latestVersion.replace(".", "").toCharArray();
 
                     int maxLength = Math.max(curr.length, latest.length);
@@ -773,9 +773,11 @@ public class MainActivity extends AppCompatActivity {
             try {
                 currentVer = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             } catch (Exception ex) {
-                currentVer = "2.2.2";
+                currentVer = "2.2.3";
             }
-            fullLog.append(currentVer).append('\n').append("Storage permission granted: ").append(!com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this))
+            fullLog.append(currentVer).append('\n')
+                    .append("Storage permission granted: ")
+                    .append(!com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this))
                     .append('\n').append(((TextView) findViewById(R.id.logField)).getText());
 
             getHandler().post(() -> {

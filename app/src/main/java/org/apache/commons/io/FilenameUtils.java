@@ -158,10 +158,7 @@ public class FilenameUtils {
     public static String getExtension(final String fileName) throws IllegalArgumentException {
         if (fileName == null) return null;
         final int index = indexOfExtension(fileName);
-        if (index == NOT_FOUND) {
-            return "";
-        }
-        return fileName.substring(index + 1);
+        return index == NOT_FOUND ? "" : fileName.substring(index + 1);
     }
 
     /**
@@ -187,29 +184,12 @@ public class FilenameUtils {
      * the identifier of an Alternate Data Stream, for example "foo.exe:bar.txt".
      */
     public static int indexOfExtension(final String fileName) throws IllegalArgumentException {
-        if (fileName == null) {
-            return NOT_FOUND;
-        }
-//        if (isSystemWindows()) {
-//            // Special handling for NTFS ADS: Don't accept colon in the file name.
-//            final int offset = fileName.indexOf(':', getAdsCriticalOffset(fileName));
-//            if (offset != -1) {
-//                throw new IllegalArgumentException("NTFS ADS separator (':') in file name is forbidden.");
-//            }
-//        }
-        final int extensionPos = fileName.lastIndexOf(EXTENSION_SEPARATOR);
-        final int lastSeparator = indexOfLastSeparator(fileName);
-        return lastSeparator > extensionPos ? NOT_FOUND : extensionPos;
+        return fileName == null ? NOT_FOUND : indexOfLastSeparator(fileName) > fileName.lastIndexOf(EXTENSION_SEPARATOR) ? NOT_FOUND : fileName.lastIndexOf(EXTENSION_SEPARATOR);
     }
     public static final char EXTENSION_SEPARATOR = '.';
 
     public static int indexOfLastSeparator(final String fileName) {
-        if (fileName == null) {
-            return NOT_FOUND;
-        }
-        final int lastUnixPos = fileName.lastIndexOf(UNIX_NAME_SEPARATOR);
-        final int lastWindowsPos = fileName.lastIndexOf(WINDOWS_NAME_SEPARATOR);
-        return Math.max(lastUnixPos, lastWindowsPos);
+        return fileName == null ? NOT_FOUND : Math.max(fileName.lastIndexOf(UNIX_NAME_SEPARATOR), fileName.lastIndexOf(WINDOWS_NAME_SEPARATOR));
     }
     private static final int NOT_FOUND = -1;
     /**
