@@ -53,6 +53,7 @@
         <item>Français</item>  <!-- fr -->
         <item>Bahasa Indonesia</item>  <!-- id -->
         <item>Italiano</item>  <!-- it -->
+        <item>Polski</item>  <!-- pl -->
         <item>Português</item> <!-- pt -->
         <item>русский язык</item>  <!-- ru -->
         <item>Türkçe</item>    <!-- tr -->
@@ -67,6 +68,7 @@
         <item>fr</item>      <!-- French -->
         <item>in</item>      <!-- Indonesian (for some reason) -->
         <item>it</item>      <!-- Italian -->
+        <item>pl</item>      <!-- Polish -->
         <item>pt-BR</item>   <!-- Portuguese (Brazil) -->
         <item>ru</item>      <!-- Russian -->
         <item>tr</item>      <!-- Turkish -->
