@@ -50,6 +50,7 @@
         <item>العربية</item>  <!-- ar -->
         <item>English</item>   <!-- en -->
         <item>Español</item>   <!-- es -->
+        <item>Deutsch</item>   <!-- de -->
         <item>Français</item>  <!-- fr -->
         <item>Bahasa Indonesia</item>  <!-- id -->
         <item>Italiano</item>  <!-- it -->
@@ -64,6 +65,7 @@
         <item>ar</item>      <!-- Arabic -->
         <item>en</item>      <!-- English -->
         <item>es</item>      <!-- Spanish -->
+        <item>de</item>      <!-- German -->
         <item>fr</item>      <!-- French -->
         <item>in</item>      <!-- Indonesian (for some reason) -->
         <item>it</item>      <!-- Italian -->
