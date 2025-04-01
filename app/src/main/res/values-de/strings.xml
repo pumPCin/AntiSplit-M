@@ -33,7 +33,6 @@
     <string name="label_parent_directory">Übergeordnetes Verzeichnis</string>
     <string name="last_edit">Zuletzt bearbeitet: </string>
     <string name="error_dir_access">Auf das Verzeichnis kann nicht zugegriffen werden</string>
-    <string name="lang" translatable="false">Sprache</string>
     <string name="update">Update verfügbar</string>
     <string name="new_ver">Eine neue Version von AntiSplit M ist verfügbar</string>
     <string name="dl">Herunterladen</string>
