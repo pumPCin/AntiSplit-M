@@ -47,7 +47,7 @@
     <string name="warning">Uwaga</string>
     <string name="mismatch_base">" kod wersji nie pasuje do base.apk"</string>
     <string name="label_parent_dir" translatable="false">…</string>
-    <string name="create_issue">Zgłoś problem na GitHub'ie</string>
+    <string name="create_issue">Zgłoś problem na GitHub\'ie</string>
     <string name="copy_log">Skopiuj log</string>
     <string name="pause">Przycisk pauzy</string>
     <string name="copied_log">Skopiowano log</string>
