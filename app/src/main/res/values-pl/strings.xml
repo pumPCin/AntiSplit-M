@@ -1,0 +1,67 @@
+<resources>
+    <string name="app_name" translatable="false">AntiSplit M</string>
+    <string name="merge">Wybierz podzielone APK do scalenia</string>
+    <string name="success_saved">Plik został zapisany pomyślnie</string>
+    <string name="enable_logs" >Włącz logi</string>
+    <string name="ask">Pytaj za każdym razem</string>
+    <string name="same">Ten sam katalog co wybrany plik</string>
+    <string name="grant_storage">Uprawnienie do zapisu jest wymagane do zapisania w tym samym katalogu, co wybrany plik.</string>
+    <string name="no_filepath">"Nie można zapisać do ścieżki "</string>
+    <string name="output">"Katalog wyjściowy: "</string>
+    <string name="show_dialog">Pokaż okno dialogowe pozwalające wybrać, które części APK dołączyć</string>
+    <string name="nothing">Nic nie wybrano</string>
+    <string name="change_text_color">Zmień kolor tekstu</string>
+    <string name="change_background_color">Zmień kolor tła</string>
+    <string name="all">Wybierz wszystkie</string>
+    <string name="for_device">Wybierz wszystkie części APK dla specyfikacji swojego urządzenia</string>
+    <string name="lang_for_device">Wybierz język swojego urządzenia</string>
+    <string name="arch_for_device">Wybierz architekturę swojego urządzenia</string>
+    <string name="dpi_for_device">Wybierz szerokość ekranu swojego urządzenia</string>
+    <string name="select_splits">Wybierz części</string>
+    <string name="sign_apk">Podpisz APK po scaleniu</string>
+    <string name="automatically_select">Automatycznie wybierz części APK dla specyfikacji twojego urządzenia</string>
+    <string name="sign_failed">Nie udało się podpisać APK, zapisywanie bez podpisu</string>
+    <string name="signing">Podpisywanie pliku APK…</string>
+    <string name="saving">Zapisywanie…</string>
+    <string name="removed_table_entry">"Usunięto wpis z tabeli: "</string>
+    <string name="sanitizing_manifest">Czyszczenie pliku manifest…</string>
+    <string name="skipping">"Pomijanie "</string>
+    <string name="not_apk">: Nie jest plikiem APK</string>
+    <string name="unselected">: Niewybrane</string>
+    <string name="searching">Szukanie plików APK…</string>
+    <string name="cancel">Anuluj</string>
+    <string name="select">Wybierz</string>
+    <string name="label_parent_directory">Katalog nadrzędny</string>
+    <string name="last_edit">Ostatnia modyfikacja: </string>
+    <string name="error_dir_access">Nie można uzyskać dostępu do katalogu</string>
+    <string name="lang" translatable="false">Język</string>
+    <string name="update">Dostępna aktualizacja</string>
+    <string name="new_ver">Nowa wersja AntiSplit M jest dostępna</string>
+    <string name="dl">Pobierz</string>
+    <string name="auto_update">Automatycznie sprawdzaj aktualizacje</string>
+    <string name="check_update_now">Sprawdź aktualizacje teraz</string>
+    <string name="no_update_found">Brak dostępnych aktualizacji</string>
+    <string name="settings">Ustawienia</string>
+    <string name="close">Zamknij</string>
+    <string name="mismatch">Następujące części APK (%1$s) mają niezgodne kody wersji. To pakiety językowe, aplikacja zadziała bez nich, ale te języki nie będa dostępne. Czy chcesz kontynuować scalanie?</string>
+    <string name="warning">Uwaga</string>
+    <string name="mismatch_base">" kod wersji nie pasuje do base.apk"</string>
+    <string name="label_parent_dir" translatable="false">…</string>
+    <string name="create_issue">Zgłoś problem na GitHub\'ie</string>
+    <string name="copy_log">Skopiuj log</string>
+    <string name="pause">Przycisk pauzy</string>
+    <string name="copied_log">Skopiowano log</string>
+    <string name="select_from_installed_apps">Wybierz z zainstalowanych aplikacji</string>
+    <string name="app_icon_list_label">Ikona aplikacji</string>
+    <string name="install">Zainstaluj</string>
+    <string name="black_theme">Czarny motyw</string>
+    <string name="dark_theme">Ciemny motyw</string>
+    <string name="light_theme">Jasny motyw</string>
+    <string name="system_theme">Motyw systemowy</string>
+    <string name="suffix">Sufiks</string>
+    <string name="pairip_warning">Aplikacja używa Pairip/Google加固 do ochrony przed modyfikacjami. Po scaleniu zawiesi się przy uruchomieniu, chyba że wiesz, jak to obejść</string>
+    <string name="force">Wymuś scalanie niezgodnych części APK (z różnym kodem wersji lub nazwą pakietu)</string>
+    <string name="file_save_method">Lokalizacja zapisu pliku</string>
+    <string name="pick_folder">Wybierz folder</string>
+    <string name="not_split">To nie wydaje się być podzielonym plikiem APK (%1$s)</string>
+</resources>

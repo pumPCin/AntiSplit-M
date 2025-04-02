@@ -66,11 +66,11 @@
     <string name="update">Update available</string>
     <string name="warning">Warning</string>
     <string-array name="langs_display">
-        <item>English</item>
-        <item>Русский</item>
+        <item>English</item>   <!-- en -->
+        <item>Русский</item>   <!-- ru -->
     </string-array>
     <string-array name="langs">
-        <item>en</item>
-        <item>ru</item>
+        <item>en</item>      <!-- English -->
+        <item>ru</item>      <!-- Russian -->
     </string-array>
 </resources>
