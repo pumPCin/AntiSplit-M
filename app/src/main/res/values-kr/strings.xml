@@ -1,0 +1,101 @@
+<resources>
+    <string name="app_name" translatable="false">AntiSplit M</string>
+    <string name="merge">병합/반분할할 분할 APK 선택하기</string>
+    <string name="success_saved">파일을 성공적으로 저장하였습니다.</string>
+    <string name="enable_logs" >로그 활성화하기</string>
+    <string name="ask">매번 물어보기</string>
+    <string name="same">선택한 파일과 동일 디렉토리에 저장하기</string>
+    <string name="grant_storage">선택한 파일과 동일 디렉토리에 저장하는 파일 액세스 권한이 필요합니다.</string>
+    <string name="no_filepath">"파일 경로를 사용할 수 없습니다."</string>
+    <string name="output">"출력 디렉토리: "</string>
+    <string name="show_dialog">포함할 분할을 선택할 수 있는 다이얼로그 표시하기</string>
+    <string name="nothing">선택된 항목 없음</string>
+    <string name="change_text_color">텍스트 색상 변경하기</string>
+    <string name="change_background_color">배경 색상 변경하기</string>
+    <string name="all">모두 선택하기</string>
+    <string name="for_device">이 기기 사양에 맞는 모든 분할 선택하기</string>
+    <string name="lang_for_device">이 기기에 맞는 언어 선택하기</string>
+    <string name="arch_for_device">이 기기에 맞는 아키텍처 선택하기</string>
+    <string name="dpi_for_device">이 기기에 맞는 DPI 선택하기</string>
+    <string name="select_splits">분할 선택하기</string>
+    <string name="sign_apk">병합한 후, APK에 서명하기</string>
+    <string name="automatically_select">자동으로 이 기기 사양에 맞는 분할 선택하기</string>
+    <string name="sign_failed">APK에 서명하지 못하였습니다. 서명하지 않고 저장합니다.</string>
+    <string name="signing">APK에 서명하는 중 …</string>
+    <string name="saving">저장하는 중 …</string>
+    <string name="removed_table_entry">"테이블 엔트리를 제거하였습니다: "</string>
+    <string name="sanitizing_manifest">매니페스트를 처리하는 중 …</string>
+    <string name="skipping">"건너뛰는 중"</string>
+    <string name="not_apk">: APK 파일이 아님</string>
+    <string name="unselected">: 선택되지 않음</string>
+    <string name="searching">APK 파일을 검색하는 중 …</string>
+    <string name="cancel">취소하기</string>
+    <string name="select">선택하기</string>
+    <string name="label_parent_directory">부모 디렉토리</string>
+    <string name="last_edit">마지막으로 수정한 날짜: </string>
+    <string name="error_dir_access">디렉토리에 액세스할 수 없습니다.</string>
+    <string name="lang" translatable="false">언어</string>
+    <string name="update">업데이트 가능</string>
+    <string name="new_ver">새로운 버전의 AntiSplit M을 업데이트할 수 있습니다.</string>
+    <string name="dl">다운로드하기</string>
+    <string name="auto_update">자동으로 업데이트 확인하기</string>
+    <string name="check_update_now">지금 업데이트 확인하기</string>
+    <string name="no_update_found">업데이트가 없습니다.</string>
+    <string name="settings">설정</string>
+    <string name="close">닫기</string>
+    <string name="mismatch">다음 분할 (%1$s) 에 일치하지 않는 버전 코드가 있습니다. 이 코드는 언어 코드일 뿐이므로 이 코드 없이 앱이 실행될 수 있지만 앱에서 해당 언어가 작동하지 않습니다. 그래도 병합을 계속하시겠습니까?</string>
+    <string name="warning">경고</string>
+    <string name="mismatch_base">" 버전 코드가 base.apk의 버전코드와 일치하지 않습니다."</string>
+    <string-array name="langs_display">
+        <item>العربية</item>  <!-- ar -->
+        <item>English</item>   <!-- en -->
+        <item>Español</item>   <!-- es -->
+        <item>Deutsch</item>   <!-- de -->
+        <item>Français</item>  <!-- fr -->
+        <item>Bahasa Indonesia</item>  <!-- id -->
+        <item>Italiano</item>  <!-- it -->
+        <item>한국어</item>  <!-- kr -->
+        <item>Polski</item>  <!-- pl -->
+        <item>Português</item> <!-- pt -->
+        <item>русский язык</item>  <!-- ru -->
+        <item>Türkçe</item>    <!-- tr -->
+        <item>українська мова</item>  <!-- uk -->
+        <item>Tiếng Việt</item>  <!-- vi -->
+        <item>繁體中文(台灣)</item>  <!-- zh-tw -->
+    </string-array>
+    <string-array name="langs">
+        <item>ar</item>      <!-- Arabic -->
+        <item>en</item>      <!-- English -->
+        <item>es</item>      <!-- Spanish -->
+        <item>de</item>      <!-- German -->
+        <item>fr</item>      <!-- French -->
+        <item>in</item>      <!-- Indonesian (for some reason) -->
+        <item>it</item>      <!-- Italian -->
+        <item>kr</item>      <!-- korea -->	
+        <item>pl</item>      <!-- Polish -->
+        <item>pt-BR</item>   <!-- Portuguese (Brazil) -->
+        <item>ru</item>      <!-- Russian -->
+        <item>tr</item>      <!-- Turkish -->
+        <item>uk</item>      <!-- Ukrainian -->
+        <item>vi</item>      <!-- Vietnamese -->
+        <item>zh-TW</item>   <!-- Chinese (Taiwan, Traditional) -->
+    </string-array>
+    <string name="label_parent_dir" translatable="false">…</string>
+    <string name="create_issue">GitHub에 문제점 신고하기</string>
+    <string name="copy_log">로그 복사하기</string>
+    <string name="pause">멈춤 버튼</string>
+    <string name="copied_log">로그를 복사하였습니다.</string>
+    <string name="select_from_installed_apps">이 기기에 설치된 앱에서 선택하기</string>
+    <string name="app_icon_list_label">앱 아이콘</string>
+    <string name="install">설치하기</string>
+    <string name="black_theme">검은 테마</string>
+    <string name="dark_theme">어두운 테마</string>
+    <string name="light_theme">밝은 테마</string>
+    <string name="system_theme">기기 테마 사용</string>
+    <string name="suffix">접미사</string>
+    <string name="pairip_warning">병합하려는 앱은 수정으로부터 보호하기 위해 Pairip/Google加固 무결성을 사용합니다. APK를 수정하여 이를 우회하는 방법을 알지 못하는 경우에는 병합된 앱은 열 때 충돌이 발생합니다.</string>
+    <string name="force">일치하지 않는 분할을 강제로 병합하기 (버전코드 또는 패키지명이 다른 경우)</string>
+    <string name="file_save_method">파일 저장 방식</string>
+    <string name="pick_folder">폴더 경로 입력하기</string>
+    <string name="not_split">분할 APK가 아닌 것 같습니다. (%1$s)</string>
+</resources>
