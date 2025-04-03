@@ -5,7 +5,7 @@
     <string name="enable_logs" >로그 활성화하기</string>
     <string name="ask">매번 물어보기</string>
     <string name="same">선택한 파일과 동일 디렉토리에 저장하기</string>
-    <string name="grant_storage">선택한 파일과 동일 디렉토리에 저장하는 파일 액세스 권한이 필요합니다.</string>
+    <string name="grant_storage">선택한 파일과 동일 디렉토리에 저장하기 위한 파일 액세스 권한이 필요합니다.</string>
     <string name="no_filepath">"파일 경로를 사용할 수 없습니다."</string>
     <string name="output">"출력 디렉토리: "</string>
     <string name="show_dialog">포함할 분할을 선택할 수 있는 다이얼로그 표시하기</string>
