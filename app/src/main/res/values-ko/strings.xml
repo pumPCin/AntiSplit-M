@@ -32,7 +32,7 @@
     <string name="cancel">취소하기</string>
     <string name="select">선택하기</string>
     <string name="label_parent_directory">부모 디렉토리</string>
-    <string name="last_edit">마지막으로 수정한 날짜: </string>
+    <string name="last_edit">마지막으로 수정됨: </string>
     <string name="error_dir_access">디렉토리에 액세스할 수 없습니다.</string>
     <string name="lang" translatable="false">언어</string>
     <string name="update">업데이트 가능</string>
@@ -96,6 +96,6 @@
     <string name="pairip_warning">병합하려는 앱은 수정으로부터 보호하기 위해 Pairip/Google加固 무결성을 사용합니다. APK를 수정하여 이를 우회하는 방법을 알지 못하는 경우에는 병합된 앱은 열 때 충돌이 발생합니다.</string>
     <string name="force">일치하지 않는 분할을 강제로 병합하기 (버전코드 또는 패키지명이 다른 경우)</string>
     <string name="file_save_method">파일 저장 방식</string>
-    <string name="pick_folder">폴더 경로 입력하기</string>
+    <string name="pick_folder">저장할 폴더 경로 입력하기</string>
     <string name="not_split">분할 APK가 아닌 것 같습니다. (%1$s)</string>
 </resources>
