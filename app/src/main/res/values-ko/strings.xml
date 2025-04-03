@@ -83,7 +83,7 @@
     <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">GitHub에 문제점 신고하기</string>
     <string name="copy_log">로그 복사하기</string>
-    <string name="pause">멈춤 버튼</string>
+    <string name="pause">정지 버튼</string>
     <string name="copied_log">로그를 복사하였습니다.</string>
     <string name="select_from_installed_apps">이 기기에 설치된 앱에서 선택하기</string>
     <string name="app_icon_list_label">앱 아이콘</string>
