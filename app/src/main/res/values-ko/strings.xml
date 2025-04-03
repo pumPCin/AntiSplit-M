@@ -23,8 +23,8 @@
     <string name="sign_failed">APK에 서명하지 못하였습니다. 서명하지 않고 저장합니다.</string>
     <string name="signing">APK에 서명하는 중 …</string>
     <string name="saving">저장하는 중 …</string>
-    <string name="removed_table_entry">"테이블 엔트리를 제거하였습니다: "</string>
-    <string name="sanitizing_manifest">매니페스트를 처리하는 중 …</string>
+    <string name="removed_table_entry">"table-entry를 제거함: "</string>
+    <string name="sanitizing_manifest">manifest를 처리하는 중 …</string>
     <string name="skipping">"건너뛰는 중"</string>
     <string name="not_apk">: APK 파일이 아님</string>
     <string name="unselected">: 선택되지 않음</string>
