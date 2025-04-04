@@ -39,8 +39,8 @@
     <string name="new_ver">새로운 버전의 AntiSplit M을 업데이트할 수 있습니다.</string>
     <string name="dl">다운로드하기</string>
     <string name="auto_update">자동으로 업데이트 확인하기</string>
-    <string name="check_update_now">지금 업데이트 확인하기</string>
-    <string name="no_update_found">업데이트가 없습니다.</string>
+    <string name="check_update_now">업데이트 확인하기</string>
+    <string name="no_update_found">새로운 업데이트가 없습니다.</string>
     <string name="settings">설정</string>
     <string name="close">닫기</string>
     <string name="mismatch">다음 분할 (%1$s) 에 일치하지 않는 버전 코드가 있습니다. 이 코드는 언어 코드일 뿐이므로 이 코드 없이 앱이 실행될 수 있지만 앱에서 해당 언어가 작동하지 않습니다. 그래도 병합을 계속하시겠습니까?</string>
@@ -92,7 +92,7 @@
     <string name="dark_theme">어두운 테마</string>
     <string name="light_theme">밝은 테마</string>
     <string name="system_theme">기기 테마 사용</string>
-    <string name="suffix">접미사</string>
+    <string name="suffix">APK 파일 이름 꼬리말</string>
     <string name="pairip_warning">병합하려는 앱은 Pairip/Google加固 Integrity를 사용하여 수정할 수 없도록 보호됩니다. APK를 수정하여 이를 우회하는 방법을 알지 못하는 경우에는 병합된 앱을 시작할 때 충돌이 발생합니다.</string>
     <string name="force">일치하지 않는 분할을 강제로 병합하기 (버전코드 또는 패키지명이 다른 경우)</string>
     <string name="file_save_method">파일 저장 방식</string>
