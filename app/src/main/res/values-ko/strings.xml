@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">AntiSplit M</string>
-    <string name="merge">병합/반분할할 분할 APK 선택하기</string>
+    <string name="merge">AntiSplit/병합할 분할 APK 선택하기</string>
     <string name="success_saved">파일을 성공적으로 저장하였습니다.</string>
     <string name="enable_logs" >로그 활성화하기</string>
     <string name="ask">매번 물어보기</string>
@@ -93,7 +93,7 @@
     <string name="light_theme">밝은 테마</string>
     <string name="system_theme">기기 테마 사용</string>
     <string name="suffix">접미사</string>
-    <string name="pairip_warning">병합하려는 앱은 수정으로부터 보호하기 위해 Pairip/Google加固 무결성을 사용합니다. APK를 수정하여 이를 우회하는 방법을 알지 못하는 경우에는 병합된 앱은 열 때 충돌이 발생합니다.</string>
+    <string name="pairip_warning">병합하려는 앱은 Pairip/Google加固 Integrity를 사용하여 수정할 수 없도록 보호됩니다. APK를 수정하여 이를 우회하는 방법을 알지 못하는 경우에는 병합된 앱을 시작할 때 충돌이 발생합니다.</string>
     <string name="force">일치하지 않는 분할을 강제로 병합하기 (버전코드 또는 패키지명이 다른 경우)</string>
     <string name="file_save_method">파일 저장 방식</string>
     <string name="pick_folder">저장할 폴더 경로 입력하기</string>
