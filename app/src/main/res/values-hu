@@ -1,0 +1,101 @@
+<resources>
+    <string name="app_name" translatable="false">AntiSplit M</string>
+    <string name="merge">Osztott APK kiválasztása az egyesítéshez/szétválasztáshoz</string>
+    <string name="success_saved">Fájl sikeresen mentve</string>
+    <string name="enable_logs">Naplók engedélyezése</string>
+    <string name="ask">Kérdezzen rá minden alkalommal</string>
+    <string name="same">A kiválasztott fájllal azonos könyvtár</string>
+    <string name="grant_storage">Tárolási engedély szükséges a kiválasztott fájllal azonos könyvtárba való mentéshez</string>
+    <string name="no_filepath">"A fájl elérési útvonala nem írható "</string>
+    <string name="output">"Kimeneti könyvtár: "</string>
+    <string name="show_dialog">Párbeszédpanel megjelenítése az osztott részek kiválasztásához</string>
+    <string name="nothing">Nincs semmi kiválasztva</string>
+    <string name="change_text_color">Szövegszín módosítása</string>
+    <string name="change_background_color">Háttérszín módosítása</string>
+    <string name="all">Összes kijelölése</string>
+    <string name="for_device">Válassza ki az összes osztott részt eszköze specifikációinak megfelelően</string>
+    <string name="lang_for_device">Válassza ki a készülék nyelvét</string>
+    <string name="arch_for_device">Válassza ki készüléke architektúráját</string>
+    <string name="dpi_for_device">Válasszon képernyőszélességet a készülékéhez</string>
+    <string name="select_splits">Osztott részek kiválasztása</string>
+    <string name="sign_apk">APK aláírása az egyesítés után</string>
+    <string name="automatically_select">Az osztott részek automatikus kiválasztása az eszköz specifikációinak megfelelően</string>
+    <string name="sign_failed">Nem sikerült aláírni az APK-t, mentés aláírás nélkül</string>
+    <string name="signing">APK aláírása…</string>
+    <string name="saving">Mentés…</string>
+    <string name="removed_table_entry">"Eltávolított táblázat-bejegyzés : "</string>
+    <string name="sanitizing_manifest">Jegyzékfájl megtisztítás…</string>
+    <string name="skipping">"Kihagyás "</string>
+    <string name="not_apk">: Nem APK fájl</string>
+    <string name="unselected">: Nem kiválasztott</string>
+    <string name="searching">Apk fájlok keresése…</string>
+    <string name="cancel">Mégse</string>
+    <string name="select">Kiválasztás</string>
+    <string name="label_parent_directory">Szülőkönyvtár</string>
+    <string name="last_edit">Utoljára szerkesztve: </string>
+    <string name="error_dir_access">A könyvtár nem érhető el</string>
+    <string name="lang" translatable="false">Nyelv</string>
+    <string name="update">Frissítés érhető el</string>
+    <string name="new_ver">Új AntiSplit M verzió érhető el</string>
+    <string name="dl">Letöltés</string>
+    <string name="auto_update">Frissítések automatikus ellenőrzése</string>
+    <string name="check_update_now">Frissítések ellenőrzése most</string>
+    <string name="no_update_found">Nincs elérhető frissítés</string>
+    <string name="settings">Beállítások</string>
+    <string name="close">Bezárás</string>
+    <string name="mismatch">A következő osztott részek (%1$s) verziókódjai nem egyeznek. Ezek csak nyelvi kódok, így az alkalmazás ezek nélkül is futtatható, de ezek a nyelvek nem fognak működni az alkalmazásban. Folytatja az egyesítést?</string>
+    <string name="warning">Figyelem</string>
+    <string name="mismatch_base">" verziókódja nem egyezik a base.apk kódjával"</string>
+    <string-array name="langs_display">
+        <item>العربية</item>  <!-- ar -->
+        <item>English</item>   <!-- en -->
+        <item>Español</item>   <!-- es -->
+        <item>Deutsch</item>   <!-- de -->
+        <item>Français</item>  <!-- fr -->
+        <item>Hungarian</item>  <!-- hu -->
+        <item>Bahasa Indonesia</item>  <!-- id -->
+        <item>Italiano</item>  <!-- it -->
+        <item>Polski</item>  <!-- pl -->
+        <item>Português</item> <!-- pt -->
+        <item>русский язык</item>  <!-- ru -->
+        <item>Türkçe</item>    <!-- tr -->
+        <item>українська мова</item>  <!-- uk -->
+        <item>Tiếng Việt</item>  <!-- vi -->
+        <item>繁體中文(台灣)</item>  <!-- zh-tw -->
+    </string-array>
+    <string-array name="langs">
+        <item>ar</item>      <!-- Arab -->
+        <item>en</item>      <!-- Angol -->
+        <item>es</item>      <!-- Spanyol -->
+        <item>de</item>      <!-- Német -->
+        <item>fr</item>      <!-- Francia -->
+        <item>hu</item>      <!-- Magyar -->
+        <item>in</item>      <!-- Indonéz Indonéz (valamilyen oknál fogva) -->
+        <item>it</item>      <!-- Olasz -->
+        <item>pl</item>      <!-- Lengyel -->
+        <item>pt-BR</item>   <!-- Portugál (Brazil) -->
+        <item>ru</item>      <!-- Orosz -->
+        <item>tr</item>      <!-- Török -->
+        <item>uk</item>      <!-- Ukrán -->
+        <item>vi</item>      <!-- Vietnámi -->
+        <item>zh-TW</item>   <!-- Kínai (Tajvan, hagyományos) -->
+    </string-array>
+    <string name="label_parent_dir" translatable="false">…</string>
+    <string name="create_issue">GitHub téma létrehozása</string>
+    <string name="copy_log">Napló másolása</string>
+    <string name="pause">Szünet gomb</string>
+    <string name="copied_log">Napló másolva</string>
+    <string name="select_from_installed_apps">Telepített alkalmazás kiválasztása</string>
+    <string name="app_icon_list_label">Alkalmazás ikon</string>
+    <string name="install">Telepítés</string>
+    <string name="black_theme">Fekete téma</string>
+    <string name="dark_theme">Sötét téma</string>
+    <string name="light_theme">Világos téma</string>
+    <string name="system_theme">Rendszer téma</string>
+    <string name="suffix">Utótag</string>
+    <string name="pairip_warning">Az egyesíteni kívánt alkalmazás a Pairip/Google加固 Integrity-t használja a módosítások elleni védelem érdekében. Az egyesített verzió a megnyitáskor összeomlik, hacsak nem tudja, hogyan módosíthatja az APK-t, hogy megkerülje ezt.</string>
+    <string name="force">Nem egyező osztott részek kényszerített egyesítése (különböző versionCode vagy csomagnév esetén)</string>
+    <string name="file_save_method">Fájl mentési módszer</string>
+    <string name="pick_folder">Mappa megadása</string>
+    <string name="not_split">Ez nem tűnik split APK-nak (%1$s)</string>
+</resources>
