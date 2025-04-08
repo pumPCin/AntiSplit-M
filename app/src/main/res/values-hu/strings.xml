@@ -46,40 +46,6 @@
     <string name="mismatch">A következő osztott részek (%1$s) verziókódjai nem egyeznek. Ezek csak nyelvi kódok, így az alkalmazás ezek nélkül is futtatható, de ezek a nyelvek nem fognak működni az alkalmazásban. Folytatja az egyesítést?</string>
     <string name="warning">Figyelem</string>
     <string name="mismatch_base">" verziókódja nem egyezik a base.apk kódjával"</string>
-    <string-array name="langs_display">
-        <item>العربية</item>  <!-- ar -->
-        <item>English</item>   <!-- en -->
-        <item>Español</item>   <!-- es -->
-        <item>Deutsch</item>   <!-- de -->
-        <item>Français</item>  <!-- fr -->
-        <item>Hungarian</item>  <!-- hu -->
-        <item>Bahasa Indonesia</item>  <!-- id -->
-        <item>Italiano</item>  <!-- it -->
-        <item>Polski</item>  <!-- pl -->
-        <item>Português</item> <!-- pt -->
-        <item>русский язык</item>  <!-- ru -->
-        <item>Türkçe</item>    <!-- tr -->
-        <item>українська мова</item>  <!-- uk -->
-        <item>Tiếng Việt</item>  <!-- vi -->
-        <item>繁體中文(台灣)</item>  <!-- zh-tw -->
-    </string-array>
-    <string-array name="langs">
-        <item>ar</item>      <!-- Arab -->
-        <item>en</item>      <!-- Angol -->
-        <item>es</item>      <!-- Spanyol -->
-        <item>de</item>      <!-- Német -->
-        <item>fr</item>      <!-- Francia -->
-        <item>hu</item>      <!-- Magyar -->
-        <item>in</item>      <!-- Indonéz Indonéz (valamilyen oknál fogva) -->
-        <item>it</item>      <!-- Olasz -->
-        <item>pl</item>      <!-- Lengyel -->
-        <item>pt-BR</item>   <!-- Portugál (Brazil) -->
-        <item>ru</item>      <!-- Orosz -->
-        <item>tr</item>      <!-- Török -->
-        <item>uk</item>      <!-- Ukrán -->
-        <item>vi</item>      <!-- Vietnámi -->
-        <item>zh-TW</item>   <!-- Kínai (Tajvan, hagyományos) -->
-    </string-array>
     <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">GitHub téma létrehozása</string>
     <string name="copy_log">Napló másolása</string>

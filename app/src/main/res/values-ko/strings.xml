@@ -46,40 +46,6 @@
     <string name="mismatch">다음 분할 (%1$s) 에 일치하지 않는 버전 코드가 있습니다. 이 코드는 언어 코드일 뿐이므로 이 코드 없이 앱이 실행될 수 있지만 앱에서 해당 언어가 작동하지 않습니다. 그래도 병합을 계속하시겠습니까?</string>
     <string name="warning">경고</string>
     <string name="mismatch_base">" 버전 코드가 base.apk의 버전코드와 일치하지 않습니다."</string>
-    <string-array name="langs_display">
-        <item>العربية</item>  <!-- ar -->
-        <item>English</item>   <!-- en -->
-        <item>Español</item>   <!-- es -->
-        <item>Deutsch</item>   <!-- de -->
-        <item>Français</item>  <!-- fr -->
-        <item>Bahasa Indonesia</item>  <!-- id -->
-        <item>Italiano</item>  <!-- it -->
-        <item>한국어</item>  <!-- ko -->
-        <item>Polski</item>  <!-- pl -->
-        <item>Português</item> <!-- pt -->
-        <item>русский язык</item>  <!-- ru -->
-        <item>Türkçe</item>    <!-- tr -->
-        <item>українська мова</item>  <!-- uk -->
-        <item>Tiếng Việt</item>  <!-- vi -->
-        <item>繁體中文(台灣)</item>  <!-- zh-tw -->
-    </string-array>
-    <string-array name="langs">
-        <item>ar</item>      <!-- Arabic -->
-        <item>en</item>      <!-- English -->
-        <item>es</item>      <!-- Spanish -->
-        <item>de</item>      <!-- German -->
-        <item>fr</item>      <!-- French -->
-        <item>in</item>      <!-- Indonesian (for some reason) -->
-        <item>it</item>      <!-- Italian -->
-        <item>ko</item>      <!-- Korea -->	
-        <item>pl</item>      <!-- Polish -->
-        <item>pt-BR</item>   <!-- Portuguese (Brazil) -->
-        <item>ru</item>      <!-- Russian -->
-        <item>tr</item>      <!-- Turkish -->
-        <item>uk</item>      <!-- Ukrainian -->
-        <item>vi</item>      <!-- Vietnamese -->
-        <item>zh-TW</item>   <!-- Chinese (Taiwan, Traditional) -->
-    </string-array>
     <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">GitHub에 문제점 신고하기</string>
     <string name="copy_log">로그 복사하기</string>

@@ -46,38 +46,6 @@
     <string name="mismatch">The following splits (%1$s) have mismatched version codes. They are only language codes, so the app can run without them, but these languages will not work in the app. Do you want to continue with merging anyway?</string>
     <string name="warning">Warning</string>
     <string name="mismatch_base">" version code does not match that of base.apk"</string>
-    <string-array name="langs_display">
-        <item>العربية</item>  <!-- ar -->
-        <item>English</item>   <!-- en -->
-        <item>Español</item>   <!-- es -->
-        <item>Deutsch</item>   <!-- de -->
-        <item>Français</item>  <!-- fr -->
-        <item>Bahasa Indonesia</item>  <!-- id -->
-        <item>Italiano</item>  <!-- it -->
-        <item>Polski</item>  <!-- pl -->
-        <item>Português</item> <!-- pt -->
-        <item>русский язык</item>  <!-- ru -->
-        <item>Türkçe</item>    <!-- tr -->
-        <item>українська мова</item>  <!-- uk -->
-        <item>Tiếng Việt</item>  <!-- vi -->
-        <item>繁體中文(台灣)</item>  <!-- zh-tw -->
-    </string-array>
-    <string-array name="langs">
-        <item>ar</item>      <!-- Arabic -->
-        <item>en</item>      <!-- English -->
-        <item>es</item>      <!-- Spanish -->
-        <item>de</item>      <!-- German -->
-        <item>fr</item>      <!-- French -->
-        <item>in</item>      <!-- Indonesian (for some reason) -->
-        <item>it</item>      <!-- Italian -->
-        <item>pl</item>      <!-- Polish -->
-        <item>pt-BR</item>   <!-- Portuguese (Brazil) -->
-        <item>ru</item>      <!-- Russian -->
-        <item>tr</item>      <!-- Turkish -->
-        <item>uk</item>      <!-- Ukrainian -->
-        <item>vi</item>      <!-- Vietnamese -->
-        <item>zh-TW</item>   <!-- Chinese (Taiwan, Traditional) -->
-    </string-array>
     <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">Create GitHub Issue</string>
     <string name="copy_log">Copy log</string>
