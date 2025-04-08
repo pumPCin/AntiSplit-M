@@ -1,39 +1,11 @@
 <resources>
     <!--You don't need to translate anything here-->
     <string-array name="langs_display">
-        <item>العربية</item>  <!-- ar -->
         <item>English</item>   <!-- en -->
-        <item>Español</item>   <!-- es -->
-        <item>Deutsch</item>   <!-- de -->
-        <item>Français</item>  <!-- fr -->
-        <item>Hungarian</item>  <!-- hu -->
-        <item>Bahasa Indonesia</item>  <!-- id -->
-        <item>Italiano</item>  <!-- it -->
-        <item>한국어</item>  <!-- ko -->
-        <item>Polski</item>  <!-- pl -->
-        <item>Português</item> <!-- pt -->
-        <item>русский язык</item>  <!-- ru -->
-        <item>Türkçe</item>    <!-- tr -->
-        <item>українська мова</item>  <!-- uk -->
-        <item>Tiếng Việt</item>  <!-- vi -->
-        <item>繁體中文(台灣)</item>  <!-- zh-tw -->
+        <item>Русский</item>  <!-- ru -->
     </string-array>
     <string-array name="langs">
-        <item>ar</item>      <!-- Arabic -->
         <item>en</item>      <!-- English -->
-        <item>es</item>      <!-- Spanish -->
-        <item>de</item>      <!-- German -->
-        <item>fr</item>      <!-- French -->
-        <item>hu</item>      <!-- Magyar -->
-        <item>in</item>      <!-- Indonesian (for some reason) -->
-        <item>it</item>      <!-- Italian -->
-        <item>ko</item>      <!-- Korean -->
-        <item>pl</item>      <!-- Polish -->
-        <item>pt-BR</item>   <!-- Portuguese (Brazil) -->
         <item>ru</item>      <!-- Russian -->
-        <item>tr</item>      <!-- Turkish -->
-        <item>uk</item>      <!-- Ukrainian -->
-        <item>vi</item>      <!-- Vietnamese -->
-        <item>zh-TW</item>   <!-- Chinese (Taiwan, Traditional) -->
     </string-array>
 </resources>

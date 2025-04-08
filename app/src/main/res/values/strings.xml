@@ -26,7 +26,6 @@
     <string name="force">Force merging mismatched splits (with different versionCode or package name)</string>
     <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
     <string name="install">Install</string>
-    <string name="label_parent_dir" translatable="false">…</string>
     <string name="label_parent_dir">…</string>
     <string name="label_parent_directory">Parent Directory</string>
     <string name="lang">Language (Язык)</string>
@@ -66,12 +65,4 @@
     <string name="unselected">: Unselected</string>
     <string name="update">Update available</string>
     <string name="warning">Warning</string>
-    <string-array name="langs_display">
-        <item>English</item>   <!-- en -->
-        <item>Русский</item>   <!-- ru -->
-    </string-array>
-    <string-array name="langs">
-        <item>en</item>      <!-- English -->
-        <item>ru</item>      <!-- Russian -->
-    </string-array>
 </resources>
