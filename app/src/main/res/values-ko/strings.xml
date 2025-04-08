@@ -8,7 +8,7 @@
     <string name="grant_storage">선택한 파일과 동일 디렉토리에 저장하기 위한 파일 액세스 권한이 필요합니다.</string>
     <string name="no_filepath">"파일 경로를 사용할 수 없습니다."</string>
     <string name="output">"출력 디렉토리: "</string>
-    <string name="show_dialog">포함할 분할을 선택할 수 있는 다이얼로그 표시하기</string>
+    <string name="show_dialog">포함될 분할을 선택할 수 있는 다이얼로그 표시하기</string>
     <string name="nothing">선택된 항목 없음</string>
     <string name="change_text_color">텍스트 색상 변경하기</string>
     <string name="change_background_color">배경 색상 변경하기</string>
@@ -25,10 +25,10 @@
     <string name="saving">저장하는 중 …</string>
     <string name="removed_table_entry">"table-entry를 제거함: "</string>
     <string name="sanitizing_manifest">manifest를 처리하는 중 …</string>
-    <string name="skipping">"건너뛰는 중"</string>
+    <string name="skipping">"건너뛰는 중 "</string>
     <string name="not_apk">: APK 파일이 아님</string>
     <string name="unselected">: 선택되지 않음</string>
-    <string name="searching">APK 파일을 검색하는 중 …</string>
+    <string name="searching">APK 파일을 탐색하는 중 …</string>
     <string name="cancel">취소하기</string>
     <string name="select">선택하기</string>
     <string name="label_parent_directory">부모 디렉토리</string>
