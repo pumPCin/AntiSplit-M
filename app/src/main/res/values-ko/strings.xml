@@ -18,7 +18,7 @@
     <string name="arch_for_device">이 기기에 맞는 아키텍처 선택하기</string>
     <string name="dpi_for_device">이 기기에 맞는 DPI 선택하기</string>
     <string name="select_splits">분할 선택하기</string>
-    <string name="sign_apk">병합한 후, APK에 서명하기</string>
+    <string name="sign_apk">병합한 후에 APK에 서명하기</string>
     <string name="automatically_select">자동으로 이 기기 사양에 맞는 분할 선택하기</string>
     <string name="sign_failed">APK에 서명하지 못하였습니다. 서명하지 않고 저장합니다.</string>
     <string name="signing">APK에 서명하는 중 …</string>
