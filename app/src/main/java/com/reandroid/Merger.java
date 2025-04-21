@@ -292,6 +292,7 @@ public class Merger {
         logger.logMessage((R.string.searching));
         try (ApkBundle bundle = new ApkBundle()) {
             if (in == null) {
+                // Multiple splits from a split apk, already copied to cache dir
                 try {
                     bundle.loadApkDirectory(cacheDir);
                 } catch (FileNotFoundException fileNotFoundException) {
