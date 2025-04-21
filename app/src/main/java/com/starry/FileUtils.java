@@ -94,19 +94,35 @@ public class FileUtils {
     }
 
     private static boolean isExternalStorageDocument(Uri uri) {
-        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+        try {
+            return "com.android.externalstorage.documents".equals(uri.getAuthority());
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private static boolean isDownloadsDocument(Uri uri) {
-        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+       try {
+           return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+       } catch (Exception e) {
+           return false;
+       }
     }
 
     private static boolean isMediaDocument(Uri uri) {
-        return "com.android.providers.media.documents".equals(uri.getAuthority());
+       try{
+           return "com.android.providers.media.documents".equals(uri.getAuthority());
+       } catch (Exception e) {
+           return false;
+       }
     }
 
     private static boolean isGooglePhotosUri(Uri uri) {
-        return "com.google.android.apps.photos.content".equals(uri.getAuthority());
+        try{
+            return "com.google.android.apps.photos.content".equals(uri.getAuthority());
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @SuppressLint("NewApi")

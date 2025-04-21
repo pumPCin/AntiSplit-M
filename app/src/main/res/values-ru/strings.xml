@@ -65,12 +65,4 @@
     <string name="unselected">: не выбран</string>
     <string name="update">Доступно обновление</string>
     <string name="warning">Предупреждение</string>
-    <string-array name="langs_display">
-        <item>English</item>
-        <item>Русский</item>
-    </string-array>
-    <string-array name="langs">
-        <item>en</item>
-        <item>ru</item>
-    </string-array>
 </resources>
