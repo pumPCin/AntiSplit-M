@@ -8,6 +8,7 @@
         <item>Français</item>  <!-- fr -->
         <item>Hungarian</item>  <!-- hu -->
         <item>Bahasa Indonesia</item>  <!-- id -->
+        <item>日本語</item>  <!-- ja -->
         <item>Italiano</item>  <!-- it -->
         <item>한국어</item>  <!-- ko -->
         <item>Polski</item>  <!-- pl -->
@@ -26,6 +27,7 @@
         <item>fr</item>      <!-- French -->
         <item>hu</item>      <!-- Magyar -->
         <item>in</item>      <!-- Indonesian (for some reason) -->
+        <item>ja</item>      <!-- Japanese -->
         <item>it</item>      <!-- Italian -->
         <item>ko</item>      <!-- Korean -->
         <item>pl</item>      <!-- Polish -->

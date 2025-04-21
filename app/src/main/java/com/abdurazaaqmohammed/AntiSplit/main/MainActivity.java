@@ -343,6 +343,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void process(Uri outputUri) {
         findViewById(R.id.installButton).setVisibility(View.GONE);
+        toggleAnimation(true);
 
         final boolean urisAreSplitApks = MainActivity.this.urisAreSplitApks;
         final Uri splitAPKUri = MainActivity.this.splitAPKUri;
@@ -550,7 +551,7 @@ public class MainActivity extends AppCompatActivity {
                         currentVer = null;
                     }
                     boolean newVer = false;
-                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '2', '5'} : currentVer.replace(".", "").toCharArray();
+                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '2', '6'} : currentVer.replace(".", "").toCharArray();
                     char[] latest = latestVersion.replace(".", "").toCharArray();
 
                     int maxLength = Math.max(curr.length, latest.length);
@@ -757,8 +758,8 @@ public class MainActivity extends AppCompatActivity {
     public void showError(Throwable e) {
         toggleAnimation(false);
         if (!(e instanceof ClosedByInterruptException)) {
-            final String mainErr = e.toString();
-            errorOccurred = !mainErr.equals(rss.getString(R.string.sign_failed));
+            final String mainErr = e.getMessage();
+            errorOccurred = TextUtils.isEmpty(mainErr) || !mainErr.equals(rss.getString(R.string.sign_failed));
 
             StringBuilder stackTrace = new StringBuilder(mainErr);
             if(!TextUtils.isEmpty(openedFile)) {
@@ -773,7 +774,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 currentVer = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             } catch (Exception ex) {
-                currentVer = "2.2.5";
+                currentVer = "2.2.6";
             }
             fullLog.append(currentVer).append('\n')
                     .append("Storage permission granted: ")

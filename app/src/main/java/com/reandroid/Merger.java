@@ -49,6 +49,7 @@ import com.reandroid.arsc.value.ValueType;
 import com.starry.FileUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -60,6 +61,7 @@ public class Merger {
     /** @noinspection ResultOfMethodCallIgnored*/
     private static void extractAndLoad(Uri in, File cacheDir, MainActivity context, List<String> splits, ApkBundle bundle, MyAPKLogger logger) throws IOException {
         logger.logMessage(in.getPath());
+
         //bundle.setAPKLogger(context.getLogger()); // This spams the log
         boolean checkSplits = splits != null && !splits.isEmpty();
         try (InputStream is = FileUtils.getInputStream(in, context);
@@ -80,25 +82,51 @@ public class Merger {
                     }
                 } else logger.logMessage(context.getRss().getString(R.string.skipping) + name + context.getRss().getString(R.string.not_apk));
             }
-            bundle.loadApkDirectory(cacheDir);
+            try {
+                bundle.loadApkDirectory(cacheDir);
+            } catch (FileNotFoundException fileNotFoundException) {
+                String path;
+                try {
+                    path= FileUtils.getPath(in, context);
+                } catch (Exception esds) {
+                    path = context.getOriginalFileName(in);
+                }
+                throw(new IOException(fileNotFoundException.getMessage() + " file " + in + ' ' + path, fileNotFoundException));
+            }
         } catch (Exception e) {
             // If the above failed it probably did not copy any files
             // so might as well do it this way instead of trying unreliable methods to see if we need to do this
             // and possibly copying the file for no reason
 
             // Check if already copied the file earlier to get list of splits.
-            if (DeviceSpecsUtil.zipFile == null) {
+            long size;
+            boolean notAlreadyCopied = DeviceSpecsUtil.zipFile == null;
+            if (notAlreadyCopied) {
                 File input = new File(FileUtils.getPath(in, context));
                 boolean couldNotRead = !input.canRead();
                 if (couldNotRead) try(InputStream is = context.getContentResolver().openInputStream(in)) {
                     File parentFile = cacheDir.getParentFile();
                     com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, input = new File(parentFile != null && parentFile.canRead() ? parentFile : cacheDir, input.getName()));
                 }
+                size = input.length();
                 ArchiveFile zf = new ArchiveFile(input);
                 extractZipFile(zf, checkSplits, splits, cacheDir, logger, context.getRss());
                 if (couldNotRead) input.delete();
-            } else extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splits, cacheDir, logger, context.getRss());
-            bundle.loadApkDirectory(cacheDir);
+            } else {
+                extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splits, cacheDir, logger, context.getRss());
+                size = DeviceSpecsUtil.zipFile.size();
+            }
+            try {
+                bundle.loadApkDirectory(cacheDir);
+            } catch (FileNotFoundException fileNotFoundException) {
+                String path;
+                try {
+                    path= FileUtils.getPath(in, context);
+                } catch (Exception esds) {
+                    path = context.getOriginalFileName(in);
+                }
+                throw(new IOException(fileNotFoundException.getMessage() + " file " + in + ' ' + path + ' ' + (notAlreadyCopied ? "size" : "length") +' ' + size, fileNotFoundException));
+            }
         }
     }
 
@@ -263,7 +291,14 @@ public class Merger {
         MyAPKLogger logger = context.getLogger();
         logger.logMessage((R.string.searching));
         try (ApkBundle bundle = new ApkBundle()) {
-            if (in == null) bundle.loadApkDirectory(cacheDir); // Multiple splits from a split apk, already copied to cache dir
+            if (in == null) {
+                // Multiple splits from a split apk, already copied to cache dir
+                try {
+                    bundle.loadApkDirectory(cacheDir);
+                } catch (FileNotFoundException fileNotFoundException) {
+                    throw(new IOException(fileNotFoundException.getMessage() + " file " + splits.toString(), fileNotFoundException));
+                }
+            }
             else extractAndLoad(in, cacheDir, context, splits, bundle, logger);
             run(bundle, cacheDir, out, context, signApk, force);
         }
