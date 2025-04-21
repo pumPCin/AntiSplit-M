@@ -5,7 +5,7 @@
   <string name="success_saved">ファイルの保存に成功しました</string>
   <string name="enable_logs">ログを有効化</string>
   <string name="ask">毎回尋ねる</string>
-  <string name="same">選択したファイルと同じディレクトリ内</string>
+  <string name="same">選択したファイルと同じ場所</string>
   <string name="grant_storage">選択したファイルと同じディレクトリ内に保存するにはストレージの権限が必要です</string>
   <string name="no_filepath">"ファイルパスに書き込めません "</string>
   <string name="output">"出力先ディレクトリ: "</string>
@@ -20,7 +20,7 @@
   <string name="dpi_for_device">デバイスの画面幅を選択</string>
   <string name="select_splits">分割を選択</string>
   <string name="sign_apk">統合後に APK を署名する</string>
-  <string name="automatically_select">デバイスの仕様に応じた分割を自動的に選択</string>
+  <string name="automatically_select">デバイスの仕様に応じた分割を自動選択する</string>
   <string name="sign_failed">APK に署名できませんでした。署名をしないで保存しました。</string>
   <string name="signing">APK を署名中…</string>
   <string name="saving">保存中…</string>
@@ -62,7 +62,7 @@
   <string name="suffix">接頭辞</string>
   <string name="pairip_warning">統合しようとしているアプリは Pairip/Google Play Integrity を使用して改ざんの保護をしています。APK を変更して回避しない限り、統合したアプリを開くとクラッシュします。</string>
   <string name="force">不一致の分割を強制的に統合する (バージョンコードまたはパッケージ名が異なる物)</string>
-  <string name="file_save_method">ファイルの保存方式</string>
-  <string name="pick_folder">フォルダを入力</string>
+  <string name="file_save_method">ファイルの保存方法</string>
+  <string name="pick_folder">保存先を入力</string>
   <string name="not_split">これは分割 APK ではないようです (%1$s)</string>
 </resources>
