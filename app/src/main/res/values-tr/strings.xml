@@ -56,4 +56,9 @@
     <string name="force">Uyumsuz bölünmelerin birleştirilmesini zorla (farklı versionCode veya paket adı ile)</string>
     <string name="file_save_method">Dosya kaydetme seçenekleri</string>
     <string name="pick_folder">Yolu girin</string>
+    <string name="system_theme">Sistem teması</string>
+    <string name="black_theme">Siyah tema</string>
+    <string name="dark_theme">Koyu tema</string>
+    <string name="light_theme">Açık tema</string>
+    <string name="not_split">Bu bölünmüş bir APK gibi görünmüyor (%1$s)</string>
 </resources>
