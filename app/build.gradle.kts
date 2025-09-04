@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
-        minSdk = 19
+        minSdk = 21
         targetSdk = 35
         versionCode = 55
         versionName = "2.2.7"
