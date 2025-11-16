@@ -7,7 +7,7 @@ There are already some apps that can perform this task like Apktool M, AntiSplit
 
 In addition, Antisplit G2 (com.tilks.arscmerge), the fastest and lightest of the existing apps, has a large problem; it does not remove the information about splits in the APK from the AndroidManifest.xml. If a non-split APK contains this information it will cause an "App not installed" error on some devices. Fortunately the implementation by REAndroid contains a function to remove this automatically and it carries over to this app.
 
-Version 2.x - Material You design, support Android 4.4+
+Version 2.x - Material You design, support Android 7.0+
 
 Version 1.x - Support Android 1.6+
 
