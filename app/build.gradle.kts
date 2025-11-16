@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
-        minSdk = 19
+        minSdk = 21
         targetSdk = 35
-        versionCode = 54
-        versionName = "2.2.6"
+        versionCode = 55
+        versionName = "2.2.7"
         multiDexEnabled = true
     }
 
@@ -34,7 +34,7 @@ android {
         viewBinding = false
     }
     dependencies {
-        implementation("com.google.android.material:material:1.12.0")
+        implementation("com.google.android.material:material:1.13.0")
         implementation(files("libs/APKEditor.jar"))
     }
     dependenciesInfo {
