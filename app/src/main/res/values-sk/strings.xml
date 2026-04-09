@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">AntiSplit M</string>
+    <string name="merge">Vybrať rozdelenú APK zo súboru</string>
+    <string name="success_saved">Súbor bol úspešne uložený</string>
+    <string name="enable_logs">Povoliť logy</string>
+    <string name="ask">Zakaždým sa opýtať</string>
+    <string name="same">Rovnaký priečinok ako vybraný súbor</string>
+    <string name="grant_storage">Na uloženie do rovnakého priečinka ako vybraný súbor je potrebné povolenie úložiska</string>
+    <string name="no_filepath">"Nie je možné zapisovať na cestu "</string>
+    <string name="output">"Výstupný priečinok: "</string>
+    <string name="show_dialog">Zobraziť dialóg na výber rozdelení</string>
+    <string name="nothing">Nič nebolo vybrané</string>
+    <string name="change_text_color">Zmeniť farbu textu</string>
+    <string name="change_background_color">Zmeniť farbu pozadia</string>
+    <string name="all">Vybrať všetko</string>
+    <string name="for_device">Vybrať všetky rozdelenia pre vaše zariadenie</string>
+    <string name="lang_for_device">Vybrať jazyk pre vaše zariadenie</string>
+    <string name="arch_for_device">Vybrať architektúru pre vaše zariadenie</string>
+    <string name="dpi_for_device">Vybrať DPI pre vaše zariadenie</string>
+    <string name="select_splits">Vybrať rozdelenia</string>
+    <string name="sign_apk">Podpísať APK po zlúčení</string>
+    <string name="automatically_select">Automaticky vybrať rozdelenia pre vaše zariadenie</string>
+    <string name="sign_failed">Nepodarilo sa podpísať APK, ukladá sa bez podpisu</string>
+    <string name="signing">Podpisovanie APK…</string>
+    <string name="saving">Ukladanie…</string>
+    <string name="removed_table_entry">"Odstránená položka tabuľky: "</string>
+    <string name="sanitizing_manifest">Čistenie manifestu…</string>
+    <string name="skipping">"Preskakuje sa "</string>
+    <string name="not_apk">: Nie je súbor APK</string>
+    <string name="unselected">: Nevybrané</string>
+    <string name="searching">Vyhľadávanie súborov APK…</string>
+    <string name="cancel">Zrušiť</string>
+    <string name="select">Vybrať</string>
+    <string name="label_parent_directory">Nadradený priečinok</string>
+    <string name="last_edit">Naposledy upravené: </string>
+    <string name="error_dir_access">K priečinku nie je možné pristúpiť</string>
+    <string name="lang" translatable="false">Language</string>
+    <string name="update">Dostupná aktualizácia</string>
+    <string name="new_ver">Dostupná nová verzia AntiSplit M</string>
+    <string name="dl">Stiahnuť</string>
+    <string name="auto_update">Automaticky kontrolovať aktualizácie</string>
+    <string name="check_update_now">Skontrolovať aktualizácie teraz</string>
+    <string name="no_update_found">Žiadna aktualizácia nenájdená</string>
+    <string name="settings">Nastavenia</string>
+    <string name="close">Zavrieť</string>
+    <string name="mismatch">Nasledujúce rozdelenia (%1$s) majú nezhodné kódy verzií. Ide o jazykové balíky, aplikácia môže fungovať aj bez nich, ale tieto jazyky nebudú dostupné. Chcete pokračovať v zlúčení?</string>
+    <string name="warning">Upozornenie</string>
+    <string name="mismatch_base">" Kód verzie sa nezhoduje s base.apk"</string>
+    <string name="label_parent_dir" translatable="false">…</string>
+    <string name="create_issue">Nahlásiť problém na GitHube</string>
+    <string name="copy_log">Skopírovať log</string>
+    <string name="pause">Pozastaviť</string>
+    <string name="copied_log">Log skopírovaný</string>
+    <string name="select_from_installed_apps">Vybrať z nainštalovaných aplikácií</string>
+    <string name="app_icon_list_label">Ikona aplikácie</string>
+    <string name="install">Nainštalovať</string>
+    <string name="black_theme">Čierna téma</string>
+    <string name="dark_theme">Tmavá téma</string>
+    <string name="light_theme">Svetlá téma</string>
+    <string name="system_theme">Systémová téma</string>
+    <string name="suffix">Prípona</string>
+    <string name="pairip_warning">Aplikácia, ktorú sa pokúšate zlúčiť, používa ochranu Pairip/Google加固 proti úpravám. Zlúčená verzia sa po spustení zrúti, pokiaľ neviete, ako túto ochranu obísť.</string>
+    <string name="force">Vynútiť zlúčenie nezhodných rozdelení (s rôznym versionCode alebo názvom balíka)</string>
+    <string name="file_save_method">Spôsob ukladania súborov</string>
+    <string name="pick_folder">Vybrať priečinok</string>
+    <string name="not_split">Toto nevyzerá ako rozdelená APK (%1$s)</string>
+    <string name="merged">Zlúčenie úspešné, vyberte kam uložiť APK</string>
+    <string name="save">Uložiť</string>
+    <string name="check_file_valid">"Skontrolujte, či je vybraný súbor platný ZIP alebo rozdelená APK (skúste ho otvoriť v správcovi súborov alebo ho nainštalovať). Ak je už nainštalovaný a chyba pretrváva, skúste funkciu "</string>
+</resources>
