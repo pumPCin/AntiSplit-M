@@ -18,6 +18,7 @@ package com.reandroid;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 
@@ -29,7 +30,6 @@ import com.abdurazaaqmohammed.utils.SignUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.j256.simplezip.ZipFileInput;
 import com.j256.simplezip.format.ZipFileHeader;
-import com.reandroid.apk.APKLogger;
 import com.reandroid.apk.ApkBundle;
 import com.reandroid.apk.ApkModule;
 import com.reandroid.apkeditor.common.AndroidManifestHelper;
@@ -52,104 +52,149 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class Merger {
 
-    /** @noinspection ResultOfMethodCallIgnored*/
-    private static void extractAndLoad(Uri in, File cacheDir, MainActivity context, List<String> splits, ApkBundle bundle, MyAPKLogger logger) throws IOException {
-        logger.logMessage(in.getPath());
+    private File workingDirectory;
+    private final MainActivity context;
+    private final MyAPKLogger logger;
+    private final Resources rss;
+    public Uri signedApk;
+
+    public Merger(File workingDirectory, MainActivity context) {
+        this.workingDirectory = workingDirectory;
+        this.rss = (this.context = context).getRss();
+        this.logger = context.getLogger();
+    }
+
+    public void setWorkingDirectory(File workingDirectory) {
+        this.workingDirectory = workingDirectory;
+    }
+
+    private void extractAndLoadFromInputStream(Uri splitAPKUri,  List<String> splits, ApkBundle bundle) throws IOException {
+        logger.logMessage(splitAPKUri.getPath());
 
         //bundle.setAPKLogger(context.getLogger()); // This spams the log
         boolean checkSplits = splits != null && !splits.isEmpty();
-        try (InputStream is = FileUtils.getInputStream(in, context);
+        try (InputStream is = FileUtils.getInputStream(splitAPKUri, context);
              ZipFileInput zis = new ZipFileInput(is)) {
             ZipFileHeader header;
             while ((header = zis.readFileHeader()) != null) {
                 String name = header.getFileName();
                 if (name.endsWith(".apk")) {
                     if ((checkSplits && splits.contains(name)))
-                        logger.logMessage(context.getRss().getString(R.string.skipping) + name + context.getRss().getString(R.string.unselected));
+                        logger.logMessage(rss.getString(R.string.skipping) + name + rss.getString(R.string.unselected));
                     else {
-                        File file = new File(cacheDir, name);
-                        if (file.getCanonicalPath().startsWith(cacheDir.getCanonicalPath() + File.separator))
-                            zis.readFileDataToFile(file);
-                        else throw new IOException("Zip entry is outside of the target dir: " + name);
+                        File file = new File(workingDirectory, name);
+                        if (file.getCanonicalPath().startsWith(workingDirectory.getCanonicalPath() + File.separator)) {
+                            File parentDir = file.getParentFile();
+                            if (parentDir != null && !parentDir.exists()) {
+                                parentDir.mkdirs();
+                            }
 
-                        logger.logMessage("Extracted " + name);
+                            logger.logMessage("Extracted " + name + " (" + zis.readFileDataToFile(file) +" bytes)");
+                        } else throw new IOException("Zip entry is outside of the target dir: " + name);
                     }
-                } else logger.logMessage(context.getRss().getString(R.string.skipping) + name + context.getRss().getString(R.string.not_apk));
+                } else logger.logMessage(rss.getString(R.string.skipping) + name + rss.getString(R.string.not_apk));
             }
             try {
-                bundle.loadApkDirectory(cacheDir);
+                bundle.loadApkDirectory(workingDirectory);
             } catch (FileNotFoundException fileNotFoundException) {
                 String path;
                 try {
-                    path= FileUtils.getPath(in, context);
-                } catch (Exception esds) {
-                    path = context.getOriginalFileName(in);
+                    path= FileUtils.getPath(splitAPKUri, context);
+                } catch (Exception e) {
+                    path = context.getOriginalFileName(splitAPKUri);
                 }
-                throw(new IOException(fileNotFoundException.getMessage() + " file " + in + ' ' + path, fileNotFoundException));
+                throw(new IOException(fileNotFoundException.getMessage() + " file " + splitAPKUri + ' ' + path, fileNotFoundException));
             }
         } catch (Exception e) {
             // If the above failed it probably did not copy any files
             // so might as well do it this way instead of trying unreliable methods to see if we need to do this
             // and possibly copying the file for no reason
-
-            // Check if already copied the file earlier to get list of splits.
-            long size;
-            boolean notAlreadyCopied = DeviceSpecsUtil.zipFile == null;
-            if (notAlreadyCopied) {
-                File input = new File(FileUtils.getPath(in, context));
-                boolean couldNotRead = !input.canRead();
-                if (couldNotRead) try(InputStream is = context.getContentResolver().openInputStream(in)) {
-                    File parentFile = cacheDir.getParentFile();
-                    com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, input = new File(parentFile != null && parentFile.canRead() ? parentFile : cacheDir, input.getName()));
-                }
-                size = input.length();
-                ArchiveFile zf = new ArchiveFile(input);
-                extractZipFile(zf, checkSplits, splits, cacheDir, logger, context.getRss());
-                if (couldNotRead) input.delete();
-            } else {
-                extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splits, cacheDir, logger, context.getRss());
-                size = DeviceSpecsUtil.zipFile.size();
-            }
-            try {
-                bundle.loadApkDirectory(cacheDir);
-            } catch (FileNotFoundException fileNotFoundException) {
-                String path;
-                try {
-                    path= FileUtils.getPath(in, context);
-                } catch (Exception esds) {
-                    path = context.getOriginalFileName(in);
-                }
-                throw(new IOException(fileNotFoundException.getMessage() + " file " + in + ' ' + path + ' ' + (notAlreadyCopied ? "size" : "length") +' ' + size, fileNotFoundException));
-            }
+            extractAndLoadFromZipFile(splitAPKUri, splits, bundle, checkSplits);
         }
     }
 
-    private static void extractZipFile(ArchiveFile zf, boolean checkSplits, List<String> splits, File cacheDir, APKLogger logger, Resources rss) throws IOException {
+    /** @noinspection ResultOfMethodCallIgnored*/
+    private void extractAndLoadFromZipFile(Uri splitAPKUri,  List<String> splits, ApkBundle bundle, boolean checkSplits) throws IOException {
+        // Check if already copied the file earlier to get list of splits.
+        long size;
+        boolean notAlreadyCopied = DeviceSpecsUtil.zipFile == null;
+        if (notAlreadyCopied) {
+            boolean cantReadFile = com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(context);
+            File inputZipFile = null;
+            String path;
+
+            if(!cantReadFile) try {
+                path = FileUtils.getPath(splitAPKUri, context);
+                cantReadFile = TextUtils.isEmpty(path) || !((inputZipFile= new File(path)).canRead());
+            } catch (Exception exception) {
+                cantReadFile = true;
+            }
+
+            if (cantReadFile) {
+                try(InputStream is = context.getContentResolver().openInputStream(splitAPKUri)) {
+                    //File parentFile = cacheDir.getParentFile();
+                    // com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, input = new File(parentFile != null && parentFile.canRead() ? parentFile : cacheDir, input == null ? context.getOriginalFileName(in) :  input.getName()));
+                    inputZipFile = new File(workingDirectory, System.currentTimeMillis() + '_' + context.getOriginalFileName(splitAPKUri));
+                    com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, inputZipFile);
+                }
+            }
+            size = inputZipFile.length();
+            ArchiveFile zf = new ArchiveFile(inputZipFile);
+            extractZipFile(zf, checkSplits, splits);
+            if (cantReadFile) inputZipFile.delete();
+        } else {
+            extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splits);
+            size = DeviceSpecsUtil.zipFile.size();
+        }
+        try {
+            bundle.loadApkDirectory(workingDirectory);
+        } catch (FileNotFoundException fileNotFoundException) {
+            String path;
+            try {
+                path = FileUtils.getPath(splitAPKUri, context);
+            } catch (Exception exception) {
+                path = context.getOriginalFileName(splitAPKUri);
+            }
+            throw(new IOException(fileNotFoundException.getMessage() + " file " + splitAPKUri + ' ' + path + ' ' + (notAlreadyCopied ? "size" : "length") +' ' + size, fileNotFoundException));
+        }
+    }
+
+    private void extractZipFile(ArchiveFile zf, boolean checkSplits, List<String> splits) throws IOException {
         for(InputSource archiveEntry : zf.getInputSources()) {
             String name = archiveEntry.getName();
             if (name.endsWith(".apk")) {
                 if ((checkSplits && splits.contains(name)))
                     logger.logMessage(rss.getString(R.string.skipping) + name + rss.getString(R.string.unselected));
                 else try (InputStream is = archiveEntry.openStream()) {
-                    com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, new File(cacheDir, name));
+                   // com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, new File(cacheDir, name));
+                    File outputFile = new File(workingDirectory, name);
+                    if (outputFile.getCanonicalPath().startsWith(workingDirectory.getCanonicalPath() + File.separator)) {
+                        File parentDir = outputFile.getParentFile();
+                        if (parentDir != null && !parentDir.exists()) {
+                            parentDir.mkdirs();
+                        }
+                        com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, outputFile);
+                    } else {
+                        logger.logMessage("Skipped invalid path: " + name);
+                    }
                 }
             } else logger.logMessage(rss.getString(R.string.skipping) + name + rss.getString(R.string.not_apk));
         }
         zf.close();
     }
 
-    public static void run(ApkBundle bundle, File cacheDir, Uri out, MainActivity context, boolean signApk, boolean force) throws IOException, InterruptedException {
+    public File run(ApkBundle bundle, boolean signApk, boolean force) throws Exception {
         MyAPKLogger logger = context.getLogger();
         logger.logMessage("Found modules: " + bundle.getApkModuleList().size());
-        final boolean[] saveToCacheDir = {true}; // I found writeApk(OutputStream) is really slow and writing to file and copying is actually faster
+        //final boolean[] saveToCacheDir = {true}; // I found writeApk(OutputStream) is really slow and writing to file and copying is actually faster
         final boolean[] sign = {signApk};
-        for(File split : cacheDir.listFiles()) {
+        File[] splits = workingDirectory.listFiles();
+        for(File split : splits) {
             String splitName = split.getName();
             String arch = null;
             String var = "x86";
@@ -161,12 +206,12 @@ public class Merger {
                 if (zf.containsFile("lib" + File.separator + arch + File.separator + "libpairipcore.so")) {
                     final CountDownLatch latch = new CountDownLatch(1);
                     context.getHandler().post(() ->
-                        context.runOnUiThread(new MaterialAlertDialogBuilder(context).setTitle(context.getRss().getString(R.string.warning)).setMessage(R.string.pairip_warning)
+                        context.runOnUiThread(new MaterialAlertDialogBuilder(context).setTitle(rss.getString(R.string.warning)).setMessage(R.string.pairip_warning)
                         .setPositiveButton("OK", (dialog, which) -> {
-                            saveToCacheDir[0] = true;
+                            //saveToCacheDir[0] = true;
                             sign[0] = false;
                             latch.countDown();
-                        }).setNegativeButton(context.getRss().getString(R.string.cancel), (dialog, which) -> {
+                        }).setNegativeButton(rss.getString(R.string.cancel), (dialog, which) -> {
                             context.startActivity(new Intent(context, MainActivity.class));
                             context.finishAffinity();
                             latch.countDown();
@@ -256,51 +301,48 @@ public class Merger {
             }
             logger.logMessage((R.string.saving));
 
-            File temp;
+            File mergedAPK = new File(workingDirectory, "merged_" + System.currentTimeMillis() + ".apk");
+            mergedModule.writeApk(mergedAPK);
             if (sign[0]) {
-                mergedModule.writeApk(temp = new File(cacheDir, "temp.apk"));
                 logger.logMessage((R.string.signing));
-                boolean saveToCache = com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(context);
-                String p;
-                File signed = new File(saveToCache || (saveToCache = TextUtils.isEmpty(p = FileUtils.getPath(out, context))) ? (cacheDir + File.separator + "signed.apk") : p);
-                try {
-                    SignUtil.signDebugKey(context, temp, signed);
-                    if (saveToCache) try(OutputStream os = context.getContentResolver().openOutputStream(signedApk = out)) {
-                        com.abdurazaaqmohammed.utils.FileUtils.copyFile(signed, os);
-                    } else signedApk = FileProvider.getUriForFile(context, "com.abdurazaaqmohammed.AntiSplit.fileprovider", signed);
-                } catch (Exception e) {
-                    SignUtil.signPseudoApkSigner(temp, context, out, e);
-                }
-            } else if (saveToCacheDir[0]) {
-                temp = new File(cacheDir, "temp.apk");
-                mergedModule.writeApk(temp);
-                try(OutputStream os = FileUtils.getOutputStream(out, context)) {
-                    com.abdurazaaqmohammed.utils.FileUtils.copyFile(temp, os);
-                }
+                File outputSigned = new File(workingDirectory, System.currentTimeMillis() + "signed.apk");
+               // try {
+                SignUtil.signDebugKey(context, mergedAPK, outputSigned);
+                signedApk = FileProvider.getUriForFile(context, "com.abdurazaaqmohammed.AntiSplit.fileprovider", outputSigned);
+                return outputSigned;
+              //  } catch (Exception e) {
+                //    SignUtil.signPseudoApkSigner(mergedAPK, context, out, e); // Just forget about this because I never figure out how to solve any of the error from it and it probably does not help
+              //  }
             } else {
-                try(OutputStream os = FileUtils.getOutputStream(out, context)) {
-                    mergedModule.writeApk(os);
-                }
+                return mergedAPK;
             }
         }
     }
 
-    public static Uri signedApk;
 
-    public static void run(Uri in, File cacheDir, Uri out, MainActivity context, List<String> splits, boolean signApk, boolean force) throws Exception {
+    public File run(Uri splitAPKUri, List<String> splitsToNotInclude, boolean signApk, boolean force) throws Exception {
         MyAPKLogger logger = context.getLogger();
         logger.logMessage((R.string.searching));
         try (ApkBundle bundle = new ApkBundle()) {
-            if (in == null) {
+            if (splitAPKUri == null) {
                 // Multiple splits from a split apk, already copied to cache dir
                 try {
-                    bundle.loadApkDirectory(cacheDir);
+                    bundle.loadApkDirectory(workingDirectory);
                 } catch (FileNotFoundException fileNotFoundException) {
-                    throw(new IOException(fileNotFoundException.getMessage() + " file " + splits.toString(), fileNotFoundException));
+                    if(splitsToNotInclude != null) throw(new IOException(fileNotFoundException.getMessage() + " file " + splitsToNotInclude, fileNotFoundException));
+                    else throw fileNotFoundException;
                 }
             }
-            else extractAndLoad(in, cacheDir, context, splits, bundle, logger);
-            run(bundle, cacheDir, out, context, signApk, force);
+            else {
+                logger.logMessage("MIME Type " + context.getContentResolver().getType(splitAPKUri));
+                if(Build.VERSION.SDK_INT < 23) {
+                    logger.logMessage(splitAPKUri.getPath());
+
+                    boolean checkSplits = splitsToNotInclude != null && !splitsToNotInclude.isEmpty();
+                    extractAndLoadFromZipFile(splitAPKUri, splitsToNotInclude, bundle, checkSplits);
+                } else extractAndLoadFromInputStream(splitAPKUri, splitsToNotInclude, bundle);
+            }
+            return run(bundle, signApk, force);
         }
     }
 }
