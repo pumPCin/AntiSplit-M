@@ -49,9 +49,13 @@ public class FileUtils {
     public static OutputStream getOutputStream(Uri uri, MainActivity context) throws IOException {
         String uriPath;
         if(doesNotHaveStoragePerm(context) || (uriPath = uri.getPath()) == null || uriPath.startsWith("/document/msf:")) return context.getContentResolver().openOutputStream(uri);
-        String filePath = getPath(uri, context);
-        File file = filePath == null ? null : new File(filePath);
-        return file != null && file.canWrite() ? com.abdurazaaqmohammed.utils.FileUtils.getOutputStream(file) : context.getContentResolver().openOutputStream(uri);
+        try {
+            String filePath = getPath(uri, context);
+            File file = filePath == null ? null : new File(filePath);
+            return file != null && file.canWrite() ? com.abdurazaaqmohammed.utils.FileUtils.getOutputStream(file) : context.getContentResolver().openOutputStream(uri);
+        } catch (Exception e) {
+            return context.getContentResolver().openOutputStream(uri);
+        }
     }
 
     public static InputStream getInputStream(Uri uri, MainActivity context) throws IOException {
@@ -201,17 +205,19 @@ public class FileUtils {
             return getDataColumn(context, contentUri, selection, selectionArgs);
         }
 
-        if ("content".equalsIgnoreCase(uri.getScheme())) {
-            return isGooglePhotosUri(uri) ?
-                    uri.getLastPathSegment() :
-                    doesNotHaveStoragePerm(context) ?
-                            copyFileToInternalStorageAndGetPath(uri, context) :
-                            getDataColumn(context, uri, null, null);
+        String scheme = uri.getScheme();
+        if(!TextUtils.isEmpty(scheme)) {
+            if ("content".equalsIgnoreCase(scheme)) {
+                return doesNotHaveStoragePerm(context) ?
+                                copyFileToInternalStorageAndGetPath(uri, context) :
+                                getDataColumn(context, uri, null, null);
+            }
+
+            if ("file".equalsIgnoreCase(scheme)) {
+                return uri.getPath();
+            }
         }
 
-        if ("file".equalsIgnoreCase(uri.getScheme())) {
-            return uri.getPath();
-        }
 
         return copyFileToInternalStorageAndGetPath(uri, context);
     }
