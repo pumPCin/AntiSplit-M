@@ -59,7 +59,7 @@ public class SignUtil {
         signDebugKey(c, inputApk, output, true, true, true);
     }
 
-    public static void signPseudoApkSigner(File temp, MainActivity context, Uri out, Exception e) throws IOException {
+    public static void signPseudoApkSigner(File temp, MainActivity context, Uri out, Exception e) throws Exception {
         String msg = context.getRss().getString(R.string.sign_failed);
         if(Build.VERSION.SDK_INT < 30) {
             // When I tried signing with apksig in AVD with sdk 10 java.security is throwing some error saying something not found
@@ -95,7 +95,7 @@ public class SignUtil {
             try(OutputStream os = FileUtils.getOutputStream(out, context)) {
                 com.abdurazaaqmohammed.utils.FileUtils.copyFile(temp, os);
             }
-            throw(new RuntimeException(msg, e)); // for showError
+            throw((e)); // for showError
         }
     }
 }

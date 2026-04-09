@@ -18,10 +18,6 @@ public class RunUtil {
     private final MainActivity context;
     private final CharSequence msg;
 
-    public RunUtil(MainActivity context) {
-        this(null, context, null);
-    }
-
     public RunUtil(Handler handler, MainActivity context, CharSequence msg) {
         this.handler = handler;
         this.context = context;

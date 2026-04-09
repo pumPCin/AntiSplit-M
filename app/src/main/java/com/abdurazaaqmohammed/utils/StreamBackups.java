@@ -11,7 +11,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
-@TargetApi(26)
+@androidx.annotation.RequiresApi(26)
 public class StreamBackups {
     public static OutputStream getOutputStream(File file) throws IOException {
         try {
