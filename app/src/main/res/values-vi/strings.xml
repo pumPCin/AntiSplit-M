@@ -1,6 +1,15 @@
-<?xml version='1.0' encoding='utf-8' ?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
+    <string name="not_split">"This does not seem to be a split APK (%1$s)"</string>
+<string name="pick_folder">"Select folder"</string>
+    <string name="file_save_method">"File saving method"</string>
+    <string name="force">"Force merging mismatched splits (with different versionCode or package name)"</string>
+    <string name="app_name" translatable="false">"AntiSplit M"</string>
+    <string name="change_text_color">"Change text color"</string>
+    <string name="change_background_color">"Change background color"</string>
     <string name="all">Chọn hết</string>
+    <string name="select">"Select"</string>
+    <string name="pause">"Pause button"</string>
     <string name="app_icon_list_label">App icon</string>
     <string name="arch_for_device">Chọn kiến trúc cho thiết bị của bạn</string>
     <string name="ask">Hỏi nơi lưu tệp mỗi lần</string>

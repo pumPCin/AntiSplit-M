@@ -1,4 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
+    <string name="not_split">"This does not seem to be a split APK (%1$s)"</string>
+<string name="pick_folder">"Select folder"</string>
+    <string name="file_save_method">"File saving method"</string>
+    <string name="force">"Force merging mismatched splits (with different versionCode or package name)"</string>
+    <string name="pairip_warning">"The app you are trying to merge uses PairIP/Google Integrity Protection to protect it from modification. The merged version will crash on opening unless you know how to modify the APK to bypass it."</string>
+    <string name="app_name" translatable="false">"AntiSplit M"</string>
     <string name="merge">اختر ملف APK المقسم للدمج/أنتي سبلت</string>
     <string name="success_saved">تم حفظ الملف بنجاح</string>
     <string name="enable_logs">تفعيل السجلات</string>
@@ -33,6 +40,7 @@
     <string name="label_parent_directory">الدليل الرئيسي</string>
     <string name="last_edit">آخر تعديل: </string>
     <string name="error_dir_access">لا يمكن الوصول إلى الدليل</string>
+    <string name="lang" translatable="false">"Language"</string>
     <string name="update">تحديث متاح</string>
     <string name="new_ver">إصدار جديد من AntiSplit M متاح</string>
     <string name="dl">تحميل</string>
@@ -44,6 +52,7 @@
     <string name="mismatch">المقاطع التالية (%1$s) تحتوي على رموز إصدار غير متطابقة. هي فقط رموز لغات، لذا يمكن للتطبيق العمل بدونها، لكن هذه اللغات لن تعمل في التطبيق. هل ترغب في الاستمرار في الدمج على أي حال؟</string>
     <string name="warning">تحذير</string>
     <string name="mismatch_base">" رمز الإصدار لا يتطابق مع base.apk"</string>
+    <string name="label_parent_dir" translatable="false">"…"</string>
     <string name="create_issue">إنشاء مشكلة على GitHub</string>
     <string name="copy_log">نسخ السجل</string>
     <string name="pause">زر الإيقاف المؤقت</string>
@@ -51,5 +60,9 @@
     <string name="select_from_installed_apps">اختر من التطبيقات المثبتة</string>
     <string name="app_icon_list_label">أيقونة التطبيق</string>
     <string name="install">تثبيت</string>
+    <string name="black_theme">"Black theme"</string>
+    <string name="dark_theme">"Dark theme"</string>
+    <string name="light_theme">"Light theme"</string>
+    <string name="system_theme">"System theme"</string>
     <string name="suffix">اللاحقة</string>
 </resources>
