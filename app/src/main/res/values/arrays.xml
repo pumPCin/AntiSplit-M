@@ -12,6 +12,7 @@
         <item>Italiano</item>  <!-- it -->
         <item>한국어</item>  <!-- ko -->
         <item>Polski</item>  <!-- pl -->
+        <item>Slovenčina</item>  <!-- sk -->
         <item>Português</item> <!-- pt -->
         <item>Русский</item>  <!-- ru -->
         <item>Türkçe</item>    <!-- tr -->
@@ -32,6 +33,7 @@
         <item>it</item>      <!-- Italian -->
         <item>ko</item>      <!-- Korean -->
         <item>pl</item>      <!-- Polish -->
+        <item>sk</item>      <!-- Slovak -->
         <item>pt-BR</item>   <!-- Portuguese (Brazil) -->
         <item>ru</item>      <!-- Russian -->
         <item>tr</item>      <!-- Turkish -->
