@@ -105,28 +105,32 @@ public class DeviceSpecsUtil {
 
     public List<String> getListOfSplits(Uri splitAPKUri) throws IOException {
         List<String> splits = new ArrayList<>();
-        String path = FileUtils.getPath(splitAPKUri, context);
         File file;
-        if(!TextUtils.isEmpty(path) && (file = new File(path)) != null && file.canRead()) return getListOfSplitsFromFile(file);
+        try {
+            String path = FileUtils.getPath(splitAPKUri, context);
+            if(!TextUtils.isEmpty(path) && (file = new File(path)) != null && file.canRead()) return getListOfSplitsFromFile(file);
+        } catch (Exception ignored) {
+
+        }
 
         try (InputStream is = context.getContentResolver().openInputStream(splitAPKUri);
-                ZipFileInput zis = new ZipFileInput(is)) {
+              ZipFileInput zis = new ZipFileInput(is)) {
             ZipFileHeader header;
             while ((header = zis.readFileHeader()) != null) {
                 final String name = header.getFileName();
                 if (name.endsWith(".apk")) splits.add(name);
             }
-        } catch (Exception e) {
+        } catch (Exception e2) {
             String uriString = splitAPKUri.toString();
             try(InputStream is = context.getContentResolver().openInputStream(splitAPKUri)) {
-                com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, file = new File(context.getCacheDir(), uriString.substring(uriString.lastIndexOf('/') + 1)));
+                com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, file = new File(context.getCacheDir(), System.currentTimeMillis() + uriString));
                 return getListOfSplitsFromFile(file);
             }
         }
         if(splits.size() > 1) return splits;
         try(InputStream is = context.getContentResolver().openInputStream(splitAPKUri)) {
             String uriString = splitAPKUri.toString();
-            com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, file = new File(context.getCacheDir(), uriString.substring(uriString.lastIndexOf('/') + 1)));
+            com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, file = new File(context.getCacheDir(), System.currentTimeMillis() + uriString));
             return getListOfSplitsFromFile(file);
         }
     }
