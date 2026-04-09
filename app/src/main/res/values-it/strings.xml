@@ -1,7 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
+    <string name="not_split">"This does not seem to be a split APK (%1$s)"</string>
+<string name="app_name" translatable="false">"AntiSplit M"</string>
     <string name="merge">Seleziona l\'APK suddiviso da unire</string>
     <string name="success_saved">Esportazione file APK unito completata</string>
-    <string name="enable_logs" >Attiva registro eventi</string>
+    <string name="enable_logs">Attiva registro eventi</string>
     <string name="ask">Chiedi ogni volta</string>
     <string name="same">Stesso percorso dell\`APK suddiviso</string>
     <string name="grant_storage">È richiesto il permesso di accesso alla memoria interna per effettuare il salvataggio nella stessa cartella del file suddiviso selezionato</string>
@@ -45,6 +48,7 @@
     <string name="mismatch">Le seguenti suddivisioni (%1$s) hanno un codice di versione non corrispondente. Queste contengono solo traduzioni per altre lingue, quindi l\'app potrà essere comunque eseguita, ma non risulterà tradotta. Intendi procedere ugualmente con l\'unione?</string>
     <string name="warning">Avviso</string>
     <string name="mismatch_base">" il codice di versione non corrisponde a quello del file apk base."</string>
+    <string name="label_parent_dir" translatable="false">"…"</string>
     <string name="create_issue">Segnala un problema su GitHub</string>
     <string name="copy_log">Copia registro eventi</string>
     <string name="pause">Pulsante pausa</string>
@@ -52,7 +56,12 @@
     <string name="select_from_installed_apps">Scegli dalle App Installate</string>
     <string name="app_icon_list_label">Icona app</string>
     <string name="install">Installa</string>
+    <string name="black_theme">"Black theme"</string>
+    <string name="dark_theme">"Dark theme"</string>
+    <string name="light_theme">"Light theme"</string>
+    <string name="system_theme">"System theme"</string>
     <string name="suffix">Suffisso</string>
+    <string name="pairip_warning">"The app you are trying to merge uses PairIP/Google Integrity Protection to protect it from modification. The merged version will crash on opening unless you know how to modify the APK to bypass it."</string>
     <string name="force">Forza unificazione delle suddivisioni non corrispondenti (con differente versionCode o nome pacchetto)</string>
     <string name="file_save_method">Opzioni di salvataggio file</string>
     <string name="pick_folder">Inserisci percorso</string>

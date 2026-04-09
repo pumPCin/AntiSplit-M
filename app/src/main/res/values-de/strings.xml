@@ -1,7 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
+    <string name="app_name" translatable="false">"AntiSplit M"</string>
     <string name="merge">Wähle APK zum Zusammenführen aus</string>
     <string name="success_saved">Datei erfolgreich gespeichert</string>
-    <string name="enable_logs" >Protokolle aktivieren</string>
+    <string name="enable_logs">Protokolle aktivieren</string>
     <string name="ask">Jedes Mal nachfragen</string>
     <string name="same">Verzeichnis der ausgewählten Datei</string>
     <string name="grant_storage">Speicherberechtigungen benötigt, um im Verzeichnis der ausgewählten Datei speichern zu können</string>
@@ -33,6 +35,7 @@
     <string name="label_parent_directory">Übergeordnetes Verzeichnis</string>
     <string name="last_edit">Zuletzt bearbeitet: </string>
     <string name="error_dir_access">Auf das Verzeichnis kann nicht zugegriffen werden</string>
+    <string name="lang" translatable="false">"Language"</string>
     <string name="update">Update verfügbar</string>
     <string name="new_ver">Eine neue Version von AntiSplit M ist verfügbar</string>
     <string name="dl">Herunterladen</string>
@@ -44,6 +47,7 @@
     <string name="mismatch">Die Splits (%1$s) haben unterschiedliche Versionscodes. Es handelt sich dabei nur um Sprachcodes, die App kann also auch ohne sie funktionieren, aber diese Sprachen werden in der App nicht enthalten sein. Trotzdem mit der Zusammenführung fortfahren?</string>
     <string name="warning">Warnung</string>
     <string name="mismatch_base">" Versionscode stimmt nicht mit dem der base.apk überein"</string>
+    <string name="label_parent_dir" translatable="false">"…"</string>
     <string name="create_issue">Erstelle GitHub Issue</string>
     <string name="copy_log">Protokoll kopieren</string>
     <string name="pause">Pause-Schaltfläche</string>
