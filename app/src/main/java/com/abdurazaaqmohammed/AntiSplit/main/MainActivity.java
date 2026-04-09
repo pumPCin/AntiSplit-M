@@ -5,12 +5,11 @@ import static com.abdurazaaqmohammed.utils.LegacyUtils.aboveSdk20;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -53,9 +52,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.IntentSenderRequest;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -71,7 +67,6 @@ import com.abdurazaaqmohammed.utils.InstallUtil;
 import com.abdurazaaqmohammed.utils.LanguageUtil;
 import com.abdurazaaqmohammed.utils.LegacyUtils;
 import com.abdurazaaqmohammed.utils.RunUtil;
-import com.fom.storage.media.AndroidXI;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -88,6 +83,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.channels.ClosedByInterruptException;
@@ -110,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     private Uri splitAPKUri;
     private ArrayList<Uri> uris;
     private boolean urisAreSplitApks = true;
-    private boolean errorOccurred;
+    private boolean criticalErrorOccurred;
     private boolean checkForUpdates;
     private String lastVerChecked;
     boolean logEnabled;
@@ -206,13 +202,16 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.settingsButton).setOnClickListener(this::settingsButtonListener);
 
-        findViewById(R.id.decodeButton).setOnClickListener(v -> startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
-            .addCategory(Intent.CATEGORY_OPENABLE)
-            .setType("*/*")
-            .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            .putExtra(Intent.EXTRA_MIME_TYPES,
-                new String[]{"application/zip", "application/vnd.android.package-archive", "application/octet-stream"}) // XAPK usually octet-stream
-            , 1)
+        findViewById(R.id.decodeButton).setOnClickListener(v -> {
+            ((TextView) findViewById(R.id.logField)).setText("");
+            ((TextView) findViewById(R.id.errorField)).setText("");
+                    startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
+                                    .addCategory(Intent.CATEGORY_OPENABLE)
+                                    .setType("*/*")
+                            // .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                            // .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/zip", "application/vnd.android.package-archive", "application/octet-stream"}) // XAPK usually octet-stream
+                            , 1);
+                }
         );
         cleanupAppFolder();
 
@@ -225,16 +224,16 @@ public class MainActivity extends AppCompatActivity {
             splitAPKUri = openIntent.getData();
         } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && openIntent.hasExtra(Intent.EXTRA_STREAM)) {
             uris = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) ? openIntent.getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri.class) : openIntent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
-            if (uris != null) {
+            if (uris != null && !uris.isEmpty()) {
                 final Uri uri = uris.get(0);
                 String path = uri.getPath();
                 if(urisAreSplitApks = TextUtils.isEmpty(path) || !path.endsWith(".apk")) splitAPKUri = uri;
-                else selectDirToSaveAPKOrSaveNow();
+                else process();
             }
         }
         if (splitAPKUri != null) {
             if(showDialog) showApkSelectionDialog();
-            else selectDirToSaveAPKOrSaveNow();
+            else process();
         }
     }
 
@@ -281,10 +280,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
     private void checkStoragePerm(int requestCode) {
         if(com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this)) {
-            Toast.makeText(this, rss.getString(R.string.grant_storage), Toast.LENGTH_LONG).show();
+            getHandler().post(() -> Toast.makeText(this, rss.getString(R.string.grant_storage), Toast.LENGTH_LONG).show());
             if(LegacyUtils.supportsWriteExternalStorage) requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
             else startActivityForResult(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + getPackageName())), requestCode);
         }
@@ -341,71 +339,83 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void process(Uri outputUri) {
+    File merged;
+
+    private void process() {
         findViewById(R.id.installButton).setVisibility(View.GONE);
         toggleAnimation(true);
 
-        final boolean urisAreSplitApks = MainActivity.this.urisAreSplitApks;
-        final Uri splitAPKUri = MainActivity.this.splitAPKUri;
-        new RunUtil(handler, this, null).runInBackground(() -> {
-            errorOccurred = false; // reset to make sure success message shows
-            final File cacheDir = MainActivity.this.getCacheDir();
-            //if (cacheDir != null && MainActivity.this.urisAreSplitApks) Util.deleteDir(cacheDir); // Now that using different folder for each app, no need to clear the whole cache dir
+        MainActivity context = MainActivity.this;
+
+        final File cacheDir = getCacheDir();
+        boolean selectedFromInstalledApps = !TextUtils.isEmpty(pkgName);
+        if(selectedFromInstalledApps) urisAreSplitApks = false;
+
+        Merger merger = new Merger(cacheDir, this);
+
+        new RunUtil(handler, context, null).runInBackground(() -> {
+            criticalErrorOccurred = false; // reset to make sure success message shows
             try {
-                if (TextUtils.isEmpty(pkgName)) {
-                    //selected from anything except app list
-                    File folder = new File(cacheDir, UUID.randomUUID().toString());
-                    if(!folder.mkdir()) folder = cacheDir;
-
-                    if (!urisAreSplitApks) for (Uri uri : MainActivity.this.uris) {
-                        // These are the splits from inside the APK, just copy the splits to cache folder
-                        try (InputStream is = FileUtils.getInputStream(uri, MainActivity.this)) {
-                            com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, new File(folder, getOriginalFileName(uri)));
-                        }
+                if (selectedFromInstalledApps) {
+                    try (ApkBundle bundle = new ApkBundle()) {
+                        // Selected from apps list
+                        PackageManager packageManager = context.getPackageManager();
+                        bundle.loadApkDirectory(new File(packageManager.getPackageInfo(pkgName, 0).applicationInfo.sourceDir).getParentFile());
+                        merged = merger.run(bundle, signApk, force);
+                        selectDirToSaveAPKOrSaveNow(0);
                     }
+                } else {
+                    //selected from anything except app list
+                    File workingFolder = new File(cacheDir, UUID.randomUUID().toString());
+                    if(!workingFolder.mkdir()) workingFolder = cacheDir;
+                    merger.setWorkingDirectory(workingFolder);
 
-                    com.reandroid.Merger.run(
-                        urisAreSplitApks ? splitAPKUri : null,
-                        folder,
-                        outputUri,
-                        MainActivity.this,
-                        urisAreSplitApks ? selectSplitsForDevice ? deviceSpecsUtil.getSplitsForDevice(splitAPKUri) : MainActivity.this.splitsToUse : null,
-                        signApk, MainActivity.this.force);
-                } else try (ApkBundle bundle = new ApkBundle()) {
-                    // Selected from apps list
-                    bundle.loadApkDirectory(new File(MainActivity.this.getPackageManager().getPackageInfo(pkgName, 0).applicationInfo.sourceDir).getParentFile());
-                    com.reandroid.Merger.run(bundle, cacheDir, outputUri, MainActivity.this, signApk, MainActivity.this.force);
+                    if(urisAreSplitApks) {
+                        List<String> splitsToNotInclude = selectSplitsForDevice ? deviceSpecsUtil.getSplitsForDevice(splitAPKUri) : splitsUnselectedInDialog;
+                        merged = merger.run(splitAPKUri, splitsToNotInclude, signApk, force);
+                        selectDirToSaveAPKOrSaveNow();
+                    } else try (ApkBundle bundle = new ApkBundle()) {
+                        ArrayList<Uri> uriArrayList = uris;
+                        for (int i = 0; i < uriArrayList.size(); i++) {
+                            Uri uri = uriArrayList.get(i);
+                            try (InputStream is = FileUtils.getInputStream(uri, context)) {
+                                String fileName = getOriginalFileName(uri);
+                                if (TextUtils.isEmpty(fileName)) fileName = "split_" + i + "_.apk";
+                                com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, new File(workingFolder, fileName));
+                            }
+                        }
+
+                        bundle.loadApkDirectory(workingFolder);
+                        merged = merger.run(bundle, signApk, force);
+                        selectDirToSaveAPKOrSaveNow();
+                    }
                 }
                 toggleAnimation(false);
                 return true;
             } catch (Exception e) {
-                MainActivity.this.showError(e);
+                showError(e);
                 return false;
             }
         }, () -> {
-            MainActivity.this.pkgName = null; // reset
-            if(urisAreSplitApks) MainActivity.this.getHandler().post(() -> {
+            pkgName = null; // reset
+            if(urisAreSplitApks) getHandler().post(() -> {
                 try {
-                    MainActivity.this.uris.remove(0);
-                    MainActivity.this.splitAPKUri = MainActivity.this.uris.get(0);
-                    if(showDialog) MainActivity.this.showApkSelectionDialog();
-                    else MainActivity.this.selectDirToSaveAPKOrSaveNow();
+                    uris.remove(0);
+                    splitAPKUri = uris.get(0);
+                    if(showDialog) showApkSelectionDialog();
+                    else process();
                 } catch (IndexOutOfBoundsException | NullPointerException ignored) {
                     // End of list, I don't know why but isEmpty is not working
-                    MainActivity.this.showSuccess();
+                    setUIAfterMerging(merger);
                 }
             });
-            else MainActivity.this.showSuccess(); // multiple splits from inside the APK, can only be one go
+            else setUIAfterMerging(merger); // multiple splits from inside the APK, can only be one go
         }, true);
 
         findViewById(R.id.fabs).setAlpha(0.5f);
         View cancelButton = findViewById(R.id.cancelButton);
         cancelButton.setVisibility(View.VISIBLE);
         cancelButton.setOnClickListener(v -> {
-            try {
-                if(com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this)) AndroidXI.getInstance().with(this).delete(launcher, outputUri);
-                else if(new File(FileUtils.getPath(outputUri, this)).delete()) logger.logMessage("Cleaned output file " + getOriginalFileName(outputUri));
-            } catch (Exception ignored) {}
             try {
                 startActivity(Intent.makeRestartActivityTask(Objects.requireNonNull(getPackageManager().getLaunchIntentForPackage(getPackageName())).getComponent()));
                 Runtime.getRuntime().exit(0);
@@ -422,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
     private void processOneSplitApkUri(Uri uri) {
         splitAPKUri = uri;
         if (showDialog) showApkSelectionDialog();
-        else selectDirToSaveAPKOrSaveNow();
+        else process();
     }
 
     public void toggleAnimation(boolean on) {
@@ -461,35 +471,38 @@ public class MainActivity extends AppCompatActivity {
                         urisAreSplitApks = false;
                     } //else processOneSplitApkUri(first);
                     uris.add(first);
+                    for (int i = 1; i < clipData.getItemCount(); i++) uris.add(clipData.getItemAt(i).getUri());
 
-                    for (int i = 1; i < clipData.getItemCount(); i++) {
-                        Uri uri = clipData.getItemAt(i).getUri();
-//                        if (urisAreSplitApks) processOneSplitApkUri(uri);
-//                        else
-                            uris.add(uri);
-                    }
-                   if (urisAreSplitApks) processOneSplitApkUri(first);
-                   else selectDirToSaveAPKOrSaveNow();
+                    if (urisAreSplitApks) processOneSplitApkUri(first);
+                    else process();
                 }
                 break;
             case 2:
-                // going to process and save a file now
-                ((TextView) findViewById(R.id.logField)).setText("");
-                ((TextView) findViewById(R.id.errorField)).setText("");
-                process(data.getData());
+                // NOT going to process a file now we are saving it
+                new RunUtil(handler, this, null).runInBackground(() -> {
+                    try (OutputStream outputStream = getContentResolver().openOutputStream(data.getData())) {
+                        com.abdurazaaqmohammed.utils.FileUtils.copyFile(merged, outputStream);
+                        return true;
+                    } catch (Exception e) {
+                        showError(e);
+                        return false;
+                    }
+                }, () -> {
+                    if(!criticalErrorOccurred) {
+                        final String success = rss.getString(R.string.success_saved);
+                        logger.logMessage(success);
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, success, Toast.LENGTH_SHORT).show());
+                    }
+                }, true);
                 break;
         }
     }
-    private final ActivityResultLauncher<IntentSenderRequest> launcher = registerForActivityResult(
-        new ActivityResultContracts.StartIntentSenderForResult(),
-        result -> {
-            if (result.getResultCode() == Activity.RESULT_OK) logger.logMessage("Deleted ");
-        });
+
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     protected void onResume() {
         super.onResume();
-        if (LegacyUtils.supportsFileChannel) {
+        if (Build.VERSION.SDK_INT > 32) {
             registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_NOT_EXPORTED);
         } else registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
@@ -551,7 +564,7 @@ public class MainActivity extends AppCompatActivity {
                         currentVer = null;
                     }
                     boolean newVer = false;
-                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '2', '6'} : currentVer.replace(".", "").toCharArray();
+                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] {'2', '2', '7'} : currentVer.replace(".", "").toCharArray();
                     char[] latest = latestVersion.replace(".", "").toCharArray();
 
                     int maxLength = Math.max(curr.length, latest.length);
@@ -617,9 +630,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void showApkSelectionDialog() {
         try {
-            List<String> splits = deviceSpecsUtil.getListOfSplits(splitAPKUri);
-            Collections.sort(splits, CompareUtils::compareByName);
-            final int initialSize = splits.size();
+            List<String> splitsToNotInclude = deviceSpecsUtil.getListOfSplits(splitAPKUri);
+            Collections.sort(splitsToNotInclude, CompareUtils::compareByName);
+            final int initialSize = splitsToNotInclude.size();
             String[] apkNames = new String[initialSize + 5];
             boolean[] checkedItems = new boolean[initialSize + 5];
 
@@ -629,7 +642,7 @@ public class MainActivity extends AppCompatActivity {
             apkNames[3] = rss.getString(R.string.dpi_for_device);
             apkNames[4] = rss.getString(R.string.lang_for_device);
             for (int i = 5; i < initialSize + 5; i++) {
-                apkNames[i] = splits.get(i - 5);
+                apkNames[i] = splitsToNotInclude.get(i - 5);
                 checkedItems[i] = false;
             }
 
@@ -710,18 +723,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             }).setPositiveButton("OK", (dialog, which) -> {
                 for (int i = 1; i < checkedItems.length; i++) {
-                    if (checkedItems[i]) splits.remove(apkNames[i]); // ?????
+                    if (checkedItems[i]) splitsToNotInclude.remove(apkNames[i]);
                 }
 
-                if (splits.size() == initialSize) {
+                if (splitsToNotInclude.size() == initialSize) {
                     urisAreSplitApks = true; // reset
                     showError(rss.getString(R.string.nothing));
                 } else {
-                    splitsToUse = splits;
-                    selectDirToSaveAPKOrSaveNow();
+                    splitsUnselectedInDialog = splitsToNotInclude;
+                    process();
                 }
             }).setNegativeButton("Cancel", null).create();
             styleAlertDialog(ad);
+
+            // Select base.apk by default
+            // Not force include base.apk because there may be some use case where you actually need to merge other splits only
             for (int i = 5; i < apkNames.length; i++) {
                 if (DeviceSpecsUtil.isBaseApk(apkNames[i])) {
                     ad.getListView().setItemChecked(i, checkedItems[i] = true);
@@ -733,20 +749,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private List<String> splitsToUse;
+    private List<String> splitsUnselectedInDialog;
 
-    private void showSuccess() {
+    private void setUIAfterMerging(Merger merger) {
+        urisAreSplitApks = true; // reset
         findViewById(R.id.cancelButton).setVisibility(View.GONE);
         View installButton = findViewById(R.id.installButton);
-        if(errorOccurred) installButton.setVisibility(View.GONE);
+        View saveButton = findViewById(R.id.saveButton);
+        if(criticalErrorOccurred) {
+            installButton.setVisibility(View.GONE);
+            saveButton.setVisibility(View.GONE);
+        }
         else {
-            final String success = rss.getString(R.string.success_saved);
-            logger.logMessage(success);
-            runOnUiThread(() -> Toast.makeText(this, success, Toast.LENGTH_SHORT).show());
-            if(signApk && com.reandroid.Merger.signedApk != null) {
+            if(signApk && merger.signedApk != null) {
                 installButton.setVisibility(View.VISIBLE);
-                installButton.setOnClickListener(v -> InstallUtil.installApk(MainActivity.this, Merger.signedApk));
+                installButton.setOnClickListener(v -> InstallUtil.installApk(MainActivity.this, merger.signedApk));
             } else installButton.setVisibility(View.GONE);
+
+            // Now that the prompt to save file is after merging, put a new button to prompt again in case you closed it by accident.
+            if(saveMode == 0) {
+                saveButton.setVisibility(View.VISIBLE);
+                saveButton.setOnClickListener(view -> startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                        .addCategory(Intent.CATEGORY_OPENABLE)
+                        .setType("application/vnd.android.package-archive")
+                        .putExtra(Intent.EXTRA_TITLE, "merged.apk"), 2));
+            }
         }
     }
 
@@ -759,9 +786,26 @@ public class MainActivity extends AppCompatActivity {
         toggleAnimation(false);
         if (!(e instanceof ClosedByInterruptException)) {
             final String mainErr = e.getMessage();
-            errorOccurred = TextUtils.isEmpty(mainErr) || !mainErr.equals(rss.getString(R.string.sign_failed));
 
-            StringBuilder stackTrace = new StringBuilder(mainErr);
+
+            final boolean errEmpty = TextUtils.isEmpty(mainErr);
+            criticalErrorOccurred = errEmpty || !mainErr.equals(rss.getString(R.string.sign_failed));
+
+            StringBuilder stackTrace = new StringBuilder();
+            if(!errEmpty) {
+                stackTrace.append(mainErr);
+                boolean zipError = mainErr.contains("Failed to find end record");
+                if(!zipError && splitAPKUri != null) {
+                    String mimeType = getContentResolver().getType(splitAPKUri);
+                    zipError = (TextUtils.isEmpty(mimeType) || (!mimeType.equals("application/zip") && !mimeType.equals("application/octet-stream") && !mimeType.equals("application/vnd.apkm")));
+                }
+                if(zipError) {
+                    stackTrace.append(" - ")
+                            .append(rss.getString(R.string.check_file_valid))
+                            .append(rss.getString(R.string.select_from_installed_apps))
+                            .append('\n');
+                }
+            }
             if(!TextUtils.isEmpty(openedFile)) {
                 stackTrace.append(openedFile).append('\n');
                 openedFile = null;
@@ -774,7 +818,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 currentVer = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             } catch (Exception ex) {
-                currentVer = "2.2.6";
+                currentVer = "2.2.7";
             }
             fullLog.append(currentVer).append('\n')
                     .append("Storage permission granted: ")
@@ -785,7 +829,6 @@ public class MainActivity extends AppCompatActivity {
                 View dialogView = getLayoutInflater().inflate(R.layout.dialog_button_layout, null);
 
                 ((TextView) dialogView.findViewById(R.id.errorD)).setText(stackTrace);
-
                 styleAlertDialog(new MaterialAlertDialogBuilder(this)
                         .setTitle(mainErr)
                         .setView(dialogView)
@@ -822,8 +865,10 @@ public class MainActivity extends AppCompatActivity {
     public String getOriginalFileName(Uri uri) {
         String result = null;
 
-        if ("content".equals(uri.getScheme())) {
-            try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
+        String scheme = uri.getScheme();
+        if (!TextUtils.isEmpty(scheme) && "content".equals(scheme)) {
+            ContentResolver contentResolver = getContentResolver();
+            if (contentResolver != null) try (Cursor cursor = contentResolver.query(uri, null, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
                 }
@@ -832,7 +877,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (TextUtils.isEmpty(result)) {
             result = uri.getPath();
-            if (result != null) {
+            if (!TextUtils.isEmpty(result)) {
                 int cut = result.lastIndexOf('/');
                 if (cut != -1) {
                     result = result.substring(cut + 1);
@@ -842,12 +887,24 @@ public class MainActivity extends AppCompatActivity {
 
         logger.logMessage(openedFile = result);
 
-        return TextUtils.isEmpty(result) ? "filename_not_found" : result.replaceFirst("\\.(?:zip|xapk|aspk|apk[sm])$", suffix + ".apk");
+        if (TextUtils.isEmpty(result)) {
+            result = "file_" + System.currentTimeMillis();
+        }
+        try {
+            return result.replaceFirst("\\.(?:zip|xapk|aspk|apk[sm])$", suffix + ".apk");
+        } catch (Exception e) {
+            return result + suffix + ".apk";
+        }
     }
 
-    @SuppressLint("InlinedApi")
     private void selectDirToSaveAPKOrSaveNow() {
-        if (saveMode == 0) {
+        selectDirToSaveAPKOrSaveNow(saveMode);
+    }
+
+    private void selectDirToSaveAPKOrSaveNow(int saveMode) {
+        boolean askWhereToSave = saveMode == 0;
+        if (askWhereToSave || com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this)) {
+            getHandler().post(() -> Toast.makeText(this, R.string.merged, Toast.LENGTH_LONG).show());
             String filename;
             if(TextUtils.isEmpty(pkgName)) filename = (urisAreSplitApks ? getOriginalFileName(splitAPKUri) : getNameFromNonSplitApks());
             else {
@@ -866,39 +923,53 @@ public class MainActivity extends AppCompatActivity {
                     .putExtra(Intent.EXTRA_TITLE, filename), 2);
         } else {
             checkStoragePerm(9);
-            try {
-                if(splitAPKUri == null) process(Uri.fromFile(new File(outputFolder, "output.apk")));
-                else {
-                    File f;
-                    if(saveMode == 1) {
-                        String originalFilePath;
-                        if(urisAreSplitApks) originalFilePath = FileUtils.getPath(splitAPKUri, this);
-                        else {
-                            String path = FileUtils.getPath(uris.get(0), this);
-                            originalFilePath = (TextUtils.isEmpty(path) ? outputFolder : path.substring(0, path.lastIndexOf(File.separator))) + File.separator + getNameFromNonSplitApks();
-                        }
-                        String newFilePath = TextUtils.isEmpty(originalFilePath) ?
-                                outputFolder + File.separator + getOriginalFileName(splitAPKUri) // If originalFilePath is null urisAreSplitApks must be true because getNameFromNonSplitApks will always return something
-                                : originalFilePath.replaceFirst("\\.(?:zip|xapk|aspk|apk[sm])", suffix + ".apk");
-                        if(TextUtils.isEmpty(newFilePath) ||
-                                newFilePath.startsWith("/data/")
-                            // || !(f = new File(newFilePath)).createNewFile() || f.canWrite()
-                        ) {
-                            f = new File(outputFolder, newFilePath.substring(newFilePath.lastIndexOf(File.separator) + 1));
-                            showError(rss.getString(R.string.no_filepath) + newFilePath);
-                        } else f = new File(newFilePath);
-                    } else f = new File(outputFolder, urisAreSplitApks ? getOriginalFileName(splitAPKUri) : getNameFromNonSplitApks());
+            RunUtil.runInBackground(() -> {
+                try { File f;
+                String fp;
+                if(urisAreSplitApks) {
+                    try {
+                        fp = FileUtils.getPath(splitAPKUri, MainActivity.this);
+                        if(TextUtils.isEmpty(fp)
+                                || fp.startsWith("/data/")
+                                || fp.contains("/Android/data")) {
+                            showError(rss.getString(R.string.no_filepath) + fp);
+                            f = new File(outputFolder, getOriginalFileName(splitAPKUri));
+                        } else f = new File(fp.replaceFirst("\\.(?:zip|xapk|aspk|apk[sm])", suffix + ".apk"));
+                    } catch (Exception e) {
+                        f = new File(outputFolder, getOriginalFileName(splitAPKUri));
+                    }
+                } else {
+                    String path;
 
-                    ((TextView) findViewById(R.id.logField)).setText("");
-                    ((TextView) findViewById(R.id.errorField)).setText("");
-                    f = com.abdurazaaqmohammed.utils.FileUtils.getUnusedFile(f);
-                    logger.logMessage(rss.getString(R.string.output) + f);
-                    process(Uri.fromFile(f));
+                    try {
+                        path = FileUtils.getPath(uris.get(0), MainActivity.this);
+                        if (TextUtils.isEmpty(path))
+                            fp = outputFolder + File.separator + getNameFromNonSplitApks();
+                        else
+                            fp = path.substring(0, path.lastIndexOf(File.separator)) + File.separator + getNameFromNonSplitApks();
+                        if (TextUtils.isEmpty(fp)
+                                || fp.startsWith("/data/")
+                                || fp.contains("/Android/data")) {
+                            showError(rss.getString(R.string.no_filepath) + fp);
+                            f = new File(outputFolder, getNameFromNonSplitApks());
+                        } else f = new File(fp);
+                    } catch (Exception e) {
+                        f = new File(outputFolder, getOriginalFileName(uris.get(0)));
+                    }
                 }
 
-            } catch (IOException e) {
-                showError(e);
-            }
+                f = com.abdurazaaqmohammed.utils.FileUtils.getUnusedFile(f);
+                logger.logMessage(rss.getString(R.string.output) + f);
+                com.abdurazaaqmohammed.utils.FileUtils.copyFile(merged, f);
+                if(!criticalErrorOccurred) {
+                    final String success = rss.getString(R.string.success_saved);
+                    logger.logMessage(success);
+                    runOnUiThread(() -> Toast.makeText(this, success, Toast.LENGTH_SHORT).show());
+                }
+                } catch (IOException e) {
+                    showError(e);
+                }
+            });
         }
     }
 
@@ -918,11 +989,13 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
         }
-        return (TextUtils.isEmpty(realName) ? "unknown" : realName.replaceFirst("\\.apk$", suffix + ".apk"));
+        return (TextUtils.isEmpty(realName) ? "unknown" + suffix + ".apk" : realName.replaceFirst("\\.apk$", suffix + ".apk"));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void installedAppsClickListener(View v3) {
+        ((TextView) findViewById(R.id.logField)).setText("");
+        ((TextView) findViewById(R.id.errorField)).setText("");
         AlertDialog ad = new MaterialAlertDialogBuilder(MainActivity.this).setNegativeButton(rss.getString(R.string.cancel), null).create();
         PackageManager pm = getPackageManager();
 
@@ -960,11 +1033,8 @@ public class MainActivity extends AppCompatActivity {
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
             ad.dismiss();
-            int realAskValue = saveMode;
-            saveMode = 0;
             pkgName = adapter.filteredAppInfoList.get(position).packageName;
-            selectDirToSaveAPKOrSaveNow();
-            saveMode = realAskValue;
+            process();
         });
         EditText searchBar = dialogView.findViewById(R.id.search_bar);
 
@@ -1079,8 +1149,15 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 getSharedPreferences("set", Context.MODE_PRIVATE).edit().putInt("theme", theme).apply();
-                MainActivity.this.setTheme(theme);
-                MainActivity.this.recreate();
+                setTheme(theme);
+
+                // Clear these so that if something was shared with the app it wont try to merge it again upon opening
+                getIntent().replaceExtras(new Bundle());
+                getIntent().setAction("");
+                getIntent().setData(null);
+                recreate();
+                /*startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
+                finish();*/
             }
         });
 
@@ -1166,7 +1243,7 @@ public class MainActivity extends AppCompatActivity {
         autoCompleteTextView.setThreshold(1);
         autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
             saveMode = position;
-            if(position != 0) checkStoragePerm(9);
+            if((position != 0) && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)) checkStoragePerm(9);
             if(position == 2) {
                 TextInputEditText editText = new TextInputEditText(this);
                 editText.setHint(rss.getString(R.string.pick_folder));
