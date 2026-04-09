@@ -13,9 +13,10 @@
         <item>한국어</item>  <!-- ko -->
         <item>Polski</item>  <!-- pl -->
         <item>Português</item> <!-- pt -->
-        <item>русский язык</item>  <!-- ru -->
+        <item>Русский</item>  <!-- ru -->
         <item>Türkçe</item>    <!-- tr -->
-        <item>українська мова</item>  <!-- uk -->
+        <item>Українська</item>  <!-- uk -->
+        <item>O\'zbek</item>  <!-- uz -->
         <item>Tiếng Việt</item>  <!-- vi -->
         <item>繁體中文(台灣)</item>  <!-- zh-tw -->
     </string-array>
@@ -35,6 +36,7 @@
         <item>ru</item>      <!-- Russian -->
         <item>tr</item>      <!-- Turkish -->
         <item>uk</item>      <!-- Ukrainian -->
+        <item>uz</item>      <!-- Uzbek -->
         <item>vi</item>      <!-- Vietnamese -->
         <item>zh-TW</item>   <!-- Chinese (Taiwan, Traditional) -->
     </string-array>

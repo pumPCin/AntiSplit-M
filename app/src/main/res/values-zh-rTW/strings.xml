@@ -3,7 +3,7 @@
     <string name="app_name" translatable="false">AntiSplit M</string>
     <string name="merge">選擇split APK來合併/AntiSplit</string>
     <string name="success_saved">檔案已成功保存</string>
-    <string name="enable_logs" >啟用日誌</string>
+    <string name="enable_logs">啟用日誌</string>
     <string name="ask">每次都詢問</string>
     <string name="same">與選擇檔案相同的路徑</string>
     <string name="grant_storage">需要儲存空間權限以保存與選擇檔案相同的路徑</string>

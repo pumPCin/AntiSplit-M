@@ -1,14 +1,15 @@
 <resources>
-    <string name="merge">Bölünmüş APK\'yı birleştirin</string>
-    <string name="success_saved">Birleştirilen APK dosyasının dışa aktarımı tamamlandı</string>
+    <string name="app_name" translatable="false">AntiSplit M</string>
+    <string name="merge">Dosyadan bölünmüş APK seçin</string>
+    <string name="success_saved">Dosya başarıyla kaydedildi</string>
     <string name="enable_logs">Etkinlik kaydını etkinleştir</string>
     <string name="ask">Her seferinde sor</string>
-    <string name="same">Bölünmüş APK\'nın aynı yolu</string>
-    <string name="grant_storage">Seçilen bölünmüş dosyanın aynı klasörüne kaydetmek için dahili depolama erişim izni gereklidir</string>
+    <string name="same">Seçilen dosyayla aynı yol</string>
+    <string name="grant_storage">Seçilen dosyayla aynı klasöre kaydetmek için dahili depolama erişim izni gereklidir</string>
     <string name="no_filepath">"Yola kaydedilemiyor "</string>
     <string name="output">"Kayıt klasörü: "</string>
     <string name="show_dialog">Uygulanacak bölünmeleri seçme penceresini göster</string>
-    <string name="nothing">Herhangi bir seçim yapılmadı</string>
+    <string name="nothing">Seçim yapılmadı</string>
     <string name="change_text_color">Metin rengini değiştir</string>
     <string name="change_background_color">Arka plan rengini değiştir</string>
     <string name="all">Hepsini seç</string>
@@ -35,7 +36,7 @@
     <string name="error_dir_access">Klasöre erişilemiyor</string>
     <string name="lang" translatable="false">Dil</string>
     <string name="update">Güncelleme mevcut</string>
-    <string name="new_ver">AntiSplit M uygulamasının yeni bir versiyonu mevcut</string>
+    <string name="new_ver">AntiSplit M\'nin yeni bir sürümü mevcut</string>
     <string name="dl">İndir</string>
     <string name="auto_update">Güncellemeleri otomatik olarak kontrol et</string>
     <string name="check_update_now">Şimdi güncellemeleri kontrol et</string>
@@ -45,6 +46,7 @@
     <string name="mismatch">Aşağıdaki bölünmelerin (%1$s) sürüm kodu uyuşmuyor. Bunlar yalnızca diğer diller için çeviriler içeriyor, bu nedenle uygulama yine de çalışabilir.</string>
     <string name="warning">Uyarı</string>
     <string name="mismatch_base">" sürüm kodu temel APK dosyasıyla eşleşmiyor."</string>
+    <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">GitHub\'da sorun bildir</string>
     <string name="copy_log">Etkinlik kaydını kopyala</string>
     <string name="pause">Duraklatma düğmesi</string>
@@ -52,8 +54,14 @@
     <string name="select_from_installed_apps">Yüklü Uygulamalardan Seç</string>
     <string name="app_icon_list_label">Uygulama ikonu</string>
     <string name="install">Yükle</string>
+    <string name="black_theme">Koyu tema</string>
+    <string name="dark_theme">Karanlık tema</string>
+    <string name="light_theme">Açık theme</string>
+    <string name="system_theme">Sistem teması</string>
     <string name="suffix">Ek</string>
+    <string name="pairip_warning">Birleştirmeye çalıştığınız uygulama, değişikliklere karşı korunmak için Pairip/Google加固 Integrity koruması kullanıyor. Birleştirilmiş uygulama siz bu korumayı kırıncaya kadar çökecek.</string>
     <string name="force">Uyumsuz bölünmelerin birleştirilmesini zorla (farklı versionCode veya paket adı ile)</string>
     <string name="file_save_method">Dosya kaydetme seçenekleri</string>
     <string name="pick_folder">Yolu girin</string>
+    <string name="not_split">Bu bölünmüş APK gibi durmuyor (%1$s)</string>
 </resources>

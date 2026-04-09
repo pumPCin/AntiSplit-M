@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">AntiSplit M</string>
-    <string name="merge">Select split APK to Merge/AntiSplit</string>
+    <string name="merge">Select split APK from file</string>
     <string name="success_saved">File saved successfully</string>
-    <string name="enable_logs" >Enable logs</string>
+    <string name="enable_logs">Enable logs</string>
     <string name="ask">Ask each time</string>
     <string name="same">Same directory as selected file</string>
     <string name="grant_storage">Storage permission needed to save to the same dir as the selected file</string>
@@ -28,7 +28,7 @@
     <string name="skipping">"Skipping "</string>
     <string name="not_apk">: Not an APK file</string>
     <string name="unselected">: Unselected</string>
-    <string name="searching">Searching apk files…</string>
+    <string name="searching">Searching APK files…</string>
     <string name="cancel">Cancel</string>
     <string name="select">Select</string>
     <string name="label_parent_directory">Parent Directory</string>
@@ -38,6 +38,7 @@
     <string name="update">Update available</string>
     <string name="new_ver">New version of AntiSplit M is available</string>
     <string name="dl">Download</string>
+    Check mime type and log
     <string name="auto_update">Check for updates automatically</string>
     <string name="check_update_now">Check for update now</string>
     <string name="no_update_found">No update found</string>
@@ -64,4 +65,7 @@
     <string name="file_save_method">File save method</string>
     <string name="pick_folder">Enter folder</string>
     <string name="not_split">This does not seem to be a split APK (%1$s)</string>
+    <string name="merged">Merged successfully, select where to save</string>
+    <string name="save">save</string>
+    <string name="check_file_valid">"Please check that file selected is a valid ZIP/split APK (Try opening in file manager or installing it). If you have it installed but still getting error please try the feature "</string> <!-- select_from_installed_apps -->
 </resources>

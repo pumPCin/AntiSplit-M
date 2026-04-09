@@ -1,7 +1,7 @@
 <resources>
     <string name="merge">Wähle APK zum Zusammenführen aus</string>
     <string name="success_saved">Datei erfolgreich gespeichert</string>
-    <string name="enable_logs" >Protokolle aktivieren</string>
+    <string name="enable_logs">Protokolle aktivieren</string>
     <string name="ask">Jedes Mal nachfragen</string>
     <string name="same">Verzeichnis der ausgewählten Datei</string>
     <string name="grant_storage">Speicherberechtigungen benötigt, um im Verzeichnis der ausgewählten Datei speichern zu können</string>

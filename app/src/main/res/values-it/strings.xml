@@ -1,7 +1,7 @@
 <resources>
     <string name="merge">Seleziona l\'APK suddiviso da unire</string>
     <string name="success_saved">Esportazione file APK unito completata</string>
-    <string name="enable_logs" >Attiva registro eventi</string>
+    <string name="enable_logs">Attiva registro eventi</string>
     <string name="ask">Chiedi ogni volta</string>
     <string name="same">Stesso percorso dell\`APK suddiviso</string>
     <string name="grant_storage">È richiesto il permesso di accesso alla memoria interna per effettuare il salvataggio nella stessa cartella del file suddiviso selezionato</string>

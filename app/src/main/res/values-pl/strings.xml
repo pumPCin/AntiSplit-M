@@ -2,7 +2,7 @@
     <string name="app_name" translatable="false">AntiSplit M</string>
     <string name="merge">Wybierz podzielone APK do scalenia</string>
     <string name="success_saved">Plik został zapisany pomyślnie</string>
-    <string name="enable_logs" >Włącz logi</string>
+    <string name="enable_logs">Włącz logi</string>
     <string name="ask">Pytaj za każdym razem</string>
     <string name="same">Ten sam katalog co wybrany plik</string>
     <string name="grant_storage">Uprawnienie do zapisu jest wymagane do zapisania w tym samym katalogu, co wybrany plik.</string>
