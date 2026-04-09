@@ -13,7 +13,7 @@
     <string name="change_text_color">텍스트 색상 변경하기</string>
     <string name="change_background_color">배경 색상 변경하기</string>
     <string name="all">모두 선택하기</string>
-    <string name="for_device">이 기기 사양에 맞는 모든 분할 선택하기</string>
+    <string name="for_device">이 기기에 맞는 모든 분할 선택하기</string>
     <string name="lang_for_device">이 기기에 맞는 언어 선택하기</string>
     <string name="arch_for_device">이 기기에 맞는 아키텍처 선택하기</string>
     <string name="dpi_for_device">이 기기에 맞는 DPI 선택하기</string>
@@ -23,8 +23,8 @@
     <string name="sign_failed">APK에 서명하지 못하였습니다. 서명하지 않고 저장합니다.</string>
     <string name="signing">APK에 서명하는 중 …</string>
     <string name="saving">저장하는 중 …</string>
-    <string name="removed_table_entry">"table-entry를 제거함: "</string>
-    <string name="sanitizing_manifest">manifest를 처리하는 중 …</string>
+    <string name="removed_table_entry">"table-entry를 삭제함: "</string>
+    <string name="sanitizing_manifest">manifest에서 불필요한 구성요소를 삭제하는 중 …</string>
     <string name="skipping">"건너뛰는 중 "</string>
     <string name="not_apk">: APK 파일이 아님</string>
     <string name="unselected">: 선택되지 않음</string>
@@ -59,7 +59,7 @@
     <string name="light_theme">밝은 테마</string>
     <string name="system_theme">기기 테마 사용</string>
     <string name="suffix">APK 파일 이름 꼬리말</string>
-    <string name="pairip_warning">병합하려는 앱은 Pairip/Google加固 Integrity를 사용하여 수정할 수 없도록 보호됩니다. APK를 수정하여 이를 우회하는 방법을 알지 못하는 경우에는 병합된 앱을 시작할 때 충돌이 발생합니다.</string>
+    <string name="pairip_warning">병합하려는 앱은 Pairip/Google加固 Integrity를 사용하여 변조할 수 없도록 보호됩니다. APK를 수정하여 이를 우회하는 방법을 알지 못하는 경우에는 병합된 앱을 시작할 때 충돌이 발생합니다.</string>
     <string name="force">일치하지 않는 분할을 강제로 병합하기 (버전코드 또는 패키지명이 다른 경우)</string>
     <string name="file_save_method">파일 저장 방식</string>
     <string name="pick_folder">저장될 폴더 경로 입력하기</string>
