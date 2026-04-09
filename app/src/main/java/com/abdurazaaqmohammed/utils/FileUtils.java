@@ -15,6 +15,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 
 public class FileUtils {
 
@@ -61,9 +63,12 @@ public class FileUtils {
     }
 
     public static InputStream getInputStream(File file) throws IOException {
-        return LegacyUtils.supportsFileChannel ?
-                StreamBackups.getInputStream(file)
-                : new FileInputStream(file);
+        if (LegacyUtils.supportsFileChannel) {
+            try {
+                return Files.newInputStream(file.toPath(), StandardOpenOption.READ);
+            } catch (Exception ignored) { }
+        }
+        return new FileInputStream(file);
     }
 
     public static InputStream getInputStream(String filePath) throws IOException {
@@ -83,9 +88,12 @@ public class FileUtils {
     }
 
     public static OutputStream getOutputStream(File file) throws IOException {
-        return LegacyUtils.supportsFileChannel ?
-                StreamBackups.getOutputStream(file)
-                : new FileOutputStream(file);
+        if (LegacyUtils.supportsFileChannel) {
+          try {
+              return Files.newOutputStream(file.toPath(), java.nio.file.StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+          } catch (Exception ignored) { }
+        }
+        return new FileOutputStream(file);
     }
 
     public static boolean doesNotHaveStoragePerm(Context context) {
