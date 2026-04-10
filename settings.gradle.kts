@@ -2,7 +2,6 @@ pluginManagement {
     repositories {
         google()
         mavenCentral()
-        gradlePluginPortal()
     }
 }
 dependencyResolutionManagement {
@@ -13,5 +12,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AntiSplit M"
+rootProject.name = "AntiSplit-M"
 include(":app")
