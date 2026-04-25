@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
                     .addCategory(Intent.CATEGORY_OPENABLE)
                     .setType("*/*")
-            // .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
             // .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/zip",
             // "application/vnd.android.package-archive", "application/octet-stream"}) //
             // XAPK usually octet-stream
@@ -723,9 +723,9 @@ public class MainActivity extends AppCompatActivity {
         logger.logMessage(R.string.searching);
         RunUtil.runInBackground(() -> {
             try {
-                List<String> splitsToNotInclude = deviceSpecsUtil.getListOfSplits(splitAPKUri);
-                Collections.sort(splitsToNotInclude, CompareUtils::compareByName);
-                final int initialSize = splitsToNotInclude.size();
+                List<String> splits = deviceSpecsUtil.getListOfSplits(splitAPKUri);
+                Collections.sort(splits, CompareUtils::compareByName);
+                final int initialSize = splits.size();
                 String[] apkNames = new String[initialSize + 5];
                 boolean[] checkedItems = new boolean[initialSize + 5];
 
@@ -735,7 +735,7 @@ public class MainActivity extends AppCompatActivity {
                 apkNames[3] = rss.getString(R.string.dpi_for_device);
                 apkNames[4] = rss.getString(R.string.lang_for_device);
                 for (int i = 5; i < initialSize + 5; i++) {
-                    apkNames[i] = splitsToNotInclude.get(i - 5);
+                    apkNames[i] = splits.get(i - 5);
                     checkedItems[i] = false;
                 }
 
@@ -826,14 +826,14 @@ public class MainActivity extends AppCompatActivity {
                         }).setPositiveButton("OK", (dialog, which) -> {
                             for (int i = 1; i < checkedItems.length; i++) {
                                 if (checkedItems[i])
-                                    splitsToNotInclude.remove(apkNames[i]);
+                                    splits.remove(apkNames[i]);
                             }
 
-                            if (splitsToNotInclude.size() == initialSize) {
+                            if (splits.size() == initialSize) {
                                 urisAreSplitApks = true; // reset
                                 showError(rss.getString(R.string.nothing));
                             } else {
-                                splitsUnselectedInDialog = splitsToNotInclude;
+                                splitsUnselectedInDialog = splits;
                                 process();
                             }
                         }).setNegativeButton("Cancel", null);
