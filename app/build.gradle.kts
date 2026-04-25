@@ -4,21 +4,21 @@ plugins {
 
 android {
     namespace = "com.abdurazaaqmohammed.AntiSplit"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
         minSdk = 19
-        targetSdk = 36
-        versionCode = 55
-        versionName = "2.2.7"
+        targetSdk = 37
+        versionCode = 56
+        versionName = "2.2.8"
         multiDexEnabled = true
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
