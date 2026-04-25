@@ -148,7 +148,6 @@ public class Merger {
             extractZipFile(zf, checkSplits, splitsToNotInclude);
             if (cantReadFile) inputZipFile.delete();
         } else {
-
             extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splitsToNotInclude);
             size = DeviceSpecsUtil.zipFile.size();
         }
@@ -346,6 +345,17 @@ public class Merger {
                     } else extractAndLoadFromInputStream(splitAPKUri, splitsToNotInclude, bundle);
                 } else {
                     extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splitsToNotInclude);
+                    try {
+                        bundle.loadApkDirectory(workingDirectory);
+                    } catch (FileNotFoundException fileNotFoundException) {
+                        String path;
+                        try {
+                            path = FileUtils.getPath(splitAPKUri, context);
+                        } catch (Exception exception) {
+                            path = context.getOriginalFileName(splitAPKUri);
+                        }
+                        throw(new IOException(fileNotFoundException.getMessage() + " uri " + splitAPKUri + " file " + path, fileNotFoundException));
+                    }
                 }
             }
             return run(bundle, signApk, force);
