@@ -26,7 +26,7 @@ public class RunUtil {
 
     public static void runInBackground(Runnable runnable) {
         try {
-            Executors.newSingleThreadExecutor().submit(runnable).get();
+            Executors.newSingleThreadExecutor().submit(runnable);
         } catch (Exception ignored) { }
     }
 

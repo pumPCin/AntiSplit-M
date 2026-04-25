@@ -719,135 +719,143 @@ public class MainActivity extends AppCompatActivity {
     private Runnable checkUpdateAfterStoragePermission;
 
     public void showApkSelectionDialog() {
-        try {
-            List<String> splitsToNotInclude = deviceSpecsUtil.getListOfSplits(splitAPKUri);
-            Collections.sort(splitsToNotInclude, CompareUtils::compareByName);
-            final int initialSize = splitsToNotInclude.size();
-            String[] apkNames = new String[initialSize + 5];
-            boolean[] checkedItems = new boolean[initialSize + 5];
+        toggleAnimation(true);
+        logger.logMessage(R.string.searching);
+        RunUtil.runInBackground(() -> {
+            try {
+                List<String> splitsToNotInclude = deviceSpecsUtil.getListOfSplits(splitAPKUri);
+                Collections.sort(splitsToNotInclude, CompareUtils::compareByName);
+                final int initialSize = splitsToNotInclude.size();
+                String[] apkNames = new String[initialSize + 5];
+                boolean[] checkedItems = new boolean[initialSize + 5];
 
-            apkNames[0] = rss.getString(R.string.all);
-            apkNames[1] = rss.getString(R.string.for_device);
-            apkNames[2] = rss.getString(R.string.arch_for_device);
-            apkNames[3] = rss.getString(R.string.dpi_for_device);
-            apkNames[4] = rss.getString(R.string.lang_for_device);
-            for (int i = 5; i < initialSize + 5; i++) {
-                apkNames[i] = splitsToNotInclude.get(i - 5);
-                checkedItems[i] = false;
-            }
-
-            AlertDialog ad = new MaterialAlertDialogBuilder(this).setTitle(rss.getString(R.string.select_splits))
-                    .setMultiChoiceItems(apkNames, checkedItems, (dialog, which, isChecked) -> {
-                        switch (which) {
-                            case 0:
-                                // "Select All" option
-                                for (int i = 5; i < checkedItems.length; i++)
-                                    ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
-                                break;
-                            case 1:
-                                // device specs option
-                                for (int i = 5; i < checkedItems.length; i++) {
-                                    ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = (isChecked
-                                            && deviceSpecsUtil.shouldIncludeSplit(apkNames[i])));
-                                }
-                                boolean didNotFindAppropriateDpi = true;
-                                for (int i = 5; i < checkedItems.length; i++) {
-                                    if (checkedItems[i] && apkNames[i].contains("dpi")) {
-                                        didNotFindAppropriateDpi = false;
-                                        break;
-                                    }
-                                }
-                                if (didNotFindAppropriateDpi) {
-                                    for (int i = 5; i < checkedItems.length; i++) {
-                                        if (apkNames[i].contains("hdpi")) {
-                                            ((AlertDialog) dialog).getListView().setItemChecked(i,
-                                                    checkedItems[i] = isChecked);
-                                            break;
-                                        }
-                                    }
-                                }
-                                break;
-                            case 2:
-                                // arch for device
-                                for (int i = 5; i < checkedItems.length; i++) {
-                                    if (deviceSpecsUtil.shouldIncludeArch(apkNames[i]))
-                                        ((AlertDialog) dialog).getListView().setItemChecked(i,
-                                                checkedItems[i] = isChecked);
-                                }
-                                break;
-                            case 3:
-                                // dpi for device
-                                for (int i = 5; i < checkedItems.length; i++) {
-                                    if (deviceSpecsUtil.shouldIncludeDpi(apkNames[i]))
-                                        ((AlertDialog) dialog).getListView().setItemChecked(i,
-                                                checkedItems[i] = isChecked);
-                                }
-                                boolean didNotFoundAppropriateDpi = true;
-                                for (int i = 5; i < checkedItems.length; i++) {
-                                    if (checkedItems[i] && apkNames[i].contains("dpi")) {
-                                        didNotFoundAppropriateDpi = false;
-                                        break;
-                                    }
-                                }
-                                if (didNotFoundAppropriateDpi) {
-                                    for (int i = 5; i < checkedItems.length; i++) {
-                                        if (apkNames[i].contains("hdpi")) {
-                                            ((AlertDialog) dialog).getListView().setItemChecked(i,
-                                                    checkedItems[i] = isChecked);
-                                            break;
-                                        }
-                                    }
-                                }
-                                break;
-                            case 4:
-                                // lang for device
-                                for (int i = 5; i < checkedItems.length; i++) {
-                                    if (deviceSpecsUtil.shouldIncludeLang(apkNames[i]))
-                                        ((AlertDialog) dialog).getListView().setItemChecked(i,
-                                                checkedItems[i] = isChecked);
-                                }
-                                break;
-                            default:
-                                ListView listView = ((AlertDialog) dialog).getListView();
-                                if (!isChecked)
-                                    listView.setItemChecked(0, checkedItems[0] = false); // Uncheck "Select All" if any
-                                                                                         // individual item is unchecked
-                                for (int i = 1; i <= 4; i++) {
-                                    if (checkedItems[i] && !deviceSpecsUtil.shouldIncludeSplit(apkNames[which])) {
-                                        listView.setItemChecked(i, checkedItems[i] = false); // uncheck device arch if
-                                                                                             // non device arch selected
-                                    }
-                                }
-                                break;
-                        }
-                    }).setPositiveButton("OK", (dialog, which) -> {
-                        for (int i = 1; i < checkedItems.length; i++) {
-                            if (checkedItems[i])
-                                splitsToNotInclude.remove(apkNames[i]);
-                        }
-
-                        if (splitsToNotInclude.size() == initialSize) {
-                            urisAreSplitApks = true; // reset
-                            showError(rss.getString(R.string.nothing));
-                        } else {
-                            splitsUnselectedInDialog = splitsToNotInclude;
-                            process();
-                        }
-                    }).setNegativeButton("Cancel", null).create();
-            styleAlertDialog(ad);
-
-            // Select base.apk by default
-            // Not force include base.apk because there may be some use case where you
-            // actually need to merge other splits only
-            for (int i = 5; i < apkNames.length; i++) {
-                if (DeviceSpecsUtil.isBaseApk(apkNames[i])) {
-                    ad.getListView().setItemChecked(i, checkedItems[i] = true);
-                    break;
+                apkNames[0] = rss.getString(R.string.all);
+                apkNames[1] = rss.getString(R.string.for_device);
+                apkNames[2] = rss.getString(R.string.arch_for_device);
+                apkNames[3] = rss.getString(R.string.dpi_for_device);
+                apkNames[4] = rss.getString(R.string.lang_for_device);
+                for (int i = 5; i < initialSize + 5; i++) {
+                    apkNames[i] = splitsToNotInclude.get(i - 5);
+                    checkedItems[i] = false;
                 }
+
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this).setTitle(rss.getString(R.string.select_splits))
+                        .setMultiChoiceItems(apkNames, checkedItems, (dialog, which, isChecked) -> {
+                            switch (which) {
+                                case 0:
+                                    // "Select All" option
+                                    for (int i = 5; i < checkedItems.length; i++)
+                                        ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = isChecked);
+                                    break;
+                                case 1:
+                                    // device specs option
+                                    for (int i = 5; i < checkedItems.length; i++) {
+                                        ((AlertDialog) dialog).getListView().setItemChecked(i, checkedItems[i] = (isChecked
+                                                && deviceSpecsUtil.shouldIncludeSplit(apkNames[i])));
+                                    }
+                                    boolean didNotFindAppropriateDpi = true;
+                                    for (int i = 5; i < checkedItems.length; i++) {
+                                        if (checkedItems[i] && apkNames[i].contains("dpi")) {
+                                            didNotFindAppropriateDpi = false;
+                                            break;
+                                        }
+                                    }
+                                    if (didNotFindAppropriateDpi) {
+                                        for (int i = 5; i < checkedItems.length; i++) {
+                                            if (apkNames[i].contains("hdpi")) {
+                                                ((AlertDialog) dialog).getListView().setItemChecked(i,
+                                                        checkedItems[i] = isChecked);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                case 2:
+                                    // arch for device
+                                    for (int i = 5; i < checkedItems.length; i++) {
+                                        if (deviceSpecsUtil.shouldIncludeArch(apkNames[i]))
+                                            ((AlertDialog) dialog).getListView().setItemChecked(i,
+                                                    checkedItems[i] = isChecked);
+                                    }
+                                    break;
+                                case 3:
+                                    // dpi for device
+                                    for (int i = 5; i < checkedItems.length; i++) {
+                                        if (deviceSpecsUtil.shouldIncludeDpi(apkNames[i]))
+                                            ((AlertDialog) dialog).getListView().setItemChecked(i,
+                                                    checkedItems[i] = isChecked);
+                                    }
+                                    boolean didNotFoundAppropriateDpi = true;
+                                    for (int i = 5; i < checkedItems.length; i++) {
+                                        if (checkedItems[i] && apkNames[i].contains("dpi")) {
+                                            didNotFoundAppropriateDpi = false;
+                                            break;
+                                        }
+                                    }
+                                    if (didNotFoundAppropriateDpi) {
+                                        for (int i = 5; i < checkedItems.length; i++) {
+                                            if (apkNames[i].contains("hdpi")) {
+                                                ((AlertDialog) dialog).getListView().setItemChecked(i,
+                                                        checkedItems[i] = isChecked);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                case 4:
+                                    // lang for device
+                                    for (int i = 5; i < checkedItems.length; i++) {
+                                        if (deviceSpecsUtil.shouldIncludeLang(apkNames[i]))
+                                            ((AlertDialog) dialog).getListView().setItemChecked(i,
+                                                    checkedItems[i] = isChecked);
+                                    }
+                                    break;
+                                default:
+                                    ListView listView = ((AlertDialog) dialog).getListView();
+                                    if (!isChecked)
+                                        listView.setItemChecked(0, checkedItems[0] = false); // Uncheck "Select All" if any
+                                    // individual item is unchecked
+                                    for (int i = 1; i <= 4; i++) {
+                                        if (checkedItems[i] && !deviceSpecsUtil.shouldIncludeSplit(apkNames[which])) {
+                                            listView.setItemChecked(i, checkedItems[i] = false); // uncheck device arch if
+                                            // non device arch selected
+                                        }
+                                    }
+                                    break;
+                            }
+                        }).setPositiveButton("OK", (dialog, which) -> {
+                            for (int i = 1; i < checkedItems.length; i++) {
+                                if (checkedItems[i])
+                                    splitsToNotInclude.remove(apkNames[i]);
+                            }
+
+                            if (splitsToNotInclude.size() == initialSize) {
+                                urisAreSplitApks = true; // reset
+                                showError(rss.getString(R.string.nothing));
+                            } else {
+                                splitsUnselectedInDialog = splitsToNotInclude;
+                                process();
+                            }
+                        }).setNegativeButton("Cancel", null);
+                getHandler().post(() -> {
+                    toggleAnimation(false);
+                    AlertDialog alertDialog = builder.create();
+                    styleAlertDialog(alertDialog);
+                    // Select base.apk by default
+                    // Not force include base.apk because there may be some use case where you
+                    // actually need to merge other splits only
+                    for (int i = 5; i < apkNames.length; i++) {
+                        if (DeviceSpecsUtil.isBaseApk(apkNames[i])) {
+                            alertDialog.getListView().setItemChecked(i, checkedItems[i] = true);
+                            break;
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                toggleAnimation(false);
+                showError(e);
             }
-        } catch (IOException e) {
-            showError(e);
-        }
+        });
     }
 
     private List<String> splitsUnselectedInDialog;
