@@ -67,6 +67,7 @@ import com.abdurazaaqmohammed.utils.InstallUtil;
 import com.abdurazaaqmohammed.utils.LanguageUtil;
 import com.abdurazaaqmohammed.utils.LegacyUtils;
 import com.abdurazaaqmohammed.utils.RunUtil;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -1260,6 +1261,28 @@ public class MainActivity extends AppCompatActivity {
 
         // if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
         // settingsDialog.findViewById(R.id.blackThemeButton).setVisibility(View.GONE);
+
+        for (int i = 0; i < themeButtons.getChildCount(); i++) {
+            View child = themeButtons.getChildAt(i);
+
+            if (child instanceof MaterialButton) {
+                child.setOnLongClickListener(v3 -> {
+                    int buttonId = v3.getId();
+
+                    if (buttonId == R.id.lightThemeButton) {
+                        Toast.makeText(this, R.string.light_theme, Toast.LENGTH_SHORT).show();
+                    } else if (buttonId == R.id.darkThemeButton) {
+                        Toast.makeText(this, R.string.dark_theme, Toast.LENGTH_SHORT).show();
+                    } else if (buttonId == R.id.blackThemeButton) {
+                        Toast.makeText(this, R.string.black_theme, Toast.LENGTH_SHORT).show();
+                    } else if (buttonId == R.id.systemThemeButton) {
+                        Toast.makeText(this, R.string.system_theme, Toast.LENGTH_SHORT).show();
+                    }
+                    return true;
+                });
+            }
+        }
+
 
         themeButtons.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {
