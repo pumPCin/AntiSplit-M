@@ -4,9 +4,7 @@ Android app to merge/"AntiSplit" split APKs (APKS/XAPK/APKM) to a regular .APK f
 
 This project is a simple GUI implementation of Merge utilities from [REAndroid APKEditor](https://github.com/REAndroid/APKEditor).
 
-There are already some apps that can perform this task like Apktool M, AntiSplit G2, NP Manager, but they are all closed source.
-
-In addition, Antisplit G2 (com.tilks.arscmerge), the fastest and lightest of the existing apps, has a large problem; it does not remove the information about splits in the APK from the AndroidManifest.xml. If a non-split APK contains this information it will cause an "App not installed" error on some devices. Fortunately the implementation by REAndroid contains a function to remove this automatically and it carries over to this app.
+Some other apps that can perform this task like Apktool M, AntiSplit G2, NP Manager are all closed source. In addition, some older apps have a large problem in not removing the information about splits in the APK from the AndroidManifest.xml. If a merged/non-split APK contains this information it will cause an "App not installed" error on some devices. Fortunately the implementation by REAndroid fixes this issue.
 
 Version 2.x - Material You design, support Android 4.4+
 
@@ -20,32 +18,27 @@ There are 3 ways to open a split APK to be merged:
 
 - Share the file and select AntiSplit M in the share menu
 - Press (open) the file and select AntiSplit M in available options
-- Open the app from launcher and press the button then select the split APK file.
+- Open the app from launcher and press the first button then select the split APK file.
 
-**If the file picker is not letting you select an XAPK file, try renaming it to a ZIP. If it still doesn't work, try extracting the ZIP and selecting the APKs inside.**
+There is also a menu in the app that allows selecting an app from those installed on the device as a split APK. Please try this method if you have problems with selecting a downloaded split APK.
 
-There is also a menu in the app that allows selecting an app from those installed on the device as a split APK.
-
-Note: An APK must be signed in order to install it (unless you have [Core Patch](https://github.com/LSPosed/CorePatch)). If you are planning to further modify the APK, you only need to sign it after the modifications. Some apps verify the signature of the APK or take other measures to check if the app was modified, which may cause it to crash on startup.
+Note: An APK must be signed in order to install it (unless you use tool like [Core Patch](https://github.com/LSPosed/CorePatch)). If you are planning to further modify the APK, you only need to sign it after the modifications (Apps like ReVanced Manager will sign it for you). Some apps verify the signature of the APK or take other measures to check if the app was modified, which may cause it to crash on startup.
 
 ## Screenshots
 
 | Main screen                                 | Settings                               | Selecting from installed apps                                 |
 | ------------------------------------------- | -------------------------------------- | ------------------------------------------------------------- |
-| ![Main screen](images/2.0%20mainscreen.jpg) | ![Settings](images/2.0%20settings.jpg) | ![Selecting from installed apps](images/2.0%20app%20list.jpg) |
+| ![Main screen](screenshot/2.2.7_home.jpeg) | ![Settings](screenshot/2.2.7_settings.jpeg) | ![Selecting from installed apps](screenshot/2.2.7_applist.jpeg) |
 
 | Dialog allowing splits selection   | Processing                                 | Result                             |
 | ---------------------------------- | ------------------------------------------ | ---------------------------------- |
-| ![Dialog](images/2.0%20dialog.jpg) | ![Processing](images/2.0%20processing.jpg) | ![Result](images/2.0%20result.jpg) |
+| ![Dialog](screenshot/2.2.7_splits_list.jpeg) | ![Processing](screenshot/2.2.7_processing.jpeg) | ![Result](screenshot/2.2.7_success.jpeg) |
 
 ## Used projects
 
 ⭐ [APKEditor](https://github.com/REAndroid/APKEditor) by REAndroid, what makes it all possible
 
 - [Android port](https://github.com/MuntashirAkon/apksig-android) of apksig library by MuntashirAkon to sign APKs
-- [PseudoApkSigner](https://github.com/Aefyr/PseudoApkSigner) by Aefyr for backup signing on older Android versions
-- [AmbilWarna Color Picker](https://github.com/yukuku/ambilwarna)
-- [android-filepicker](https://github.com/singhangadin/android-filepicker) by Angad Singh for file picker on older Android versions
 
 ## Permissions
 
