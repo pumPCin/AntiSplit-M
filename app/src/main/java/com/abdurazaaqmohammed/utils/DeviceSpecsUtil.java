@@ -113,7 +113,8 @@ public class DeviceSpecsUtil {
 
         }
 
-        try (InputStream is = context.getContentResolver().openInputStream(splitAPKUri);
+        //always copy zip file I checked this is faster
+        /*try (InputStream is = context.getContentResolver().openInputStream(splitAPKUri);
               ZipFileInput zis = new ZipFileInput(is)) {
             ZipFileHeader header;
             while ((header = zis.readFileHeader()) != null) {
@@ -127,10 +128,10 @@ public class DeviceSpecsUtil {
                 return getListOfSplitsFromFile(file);
             }
         }
-        if(splits.size() > 1) return splits;
+        if(splits.size() > 1) return splits;*/
         try(InputStream is = context.getContentResolver().openInputStream(splitAPKUri)) {
             String uriString = splitAPKUri.toString();
-            com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, file = new File(context.getCacheDir(), System.currentTimeMillis() + uriString));
+            com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, file = new File(context.getCacheDir(), System.currentTimeMillis()+"_checking_splits"));
             return getListOfSplitsFromFile(file);
         }
     }
