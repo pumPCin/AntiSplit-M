@@ -895,6 +895,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void showError(Throwable e) {
         toggleAnimation(false);
+        uris.remove(0);
         if (!(e instanceof ClosedByInterruptException)) {
             final String mainErr = e.getMessage();
 
@@ -905,12 +906,16 @@ public class MainActivity extends AppCompatActivity {
             if (!errEmpty) {
                 stackTrace.append(mainErr);
                 boolean zipError = mainErr.contains("Failed to find end record");
-                if (!zipError && splitAPKUri != null) {
-                    String mimeType = getContentResolver().getType(splitAPKUri);
-                    zipError = (TextUtils.isEmpty(mimeType)
-                            || (!mimeType.equals("application/zip") && !mimeType.equals("application/octet-stream")
-                                    && !mimeType.equals("application/vnd.apkm")));
+                if (!zipError) {
+                    Uri u = splitAPKUri;
+                    if (u != null) {
+                        String mimeType = getContentResolver().getType(u);
+                        zipError = (TextUtils.isEmpty(mimeType)
+                                || (!mimeType.equals("application/zip") && !mimeType.equals("application/octet-stream")
+                                && !mimeType.equals("application/vnd.apkm")));
+                    }
                 }
+
                 if (zipError) {
                     stackTrace.append(" - ")
                             .append(rss.getString(R.string.check_file_valid))
