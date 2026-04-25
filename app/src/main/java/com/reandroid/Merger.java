@@ -73,18 +73,18 @@ public class Merger {
         this.workingDirectory = workingDirectory;
     }
 
-    private void extractAndLoadFromInputStream(Uri splitAPKUri,  List<String> splits, ApkBundle bundle) throws IOException {
+    private void extractAndLoadFromInputStream(Uri splitAPKUri,  List<String> splitsToNotInclude, ApkBundle bundle) throws IOException {
         logger.logMessage(splitAPKUri.getPath());
 
         //bundle.setAPKLogger(context.getLogger()); // This spams the log
-        boolean checkSplits = splits != null && !splits.isEmpty();
+        boolean checkSplits = splitsToNotInclude != null && !splitsToNotInclude.isEmpty();
         try (InputStream is = FileUtils.getInputStream(splitAPKUri, context);
              ZipFileInput zis = new ZipFileInput(is)) {
             ZipFileHeader header;
             while ((header = zis.readFileHeader()) != null) {
                 String name = header.getFileName();
                 if (name.endsWith(".apk")) {
-                    if ((checkSplits && splits.contains(name)))
+                    if ((checkSplits && splitsToNotInclude.contains(name)))
                         logger.logMessage(rss.getString(R.string.skipping) + name + rss.getString(R.string.unselected));
                     else {
                         File file = new File(workingDirectory, name);
@@ -114,13 +114,13 @@ public class Merger {
             // If the above failed it probably did not copy any files
             // so might as well do it this way instead of trying unreliable methods to see if we need to do this
             // and possibly copying the file for no reason
-            extractAndLoadFromZipFile(splitAPKUri, splits, bundle, checkSplits);
+            extractAndLoadFromZipFile(splitAPKUri, splitsToNotInclude, bundle, checkSplits);
         }
     }
 
     /** @noinspection ResultOfMethodCallIgnored*/
-    private void extractAndLoadFromZipFile(Uri splitAPKUri,  List<String> splits, ApkBundle bundle, boolean checkSplits) throws IOException {
-        // Check if already copied the file earlier to get list of splits.
+    private void extractAndLoadFromZipFile(Uri splitAPKUri,  List<String> splitsToNotInclude, ApkBundle bundle, boolean checkSplits) throws IOException {
+        // Check if already copied the file earlier to get list of splitsToNotInclude.
         long size;
         boolean notAlreadyCopied = DeviceSpecsUtil.zipFile == null;
         if (notAlreadyCopied) {
@@ -145,10 +145,11 @@ public class Merger {
             }
             size = inputZipFile.length();
             ArchiveFile zf = new ArchiveFile(inputZipFile);
-            extractZipFile(zf, checkSplits, splits);
+            extractZipFile(zf, checkSplits, splitsToNotInclude);
             if (cantReadFile) inputZipFile.delete();
         } else {
-            extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splits);
+
+            extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splitsToNotInclude);
             size = DeviceSpecsUtil.zipFile.size();
         }
         try {
@@ -164,11 +165,11 @@ public class Merger {
         }
     }
 
-    private void extractZipFile(ArchiveFile zf, boolean checkSplits, List<String> splits) throws IOException {
+    private void extractZipFile(ArchiveFile zf, boolean checkSplits, List<String> splitsToNotInclude) throws IOException {
         for(InputSource archiveEntry : zf.getInputSources()) {
             String name = archiveEntry.getName();
             if (name.endsWith(".apk")) {
-                if ((checkSplits && splits.contains(name)))
+                if ((checkSplits && splitsToNotInclude.contains(name)))
                     logger.logMessage(rss.getString(R.string.skipping) + name + rss.getString(R.string.unselected));
                 else try (InputStream is = archiveEntry.openStream()) {
                    // com.abdurazaaqmohammed.utils.FileUtils.copyFile(is, new File(cacheDir, name));
@@ -335,12 +336,17 @@ public class Merger {
             }
             else {
                 logger.logMessage("MIME Type " + context.getContentResolver().getType(splitAPKUri));
-                if(Build.VERSION.SDK_INT < 23) {
-                    logger.logMessage(splitAPKUri.getPath());
+                boolean notAlreadyCopied = DeviceSpecsUtil.zipFile == null;
+                boolean checkSplits = splitsToNotInclude != null && !splitsToNotInclude.isEmpty();
+                if (notAlreadyCopied) {
+                    if (Build.VERSION.SDK_INT < 23) {
+                        logger.logMessage(splitAPKUri.getPath());
 
-                    boolean checkSplits = splitsToNotInclude != null && !splitsToNotInclude.isEmpty();
-                    extractAndLoadFromZipFile(splitAPKUri, splitsToNotInclude, bundle, checkSplits);
-                } else extractAndLoadFromInputStream(splitAPKUri, splitsToNotInclude, bundle);
+                        extractAndLoadFromZipFile(splitAPKUri, splitsToNotInclude, bundle, checkSplits);
+                    } else extractAndLoadFromInputStream(splitAPKUri, splitsToNotInclude, bundle);
+                } else {
+                    extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splitsToNotInclude);
+                }
             }
             return run(bundle, signApk, force);
         }

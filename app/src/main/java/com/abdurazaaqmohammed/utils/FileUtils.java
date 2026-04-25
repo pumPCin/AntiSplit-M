@@ -1,6 +1,5 @@
 package com.abdurazaaqmohammed.utils;
 
-
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -22,19 +21,21 @@ public class FileUtils {
 
     public static File copyFileFromAssetsAndGetFile(String fileName, Context context) throws IOException {
         File destinationFile = new File(context.getFilesDir(), fileName);
-        if(!destinationFile.exists()) try(InputStream is = context.getAssets().open(fileName)) {
-            copyFile(is, destinationFile);
-        }
+        if (!destinationFile.exists())
+            try (InputStream is = context.getAssets().open(fileName)) {
+                copyFile(is, destinationFile);
+            }
         return destinationFile;
     }
 
     public static File getUnusedFile(File file) {
         int i = 0;
-        while(file.exists()) {
+        while (file.exists()) {
             i++;
             String fileName = file.getName();
             String extension = FilenameUtils.getExtension(fileName);
-            file = new File(file.getParentFile(), fileName.replace('.' + extension, "").replaceFirst("_\\d+$", "") + '_' + i + '.' + extension);
+            file = new File(file.getParentFile(),
+                    fileName.replace('.' + extension, "").replaceFirst("_\\d+$", "") + '_' + i + '.' + extension);
         }
         return file;
     }
@@ -49,24 +50,27 @@ public class FileUtils {
 
     public static void copyFile(File sourceFile, File destinationFile) throws IOException {
         try (InputStream is = getInputStream(sourceFile);
-             OutputStream os = getOutputStream(destinationFile)) {
+                OutputStream os = getOutputStream(destinationFile)) {
             copyFile(is, os);
         }
     }
 
     public static void copyFile(InputStream is, OutputStream os) throws IOException {
-        if(LegacyUtils.supportsWriteExternalStorage) {
+        if (LegacyUtils.supportsWriteExternalStorage) {
             byte[] buffer = new byte[1024];
             int length;
-            while ((length = is.read(buffer)) > 0) os.write(buffer, 0, length);
-        } else android.os.FileUtils.copy(is, os);
+            while ((length = is.read(buffer)) > 0)
+                os.write(buffer, 0, length);
+        } else
+            android.os.FileUtils.copy(is, os);
     }
 
     public static InputStream getInputStream(File file) throws IOException {
         if (LegacyUtils.supportsFileChannel) {
             try {
                 return Files.newInputStream(file.toPath(), StandardOpenOption.READ);
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
         }
         return new FileInputStream(file);
     }
@@ -82,28 +86,32 @@ public class FileUtils {
     }
 
     public static void copyFile(File in, OutputStream os) throws IOException {
-        try(InputStream is = getInputStream(in)) {
+        try (InputStream is = getInputStream(in)) {
             copyFile(is, os);
         }
     }
 
     public static OutputStream getOutputStream(File file) throws IOException {
         if (LegacyUtils.supportsFileChannel) {
-          try {
-              return Files.newOutputStream(file.toPath(), java.nio.file.StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
-          } catch (Exception ignored) { }
+            try {
+                return Files.newOutputStream(file.toPath(), java.nio.file.StandardOpenOption.CREATE,
+                        StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+            } catch (Exception ignored) {
+            }
         }
         return new FileOutputStream(file);
     }
 
     public static boolean doesNotHaveStoragePerm(Context context) {
-        return Build.VERSION.SDK_INT > 22 && (LegacyUtils.supportsWriteExternalStorage ?
-                context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED :
-                !Environment.isExternalStorageManager());
+        return Build.VERSION.SDK_INT > 22 && (LegacyUtils.supportsWriteExternalStorage
+                ? context.checkSelfPermission(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+                : !Environment.isExternalStorageManager());
     }
 
     public static File getAntisplitMFolder() {
         final File antisplitMFolder = new File(Environment.getExternalStorageDirectory(), "AntiSplit-M");
-        return antisplitMFolder.exists() || antisplitMFolder.mkdir() ? antisplitMFolder : new File(Environment.getExternalStorageDirectory(), "Download");
+        return antisplitMFolder.exists() || antisplitMFolder.mkdir() ? antisplitMFolder
+                : new File(Environment.getExternalStorageDirectory(), "Download");
     }
 }
