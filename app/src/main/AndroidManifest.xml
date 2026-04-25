@@ -21,8 +21,8 @@
             android:name=".main.MainActivity"
             android:theme="@style/Theme.Material3.DayNight.NoActionBar"
             android:exported="true"
-            android:configChanges="uiMode|screenSize|orientation">
-        <intent-filter>
+            android:configChanges="orientation|screenSize|screenLayout|uiMode|keyboard|keyboardHidden">
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
