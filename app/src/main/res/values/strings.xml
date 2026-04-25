@@ -38,7 +38,6 @@
     <string name="update">Update available</string>
     <string name="new_ver">New version of AntiSplit M is available</string>
     <string name="dl">Download</string>
-    Check mime type and log
     <string name="auto_update">Check for updates automatically</string>
     <string name="check_update_now">Check for update now</string>
     <string name="no_update_found">No update found</string>
