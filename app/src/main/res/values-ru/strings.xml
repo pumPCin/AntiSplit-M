@@ -11,6 +11,7 @@
     <string name="cancel">Отмена</string>
     <string name="change_background_color">Изменить цвет фона</string>
     <string name="change_text_color">Изменить цвет текста</string>
+    <string name="check_file_valid">"Убедитесь, что выбранный файл является корректным ZIP/Split APK (попробуйте открыть его в файловом менеджере или установить). Если приложение уже установлено, но ошибка сохраняется, попробуйте воспользоваться функцией "</string>
     <string name="check_update_now">Проверить обновления</string>
     <string name="close">Закрыть</string>
     <string name="copied_log">Журнал скопирован</string>
@@ -32,7 +33,8 @@
     <string name="lang_for_device">Выбрать язык под ваше устройство</string>
     <string name="last_edit">Последнее редактирование:</string>
     <string name="light_theme">Светлая</string>
-    <string name="merge">Выбрать splits-apk для объединения/антиразделения</string>
+    <string name="merge">Выбрать splits-apk файл</string>
+    <string name="merged">Объединение завершено успешно, выберите место для сохранения</string>
     <string name="mismatch">Части splits-apk (%1$s) другой версии. Приложение сможет работать без языковых частей и они не будут доступны в приложении. Продолжить слияние?</string>
     <string name="mismatch_base">" версия не совпадает с base.apk"</string>
     <string name="new_ver">Доступна новая версия AntiSplit-M !!!</string>
@@ -42,16 +44,18 @@
     <string name="not_split">Похоже это не split-apk (%1$s)</string>
     <string name="nothing">Ничего не выбрано</string>
     <string name="output">"Выходной каталог: "</string>
-    <string name="pairip_warning">The app you are trying to merge uses Pairip/Google加固 Integrity to protect it from modification. The merged version will crash on opening unless you know how to modify the apk to bypass it.</string>
+    <string name="pairip_warning">В выбраном приложении используется защита от изменений Pairip/Google加固. После слияния приложение не будет работать, если вы не знаете как модифицировать apk, чтобы обойти защиту.</string>
     <string name="pause">Пауза</string>
     <string name="pick_folder">Выберите папку</string>
     <string name="removed_table_entry">"Удалена запись в таблице: "</string>
     <string name="same">сохраняет apk там же, где был splits-apk</string>
     <string name="sanitizing_manifest">Очистка manifest…</string>
+    <string name="save">сохранить</string>
     <string name="saving">Сохранение…</string>
     <string name="searching">Поиск apk…</string>
     <string name="select">Выбрать</string>
     <string name="select_from_installed_apps">Выбрать из уже установленных приложений</string>
+    <string name="select_item">Выбрать файл</string>
     <string name="select_splits">Выбрать splits-apk</string>
     <string name="settings">Настройки</string>
     <string name="show_dialog">Показать диалоговое окно для выбора частей splits-apk</string>
