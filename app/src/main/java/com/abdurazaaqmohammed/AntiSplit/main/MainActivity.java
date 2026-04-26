@@ -151,11 +151,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
 
         String deviceLang = Locale.getDefault().getLanguage();
-        boolean supportedLang = deviceLang.equals("ar") || deviceLang.equals("es") || deviceLang.equals("de")
-                || deviceLang.equals("fr") || deviceLang.equals("in") || deviceLang.equals("it")
-                || deviceLang.equals("pt-BR") || deviceLang.equals("ru") || deviceLang.equals("tr")
-                || deviceLang.equals("uk") || deviceLang.equals("vi") || deviceLang.equals("zh-TW")
-                || deviceLang.equals("pl") || deviceLang.equals("hu") || deviceLang.equals("ko");
+        boolean supportedLang = deviceLang.equals("ru");
         lang = settings.getString("lang", supportedLang ? deviceLang : "en");
         boolean useDeviceRss = lang.equals(deviceLang);
         rss = useDeviceRss ? getResources() : LocaleHelper.setLocale(this, lang).getResources();
@@ -634,7 +630,7 @@ public class MainActivity extends AppCompatActivity {
                         currentVer = null;
                     }
                     boolean newVer = false;
-                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] { '2', '2', '7' }
+                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] { '2', '2', '9' }
                             : currentVer.replace(".", "").toCharArray();
                     char[] latest = latestVersion.replace(".", "").toCharArray();
 
@@ -937,7 +933,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 currentVer = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             } catch (Exception ex) {
-                currentVer = "2.2.7";
+                currentVer = "2.2.9";
             }
             fullLog.append(currentVer).append('\n')
                     .append("Storage permission granted: ")

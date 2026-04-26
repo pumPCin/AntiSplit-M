@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
-        minSdk = 19
+        minSdk = 24
         targetSdk = 37
-        versionCode = 56
-        versionName = "2.2.8"
+        versionCode = 57
+        versionName = "2.2.9"
         multiDexEnabled = true
     }
 
@@ -27,14 +27,14 @@ android {
     }
     compileOptions {
         isCoreLibraryDesugaringEnabled = false
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     buildFeatures {
         viewBinding = false
     }
     dependencies {
-        implementation("com.google.android.material:material:1.12.0")
+        implementation("com.google.android.material:material:1.14.0-beta01")
         implementation(files("libs/APKEditor.jar"))
     }
     dependenciesInfo {
