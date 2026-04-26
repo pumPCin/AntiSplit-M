@@ -213,7 +213,7 @@
     <string name="saving">Сохранение…</string>
     <string name="search_menu_title">Поиск</string>
     <string name="searchbar_scrolling_view_behavior">com.google.android.material.search.SearchBar$ScrollingViewBehavior</string>
-    <string name="searching">Поиск apk-файлов…</string>
+    <string name="searching">Поиск APK файлов…</string>
     <string name="searchview_clear_text_content_description">Очистить текст</string>
     <string name="searchview_navigation_content_description">Назад</string>
 	<string name="select">Выбирать</string>
