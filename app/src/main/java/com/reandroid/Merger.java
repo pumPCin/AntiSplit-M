@@ -62,11 +62,13 @@ public class Merger {
     private final MyAPKLogger logger;
     private final Resources rss;
     public Uri signedApk;
+    private final int compressionLevel;
 
-    public Merger(File workingDirectory, MainActivity context) {
+    public Merger(File workingDirectory, MainActivity context, int compressionLevel) {
         this.workingDirectory = workingDirectory;
         this.rss = (this.context = context).getRss();
         this.logger = context.getLogger();
+        this.compressionLevel = compressionLevel;
     }
 
     public void setWorkingDirectory(File workingDirectory) {
@@ -323,7 +325,7 @@ public class Merger {
     public File run(Uri splitAPKUri, List<String> splitsToNotInclude, boolean signApk, boolean force) throws Exception {
         MyAPKLogger logger = context.getLogger();
         logger.logMessage((R.string.searching));
-        try (ApkBundle bundle = new ApkBundle()) {
+        try (ApkBundle bundle = new ApkBundle(compressionLevel)) {
             if (splitAPKUri == null) {
                 // Multiple splits from a split apk, already copied to cache dir
                 try {

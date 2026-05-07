@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace = "com.abdurazaaqmohammed.AntiSplit"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
         minSdk = 19
-        targetSdk = 37
+        targetSdk = 36
         versionCode = 56
         versionName = "2.2.8"
         multiDexEnabled = true
@@ -35,7 +35,7 @@ android {
     }
     dependencies {
         implementation("com.google.android.material:material:1.12.0")
-        implementation(files("libs/APKEditor.jar"))
+        implementation(files("libs/ARSCLib-1.3.9.jar"))
     }
     dependenciesInfo {
         // Disables dependency metadata when building APKs.

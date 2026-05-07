@@ -94,11 +94,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.zip.Deflater;
 
 import com.github.paul035.LocaleHelper;
 
 /** @noinspection deprecation */
 public class MainActivity extends AppCompatActivity {
+    private int compressionLevel;
     private int saveMode = 0;
     private String outputFolder;
     private boolean showDialog;
@@ -206,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
         saveMode = settings.getInt("saveMode", 0);
         systemTheme = settings.getBoolean("systemTheme", true);
         sortMode = settings.getInt("sortMode", 0);
+        compressionLevel = settings.getInt("compressionLevel", Deflater.DEFAULT_COMPRESSION);
         suffix = settings.getString("suffix", "_antisplit");
         outputFolder = settings.getString("outputFolder",
                 com.abdurazaaqmohammed.utils.FileUtils.getAntisplitMFolder().getPath());
@@ -342,6 +345,7 @@ public class MainActivity extends AppCompatActivity {
                 .putBoolean("selectSplitsForDevice", selectSplitsForDevice)
                 .putInt("theme", theme)
                 .putInt("sortMode", sortMode)
+                .putInt("compressionLevel", compressionLevel)
                 .putBoolean("checkForUpdates", checkForUpdates)
                 .putString("lang", lang)
                 .putString("lastVerChecked", lastVerChecked)
@@ -393,13 +397,13 @@ public class MainActivity extends AppCompatActivity {
         if (selectedFromInstalledApps)
             urisAreSplitApks = false;
 
-        Merger merger = new Merger(cacheDir, this);
+        Merger merger = new Merger(cacheDir, this, compressionLevel);
 
         new RunUtil(handler, context, null).runInBackground(() -> {
             criticalErrorOccurred = false; // reset to make sure success message shows
             try {
                 if (selectedFromInstalledApps) {
-                    try (ApkBundle bundle = new ApkBundle()) {
+                    try (ApkBundle bundle = new ApkBundle(compressionLevel)) {
                         // Selected from apps list
                         PackageManager packageManager = context.getPackageManager();
                         bundle.loadApkDirectory(
@@ -422,7 +426,7 @@ public class MainActivity extends AppCompatActivity {
                         merged = merger.run(splitAPKUri, splitsToNotInclude, signApk, force);
                         selectDirToSaveAPKOrSaveNow();
                     } else
-                        try (ApkBundle bundle = new ApkBundle()) {
+                        try (ApkBundle bundle = new ApkBundle(compressionLevel)) {
                             ArrayList<Uri> uriArrayList = uris;
                             for (int i = 0; i < uriArrayList.size(); i++) {
                                 Uri uri = uriArrayList.get(i);
@@ -1230,7 +1234,7 @@ public class MainActivity extends AppCompatActivity {
 
     /** @noinspection AssignmentUsedAsCondition */
     private void settingsButtonListener(View v) {
-        ScrollView settingsDialog = (ScrollView) LayoutInflater.from(MainActivity.this).inflate(R.layout.setty, null);
+        ScrollView settingsDialog = (ScrollView) LayoutInflater.from(MainActivity.this).inflate(R.layout.settings_dialog, null);
         settingsDialog.setId(R.id.icon_view);
         LanguageUtil.updateSettingsDialog(settingsDialog, rss);
 
@@ -1391,8 +1395,7 @@ public class MainActivity extends AppCompatActivity {
         TextInputLayout dropdownLayout = settingsDialog.findViewById(R.id.dropdown_menu);
         AutoCompleteTextView autoCompleteTextView = settingsDialog.findViewById(R.id.auto_complete_tv);
 
-        String[] items = { rss.getString(R.string.ask), rss.getString(R.string.same),
-                rss.getString(R.string.pick_folder) };
+        String[] items = { rss.getString(R.string.ask), rss.getString(R.string.same), rss.getString(R.string.pick_folder) };
         dropdownLayout.setHint(rss.getString(R.string.file_save_method));
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.dropdownitem, items) {
@@ -1437,5 +1440,28 @@ public class MainActivity extends AppCompatActivity {
                         }).create(), false);
             }
         });
+
+        TextInputLayout dropdownLayout2 = settingsDialog.findViewById(R.id.dropdown_compress_level);
+        AutoCompleteTextView autoCompleteTextView2 = settingsDialog.findViewById(R.id.auto_complete_tv2);
+
+        String[] items2 = {"Default", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+        dropdownLayout2.setHint(rss.getString(R.string.select_compression_level));
+
+        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, R.layout.dropdownitem, items2) {
+            @NonNull
+            @Override
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                if (convertView == null)
+                    convertView = LayoutInflater.from(MainActivity.this).inflate(R.layout.dropdownitem, parent, false);
+                TextView view = (TextView) convertView;
+                view.setTextColor(theme == R.style.Theme_MyApp_Light ? Color.BLACK : Color.WHITE);
+                view.setText(items2[position]);
+                return convertView;
+            }
+        };
+        autoCompleteTextView2.setText(items2[compressionLevel + 1]);
+        autoCompleteTextView2.setAdapter(adapter2);
+        autoCompleteTextView2.setThreshold(1);
+        autoCompleteTextView2.setOnItemClickListener((parent, view, position, id) -> compressionLevel = position - 1);
     }
 }
