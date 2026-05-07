@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String openedFile;
+    private List<String> splitsUnselectedInDialog;
 
     /** @noinspection AssignmentUsedAsCondition */
     @Override
@@ -863,8 +864,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private List<String> splitsUnselectedInDialog;
-
     private void setUIAfterMerging(Merger merger) {
         urisAreSplitApks = true; // reset
         findViewById(R.id.cancelButton).setVisibility(View.GONE);
@@ -1263,9 +1262,6 @@ public class MainActivity extends AppCompatActivity {
                         : theme == R.style.Theme_MyApp_Light ? R.id.lightThemeButton
                                 : theme == R.style.Theme_MyApp_Dark ? R.id.darkThemeButton : R.id.blackThemeButton);
 
-        // if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-        // settingsDialog.findViewById(R.id.blackThemeButton).setVisibility(View.GONE);
-
         for (int i = 0; i < themeButtons.getChildCount(); i++) {
             View child = themeButtons.getChildAt(i);
 
@@ -1352,8 +1348,11 @@ public class MainActivity extends AppCompatActivity {
 
         showDialogSwitch.setChecked(showDialog);
         showDialogSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (showDialog = isChecked)
+            if (showDialog = isChecked) {
                 selectSplitsAutomaticallySwitch.setChecked(selectSplitsForDevice = false);
+            } else {
+                splitsUnselectedInDialog = null;
+            }
         });
 
         selectSplitsAutomaticallySwitch.setChecked(selectSplitsForDevice);
