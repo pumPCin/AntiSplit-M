@@ -6,6 +6,9 @@ android {
     namespace = "com.abdurazaaqmohammed.AntiSplit"
     compileSdk = 36
 
+    lint {
+        baseline = file("lint.xml")
+    }
     defaultConfig {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
         minSdk = 19
