@@ -6,6 +6,7 @@ import static com.abdurazaaqmohammed.utils.LegacyUtils.aboveSdk20;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -639,7 +640,7 @@ public class MainActivity extends AppCompatActivity {
                         currentVer = null;
                     }
                     boolean newVer = false;
-                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] { '2', '2', '7' }
+                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] { '2', '2', '9' }
                             : currentVer.replace(".", "").toCharArray();
                     char[] latest = latestVersion.replace(".", "").toCharArray();
 
@@ -940,7 +941,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 currentVer = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             } catch (Exception ex) {
-                currentVer = "2.2.7";
+                currentVer = "2.2.9";
             }
             fullLog.append(currentVer).append('\n')
                     .append("Storage permission granted: ")
@@ -1043,13 +1044,21 @@ public class MainActivity extends AppCompatActivity {
                 filename = pkgName + versionName + suffix;
             }
 
-            startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT)
-                    .addCategory(Intent.CATEGORY_OPENABLE)
-                    .setType("application/vnd.android.package-archive")
-                    .putExtra(Intent.EXTRA_TITLE, filename), 2);
-        } else {
-            checkStoragePerm(9);
-            RunUtil.runInBackground(() -> {
+            try {
+                startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                        .addCategory(Intent.CATEGORY_OPENABLE)
+                        .setType("application/vnd.android.package-archive")
+                        .putExtra(Intent.EXTRA_TITLE, filename), 2);
+            } catch (ActivityNotFoundException e) {
+                showError("Was not able to find Android system files app to save APK, please grant files permission to save successfully");
+                saveNow();
+            }
+        } else saveNow();
+    }
+
+    private void saveNow() {
+        checkStoragePerm(9);
+        RunUtil.runInBackground(() -> {
                 try {
                     File f;
                     String fp;
@@ -1101,7 +1110,6 @@ public class MainActivity extends AppCompatActivity {
                     });
                 }
             });
-        }
     }
 
     private String getNameFromNonSplitApks() {
