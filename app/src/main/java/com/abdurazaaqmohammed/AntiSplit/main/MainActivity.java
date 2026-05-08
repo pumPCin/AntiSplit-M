@@ -884,10 +884,18 @@ public class MainActivity extends AppCompatActivity {
             // again in case you closed it by accident.
             if (saveMode == 0) {
                 saveButton.setVisibility(View.VISIBLE);
-                saveButton.setOnClickListener(view -> startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT)
-                        .addCategory(Intent.CATEGORY_OPENABLE)
-                        .setType("application/vnd.android.package-archive")
-                        .putExtra(Intent.EXTRA_TITLE, "merged.apk"), 2));
+
+                    saveButton.setOnClickListener(view -> {
+                        try { startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                                .addCategory(Intent.CATEGORY_OPENABLE)
+                                .setType("application/vnd.android.package-archive")
+                                .putExtra(Intent.EXTRA_TITLE, "merged.apk"), 2);
+                        } catch (ActivityNotFoundException e) {
+                            showError("Was not able to find Android system files app to save APK, please grant files permission to save successfully");
+                            saveNow(true);
+                        }
+                    });
+
             }
         }
     }
@@ -1051,12 +1059,12 @@ public class MainActivity extends AppCompatActivity {
                         .putExtra(Intent.EXTRA_TITLE, filename), 2);
             } catch (ActivityNotFoundException e) {
                 showError("Was not able to find Android system files app to save APK, please grant files permission to save successfully");
-                saveNow();
+                saveNow(true);
             }
-        } else saveNow();
+        } else saveNow(false);
     }
 
-    private void saveNow() {
+    private void saveNow(boolean notFoundCreateDocument) {
         checkStoragePerm(9);
         RunUtil.runInBackground(() -> {
                 try {
@@ -1104,7 +1112,9 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(() -> Toast.makeText(this, success, Toast.LENGTH_SHORT).show());
                     }
                 } catch (IOException e) {
-                    runOnUiThread(() -> {
+                    if(notFoundCreateDocument) {
+                        showError(e);
+                    } else runOnUiThread(() -> {
                         Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                         selectDirToSaveAPKOrSaveNow(0);
                     });
