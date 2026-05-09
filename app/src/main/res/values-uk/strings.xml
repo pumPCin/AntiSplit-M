@@ -195,7 +195,7 @@
     <string name="no_filepath">"Не вдалося знайти шлях до вибраного файлу"</string>
     <string name="no_update_found">Оновлення не знайдено</string>
     <string name="not_apk">: Це не APK файл</string>
-	<string name="not_split">Це не схоже на Split APK (%1$s)</string>
+	<string name="not_split">Схоже, це не split APK (%1$s)</string>											   
     <string name="nothing">Нічого не вибрано</string>
     <string name="output">"Вихідний каталог: "</string>
 	<string name="pairip_warning">"Додаток, який ви намагаєтеся об'єднати, використовує цілісність Pairip/Google 加固 для захисту від змін. Об'єднана версія вийде з ладу під час відкриття, якщо ви не знаєте, як змінити APK, щоб обійти його."</string>																																																																								
@@ -217,6 +217,7 @@
     <string name="searchview_clear_text_content_description">Очистити текст</string>
     <string name="searchview_navigation_content_description">Назад</string>
 	<string name="select">Вибирати</string>
+	<string name="select_compression_level">Вибрати рівень стиснення</string>
     <string name="select_from_installed_apps">Виберіть із встановлених програм</string>
     <string name="select_splits">Виберіть спліт</string>
     <string name="settings">Налаштування</string>
