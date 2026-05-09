@@ -7,30 +7,19 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 
 import java.util.Locale;
+import java.util.Objects;
 
 // https://www.geeksforgeeks.org/how-to-change-the-whole-app-language-in-android-programmatically/
 public class LocaleHelper {
-    private static final String SELECTED_LANGUAGE = "Locale.Helper.Selected.Language";
 
     // Method to set the language at runtime
     public static Context setLocale(Context context, String language) {
-        persist(context, language);
-
-        // Updating the language for devices above Android Nougat
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return updateResources(context, language);
-        }
-        // For devices with lower versions of Android OS
-        return updateResourcesLegacy(context, language);
-    }
-
-    private static void persist(Context context, String language) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(SELECTED_LANGUAGE, language).apply();
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? updateResources(context, language) : updateResourcesLegacy(context, language);
     }
 
     // Method to update the language of the application by creating
     // an object of the inbuilt Locale class and passing the language argument to it
-    @TargetApi(Build.VERSION_CODES.N)
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.N)
     private static Context updateResources(Context context, String language) {
         String[] codes = language.split("-");
         Locale locale = codes.length > 1 ? new Locale(codes[0], codes[1]) : new Locale(language);

@@ -9,12 +9,13 @@ android {
     lint {
         baseline = file("lint.xml")
     }
+
     defaultConfig {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
         minSdk = 19
         targetSdk = 36
-        versionCode = 57
-        versionName = "2.2.9"
+        versionCode = 58
+        versionName = "2.3.0"
         multiDexEnabled = true
     }
 
