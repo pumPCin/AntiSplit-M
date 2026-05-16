@@ -34,7 +34,7 @@ android {
         viewBinding = false
     }
     dependencies {
-        implementation("com.google.android.material:material:1.14.0-rc01")
+        implementation("com.google.android.material:material:1.14.0")
         implementation(files("libs/ARSCLib.jar"))
     }
     dependenciesInfo {
