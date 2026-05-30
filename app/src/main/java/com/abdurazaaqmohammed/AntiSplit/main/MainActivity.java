@@ -1343,7 +1343,7 @@ public class MainActivity extends AppCompatActivity {
         TextInputLayout dropdownLayout2 = settingsDialog.findViewById(R.id.dropdown_compress_level);
         AutoCompleteTextView autoCompleteTextView2 = settingsDialog.findViewById(R.id.auto_complete_tv2);
 
-        String[] items2 = {"Default", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+        String[] items2 = {rss.getString(R.string.default_c), "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
         dropdownLayout2.setHint(rss.getString(R.string.select_compression_level));
 
         ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, R.layout.dropdownitem, items2) {

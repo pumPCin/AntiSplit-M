@@ -68,4 +68,5 @@
     <string name="save">save</string>
     <string name="check_file_valid">"Please check that file selected is a valid ZIP/split APK (Try opening in file manager or installing it). If you have it installed but still getting error please try the feature "</string> <!-- select_from_installed_apps -->
     <string name="select_compression_level">Select compression level</string><!-- lower = faster, higher = smaller file -->
+    <string name="default_c">Default</string>
 </resources>
