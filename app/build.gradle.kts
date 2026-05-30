@@ -39,7 +39,7 @@ android {
     }
     dependencies {
         implementation("com.google.android.material:material:1.12.0")
-        implementation(files("libs/ARSCLib-1.3.9.jar"))
+        //implementation(files("libs/ARSCLib-1.3.9.jar"))
     }
     dependenciesInfo {
         // Disables dependency metadata when building APKs.

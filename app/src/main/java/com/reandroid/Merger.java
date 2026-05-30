@@ -18,7 +18,6 @@ package com.reandroid;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Build;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 
@@ -28,8 +27,6 @@ import com.abdurazaaqmohammed.utils.DeviceSpecsUtil;
 import com.abdurazaaqmohammed.AntiSplit.main.MainActivity;
 import com.abdurazaaqmohammed.utils.SignUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.j256.simplezip.ZipFileInput;
-import com.j256.simplezip.format.ZipFileHeader;
 import com.reandroid.apk.ApkBundle;
 import com.reandroid.apk.ApkModule;
 import com.reandroid.apkeditor.common.AndroidManifestHelper;
@@ -73,51 +70,6 @@ public class Merger {
 
     public void setWorkingDirectory(File workingDirectory) {
         this.workingDirectory = workingDirectory;
-    }
-
-    private void extractAndLoadFromInputStream(Uri splitAPKUri,  List<String> splitsToNotInclude, ApkBundle bundle) throws IOException {
-        logger.logMessage(splitAPKUri.getPath());
-
-        //bundle.setAPKLogger(context.getLogger()); // This spams the log
-        boolean checkSplits = splitsToNotInclude != null && !splitsToNotInclude.isEmpty();
-        try (InputStream is = FileUtils.getInputStream(splitAPKUri, context);
-             ZipFileInput zis = new ZipFileInput(is)) {
-            ZipFileHeader header;
-            while ((header = zis.readFileHeader()) != null) {
-                String name = header.getFileName();
-                if (name.endsWith(".apk")) {
-                    if ((checkSplits && splitsToNotInclude.contains(name)))
-                        logger.logMessage(rss.getString(R.string.skipping) + name + rss.getString(R.string.unselected));
-                    else {
-                        File file = new File(workingDirectory, name);
-                        if (file.getCanonicalPath().startsWith(workingDirectory.getCanonicalPath() + File.separator)) {
-                            File parentDir = file.getParentFile();
-                            if (parentDir != null && !parentDir.exists()) {
-                                parentDir.mkdirs();
-                            }
-
-                            logger.logMessage("Extracted " + name + " (" + zis.readFileDataToFile(file) +" bytes)");
-                        } else throw new IOException("Zip entry is outside of the target dir: " + name);
-                    }
-                } else logger.logMessage(rss.getString(R.string.skipping) + name + rss.getString(R.string.not_apk));
-            }
-            try {
-                bundle.loadApkDirectory(workingDirectory);
-            } catch (FileNotFoundException fileNotFoundException) {
-                String path;
-                try {
-                    path= FileUtils.getPath(splitAPKUri, context);
-                } catch (Exception e) {
-                    path = context.getOriginalFileName(splitAPKUri);
-                }
-                throw(new IOException(fileNotFoundException.getMessage() + " file " + splitAPKUri + ' ' + path, fileNotFoundException));
-            }
-        } catch (Exception e) {
-            // If the above failed it probably did not copy any files
-            // so might as well do it this way instead of trying unreliable methods to see if we need to do this
-            // and possibly copying the file for no reason
-            extractAndLoadFromZipFile(splitAPKUri, splitsToNotInclude, bundle, checkSplits);
-        }
     }
 
     /** @noinspection ResultOfMethodCallIgnored*/
@@ -340,11 +292,11 @@ public class Merger {
                 boolean notAlreadyCopied = DeviceSpecsUtil.zipFile == null;
                 boolean checkSplits = splitsToNotInclude != null && !splitsToNotInclude.isEmpty();
                 if (notAlreadyCopied) {
-                    if (Build.VERSION.SDK_INT < 23) {
+                    //if (Build.VERSION.SDK_INT < 23) {
                         logger.logMessage(splitAPKUri.getPath());
 
                         extractAndLoadFromZipFile(splitAPKUri, splitsToNotInclude, bundle, checkSplits);
-                    } else extractAndLoadFromInputStream(splitAPKUri, splitsToNotInclude, bundle);
+                   // } else extractAndLoadFromInputStream(splitAPKUri, splitsToNotInclude, bundle);
                 } else {
                     extractZipFile(DeviceSpecsUtil.zipFile, checkSplits, splitsToNotInclude);
                     try {

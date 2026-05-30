@@ -393,7 +393,7 @@ public class FileProvider extends ContentProvider {
      * @param uri A content URI returned by {@link #getUriForFile}.
      * @param projection The list of columns to put into the {@link Cursor}. If null all columns are
      * included.
-     * @param selection Selection criteria to apply. If null then all data that matches the content
+     * @param selection Selection criteria to transform. If null then all data that matches the content
      * URI is returned.
      * @param selectionArgs An array of {@link java.lang.String}, containing arguments to bind to
      * the <i>selection</i> parameter. The <i>query</i> method scans <i>selection</i> from left to

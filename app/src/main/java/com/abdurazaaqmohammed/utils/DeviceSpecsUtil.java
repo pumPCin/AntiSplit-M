@@ -7,8 +7,6 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
 import com.abdurazaaqmohammed.AntiSplit.main.MainActivity;
-import com.j256.simplezip.ZipFileInput;
-import com.j256.simplezip.format.ZipFileHeader;
 import com.reandroid.archive.ArchiveFile;
 import com.reandroid.archive.InputSource;
 import com.starry.FileUtils;

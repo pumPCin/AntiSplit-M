@@ -32,7 +32,6 @@ import android.os.Looper;
 import android.provider.OpenableColumns;
 import android.provider.Settings;
 import android.text.Editable;
-import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -68,6 +67,7 @@ import com.abdurazaaqmohammed.utils.InstallUtil;
 import com.abdurazaaqmohammed.utils.LanguageUtil;
 import com.abdurazaaqmohammed.utils.LegacyUtils;
 import com.abdurazaaqmohammed.utils.RunUtil;
+import com.abdurazaaqmohammed.utils.UpdateUtil;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.color.DynamicColors;
@@ -77,17 +77,13 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.reandroid.Merger;
 import com.reandroid.apk.ApkBundle;
-import com.reandroid.apkeditor.Util;
+import com.reandroid.utils.io.FileUtil;
 import com.starry.FileUtils;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.channels.ClosedByInterruptException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -112,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean urisAreSplitApks = true;
     private boolean criticalErrorOccurred;
     private boolean checkForUpdates;
-    private String lastVerChecked;
+    public String lastVerChecked;
     boolean logEnabled;
     private boolean force;
     private String lang;
@@ -188,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         NestedScrollView scrollView = findViewById(R.id.scrollView);
         logger = new MyAPKLogger(this, logField, scrollView);
 
-        RunUtil.runInBackground(() -> Util.deleteDir(getCacheDir()));
+        RunUtil.runInBackground(() -> FileUtil.deleteDirectory(getCacheDir()));
 
         if (aboveSdk20) {
             getWindow().addFlags(FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -206,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         // Fetch settings from SharedPreferences
         lastVerChecked = getSharedPreferences("set", Context.MODE_PRIVATE).getString("lastVerChecked", null);
         if ((checkForUpdates = settings.getBoolean("checkForUpdates", true)))
-            checkForUpdates(false);
+            UpdateUtil.checkForUpdates(false, this);
         signApk = settings.getBoolean("signApk", true);
         force = settings.getBoolean("force", false);
         showDialog = settings.getBoolean("showDialog", false);
@@ -317,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void checkStoragePerm(int requestCode) {
+    public void checkStoragePerm(int requestCode) {
         if (com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this)) {
             getHandler()
                     .post(() -> Toast.makeText(this, rss.getString(R.string.grant_storage), Toast.LENGTH_LONG).show());
@@ -386,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Util.deleteDir(getCacheDir());
+        FileUtil.deleteDirectory(getCacheDir());
         cleanupAppFolder();
         super.onDestroy();
     }
@@ -585,7 +581,7 @@ public class MainActivity extends AppCompatActivity {
             registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
-    long downloadId;
+    public long downloadId;
     private final BroadcastReceiver onDownloadComplete = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -609,126 +605,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void checkForUpdates(boolean toast) {
-        new Thread(() -> {
-            try {
-                HttpURLConnection conn = (HttpURLConnection) new URL(
-                        "https://api.github.com/repos/AbdurazaaqMohammed/AntiSplit-M/releases").openConnection();
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("User-Agent",
-                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 Edg/128.0.0.0");
-                conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-
-                try (InputStream inputStream = conn.getInputStream();
-                        InputStreamReader in = new InputStreamReader(inputStream);
-                        BufferedReader reader = new BufferedReader(in)) {
-                    String line;
-                    String latestVersion = "";
-                    String changelog = "";
-                    String dl = "";
-                    boolean rightBranch = false;
-                    while ((line = reader.readLine()) != null) {
-                        if (line.contains("browser_download_url")) {
-                            dl = line.split("\"")[3];
-                            latestVersion = line.split("/")[7];
-                            rightBranch = latestVersion.charAt(0) == '2';
-                        } else if (line.contains("body") && rightBranch) {
-                            changelog = line.split("\"")[3];
-                            break;
-                        }
-                    }
-                    String currentVer;
-                    try {
-                        currentVer = (MainActivity.this).getPackageManager()
-                                .getPackageInfo((MainActivity.this).getPackageName(), 0).versionName;
-                    } catch (Exception e) {
-                        currentVer = null;
-                    }
-                    boolean newVer = false;
-                    char[] curr = TextUtils.isEmpty(currentVer) ? new char[] { '2', '3', '0' }
-                            : currentVer.replace(".", "").toCharArray();
-                    char[] latest = latestVersion.replace(".", "").toCharArray();
-
-                    int maxLength = Math.max(curr.length, latest.length);
-                    for (int i = 0; i < maxLength; i++) {
-                        char currChar = i < curr.length ? curr[i] : '0';
-                        char latestChar = i < latest.length ? latest[i] : '0';
-
-                        if (latestChar > currChar) {
-                            newVer = true;
-                            break;
-                        } else if (latestChar < currChar) {
-                            break;
-                        }
-                    }
-
-                    if (newVer) {
-                        if (!toast && !TextUtils.isEmpty(lastVerChecked) && lastVerChecked.equals(latestVersion))
-                            return;
-                        String ending = ".apk";
-                        String filename = "AntiSplit-M.v" + latestVersion + ending;
-                        String link = dl.endsWith(ending) ? dl : dl + File.separator + filename;
-                        MaterialTextView changelogText = new MaterialTextView(MainActivity.this);
-                        String linebreak = "<br />";
-                        changelogText.setText(Html.fromHtml(
-                                rss.getString(R.string.new_ver) + " (" + latestVersion + ")" + linebreak + linebreak
-                                        + "Changelog:" + linebreak + changelog.replace("\\r\\n", linebreak)));
-                        int padding = 16;
-                        changelogText.setPadding(padding, padding, padding, padding);
-                        MaterialTextView title = new MaterialTextView(MainActivity.this);
-                        title.setText(rss.getString(R.string.update));
-                        int size = 20;
-                        title.setPadding(size, size, size, size);
-                        title.setTextSize(size);
-                        title.setGravity(Gravity.CENTER);
-
-                        String finalLatestVersion = latestVersion;
-                        getHandler().post(() -> {
-                            AlertDialog alertDialog = new MaterialAlertDialogBuilder(MainActivity.this)
-                                    .setCustomTitle(title).setView(changelogText)
-                                    .setPositiveButton(rss.getString(R.string.dl), (dialog, which) -> {
-                                        if (checkUpdateAfterStoragePermission == null)
-                                            checkUpdateAfterStoragePermission = () -> {
-                                                DownloadManager.Request request = new DownloadManager.Request(
-                                                        Uri.parse(link))
-                                                        .setTitle(filename).setDescription(filename)
-                                                        .setMimeType("application/vnd.android.package-archive")
-                                                        .setDestinationInExternalPublicDir(
-                                                                Environment.DIRECTORY_DOWNLOADS, filename)
-                                                        .setNotificationVisibility(
-                                                                DownloadManager.Request.VISIBILITY_VISIBLE
-                                                                        | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                                                downloadId = ((DownloadManager) MainActivity.this
-                                                        .getSystemService(DOWNLOAD_SERVICE)).enqueue(request);
-                                            };
-                                        if (Build.VERSION.SDK_INT < 29
-                                                && com.abdurazaaqmohammed.utils.FileUtils.doesNotHaveStoragePerm(this))
-                                            MainActivity.this.checkStoragePerm(10);
-                                        else
-                                            checkUpdateAfterStoragePermission.run();
-                                    })
-                                    .setNegativeButton("Go to GitHub Release", (dialog, which) -> MainActivity.this
-                                            .startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(
-                                                    "https://github.com/AbdurazaaqMohammed/AntiSplit-M/releases/latest"))))
-                                    .setNeutralButton(rss.getString(R.string.cancel), null).create();
-                            alertDialog.setOnDismissListener(dialog -> lastVerChecked = finalLatestVersion);
-                            MainActivity.this.runOnUiThread(alertDialog::show);
-                        });
-                    } else if (toast)
-                        getHandler().post(() -> MainActivity.this.runOnUiThread(() -> Toast.makeText(MainActivity.this,
-                                rss.getString(R.string.no_update_found), Toast.LENGTH_SHORT).show()));
-                    // return new String[]{ver, changelog, dl};
-                }
-            } catch (Exception e) {
-                // ra showError(e);
-                if (toast)
-                    runOnUiThread(() -> Toast
-                            .makeText(MainActivity.this, "Failed to check for update", Toast.LENGTH_SHORT).show());
-            }
-        }).start();
-    }
-
-    private Runnable checkUpdateAfterStoragePermission;
+    public Runnable checkUpdateAfterStoragePermission;
 
     public void showApkSelectionDialog() {
         toggleAnimation(true);
@@ -1352,7 +1229,7 @@ public class MainActivity extends AppCompatActivity {
         updateSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> checkUpdateNow
                 .setVisibility((checkForUpdates = isChecked) ? View.GONE : View.VISIBLE));
         checkUpdateNow.setVisibility(checkForUpdates ? View.GONE : View.VISIBLE);
-        checkUpdateNow.setOnClickListener(v1 -> MainActivity.this.checkForUpdates(true));
+        checkUpdateNow.setOnClickListener(v1 -> UpdateUtil.checkForUpdates(true, this));
 
         CompoundButton logSwitch = settingsDialog.findViewById(R.id.logToggle);
         logSwitch.setChecked(logEnabled);

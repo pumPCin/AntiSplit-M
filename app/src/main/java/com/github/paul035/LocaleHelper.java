@@ -1,13 +1,10 @@
 package com.github.paul035;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
-import android.preference.PreferenceManager;
 
 import java.util.Locale;
-import java.util.Objects;
 
 // https://www.geeksforgeeks.org/how-to-change-the-whole-app-language-in-android-programmatically/
 public class LocaleHelper {
