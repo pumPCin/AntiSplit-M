@@ -15,8 +15,6 @@
     <string name="output">"Répertoire de sortie : "</string>
     <string name="show_dialog">Afficher la boîte de dialogue permettant la sélection des splits à inclure</string>
     <string name="nothing">Rien de sélectionné</string>
-    <string name="change_text_color">Changer la couleur du texte</string>
-    <string name="change_background_color">Changer la couleur de l\'arrière-plan</string>
     <string name="all">Tout sélectionner</string>
     <string name="for_device">Sélectionner tous les splits pour les spécifications de votre appareil</string>
     <string name="lang_for_device">Sélectionner la langue pour votre appareil</string>
@@ -36,9 +34,6 @@
     <string name="searching">Recherche de fichiers APK…</string>
     <string name="cancel">Annuler</string>
     <string name="select">Sélectionner</string>
-    <string name="label_parent_directory">Répertoire parent</string>
-    <string name="last_edit">Dernière modification : </string>
-    <string name="error_dir_access">Le répertoire ne peut pas être accédé</string>
     <string name="lang" translatable="false">Langue</string>
     <string name="update">Mise à jour disponible</string>
     <string name="new_ver">Nouvelle version d\'AntiSplit M disponible</string>

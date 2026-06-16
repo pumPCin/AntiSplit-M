@@ -9,8 +9,6 @@
     <string name="output">"출력 폴더: "</string>
     <string name="show_dialog">포함할 분할을 선택하는 대화상자 표시</string>
     <string name="nothing">선택된 항목 없음</string>
-    <string name="change_text_color">텍스트 색상 변경</string>
-    <string name="change_background_color">배경 색상 변경</string>
     <string name="all">모두 선택</string>
     <string name="for_device">기기 사양에 맞는 모든 분할 선택</string>
     <string name="lang_for_device">기기에 맞는 언어 선택</string>
@@ -30,9 +28,6 @@
     <string name="searching">APK 파일 검색 중…</string>
     <string name="cancel">취소</string>
     <string name="select">선택</string>
-    <string name="label_parent_directory">상위 폴더</string>
-    <string name="last_edit">마지막 수정: </string>
-    <string name="error_dir_access">폴더에 접근할 수 없습니다</string>
     <string name="lang" translatable="false">언어</string>
     <string name="update">업데이트 있음</string>
     <string name="new_ver">AntiSplit M의 새 버전이 있습니다</string>

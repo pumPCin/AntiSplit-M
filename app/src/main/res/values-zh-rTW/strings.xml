@@ -10,8 +10,6 @@
     <string name="output">"輸出路徑: "</string>
     <string name="show_dialog">顯示對話框，允許選擇要包含哪些split檔案</string>
     <string name="nothing">沒有已選擇的項目</string>
-    <string name="change_text_color">更改文字顏色</string>
-    <string name="change_background_color">更改背景顏色</string>
     <string name="all">全選</string>
     <string name="for_device">根據您的設備選擇所有split</string>
     <string name="lang_for_device">為您的設備選擇語言</string>
@@ -31,9 +29,6 @@
     <string name="searching">正在搜尋APK檔案…</string>
     <string name="cancel">取消</string>
     <string name="select">選擇</string>
-    <string name="label_parent_directory">上一路徑</string>
-    <string name="last_edit">最後編輯: </string>
-    <string name="error_dir_access">無法存取路徑</string>
     <string name="lang" translatable="false">Language</string>
     <string name="update">有可用的更新</string>
     <string name="new_ver">AntiSplit M 有新更新</string>

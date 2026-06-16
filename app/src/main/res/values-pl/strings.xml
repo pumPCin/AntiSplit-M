@@ -9,8 +9,6 @@
     <string name="output">"Katalog wyjściowy: "</string>
     <string name="show_dialog">Pokaż okno dialogowe pozwalające wybrać, które części APK dołączyć</string>
     <string name="nothing">Nic nie wybrano</string>
-    <string name="change_text_color">Zmień kolor tekstu</string>
-    <string name="change_background_color">Zmień kolor tła</string>
     <string name="all">Wybierz wszystkie</string>
     <string name="for_device">Wybierz wszystkie części APK dla specyfikacji swojego urządzenia</string>
     <string name="lang_for_device">Wybierz język swojego urządzenia</string>
@@ -30,9 +28,6 @@
     <string name="searching">Szukanie plików APK…</string>
     <string name="cancel">Anuluj</string>
     <string name="select">Wybierz</string>
-    <string name="label_parent_directory">Katalog nadrzędny</string>
-    <string name="last_edit">Ostatnia modyfikacja: </string>
-    <string name="error_dir_access">Nie można uzyskać dostępu do katalogu</string>
     <string name="lang" translatable="false">Język</string>
     <string name="update">Dostępna aktualizacja</string>
     <string name="new_ver">Nowa wersja AntiSplit M jest dostępna</string>

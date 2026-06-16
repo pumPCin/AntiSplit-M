@@ -11,8 +11,6 @@
     <string name="output">"پوشه خروجی: "</string>
     <string name="show_dialog">نمایش گفتگو برای انتخاب بخش‌هایی که باید گنجانده شوند</string>
     <string name="nothing">چیزی انتخاب نشده است</string>
-    <string name="change_text_color">تغییر رنگ متن</string>
-    <string name="change_background_color">تغییر رنگ پس‌زمینه</string>
     <string name="all">انتخاب همه</string>
     <string name="for_device">انتخاب همه بخش‌ها برای مشخصات دستگاه شما</string>
     <string name="lang_for_device">انتخاب زبان برای دستگاه شما</string>
@@ -32,9 +30,6 @@
     <string name="searching">در حال جستجوی فایل‌های APK…</string>
     <string name="cancel">لغو</string>
     <string name="select">انتخاب</string>
-    <string name="label_parent_directory">پوشه والد</string>
-    <string name="last_edit">آخرین ویرایش: </string>
-    <string name="error_dir_access">دسترسی به پوشه ممکن نیست</string>
     <string name="lang" translatable="false">Language</string>
     <string name="update">به‌روزرسانی موجود است</string>
     <string name="new_ver">نسخه جدید AntiSplit M موجود است</string>

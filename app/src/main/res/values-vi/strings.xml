@@ -4,8 +4,6 @@
 <string name="pick_folder">"Select folder"</string>
     <string name="file_save_method">"File saving method"</string>
     <string name="force">"Force merging mismatched splits (with different versionCode or package name)"</string>
-    <string name="change_text_color">"Change text color"</string>
-    <string name="change_background_color">"Change background color"</string>
     <string name="all">Chọn hết</string>
     <string name="select">"Select"</string>
     <string name="pause">"Pause button"</string>
@@ -26,14 +24,11 @@
     <string name="dl">Tải xuống</string>
     <string name="dpi_for_device">Chọn độ rộng màn hình cho thiết bị của bạn</string>
     <string name="enable_logs">Bật nhật ký</string>
-    <string name="error_dir_access">Không thể truy cập thư mục</string>
     <string name="for_device">Chọn tất cả các phần tách cho thông số kỹ thuật thiết bị của bạn</string>
     <string name="grant_storage">Cần có quyền lưu trữ để lưu vào cùng thư mục với tệp đã chọn</string>
     <string name="install">Cài đặt</string>
-    <string name="label_parent_directory">Thư mục chính</string>
     <string name="lang">Ngôn ngữ</string>
     <string name="lang_for_device">Chọn ngôn ngữ cho thiết bị của bạn</string>
-    <string name="last_edit">Chỉnh sửa lần cuối:</string>
     <string name="light_theme">Chủ đề sáng</string>
     <string name="merge">Chọn tệp Apks</string>
     <string name="mismatch">Các phần tách sau (%1$s) có mã phiên bản không khớp. Chúng chỉ là mã ngôn ngữ nên ứng dụng có thể chạy mà không cần chúng nhưng những ngôn ngữ này sẽ không hoạt động trong ứng dụng. Bạn có muốn tiếp tục hợp nhất không?</string>

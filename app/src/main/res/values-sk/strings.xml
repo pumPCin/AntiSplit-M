@@ -10,8 +10,6 @@
     <string name="output">"Výstupný priečinok: "</string>
     <string name="show_dialog">Zobraziť dialóg na výber rozdelení</string>
     <string name="nothing">Nič nebolo vybrané</string>
-    <string name="change_text_color">Zmeniť farbu textu</string>
-    <string name="change_background_color">Zmeniť farbu pozadia</string>
     <string name="all">Vybrať všetko</string>
     <string name="for_device">Vybrať všetky rozdelenia pre vaše zariadenie</string>
     <string name="lang_for_device">Vybrať jazyk pre vaše zariadenie</string>
@@ -31,9 +29,6 @@
     <string name="searching">Vyhľadávanie súborov APK…</string>
     <string name="cancel">Zrušiť</string>
     <string name="select">Vybrať</string>
-    <string name="label_parent_directory">Nadradený priečinok</string>
-    <string name="last_edit">Naposledy upravené: </string>
-    <string name="error_dir_access">K priečinku nie je možné pristúpiť</string>
     <string name="lang" translatable="false">Language</string>
     <string name="update">Dostupná aktualizácia</string>
     <string name="new_ver">Dostupná nová verzia AntiSplit M</string>

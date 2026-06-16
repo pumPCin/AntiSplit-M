@@ -9,8 +9,6 @@
     <string name="output">"Kimeneti könyvtár: "</string>
     <string name="show_dialog">Párbeszédpanel megjelenítése az osztott részek kiválasztásához</string>
     <string name="nothing">Nincs semmi kiválasztva</string>
-    <string name="change_text_color">Szövegszín módosítása</string>
-    <string name="change_background_color">Háttérszín módosítása</string>
     <string name="all">Összes kijelölése</string>
     <string name="for_device">Válassza ki az összes osztott részt eszköze specifikációinak megfelelően</string>
     <string name="lang_for_device">Válassza ki a készülék nyelvét</string>
@@ -30,9 +28,6 @@
     <string name="searching">Apk fájlok keresése…</string>
     <string name="cancel">Mégse</string>
     <string name="select">Kiválasztás</string>
-    <string name="label_parent_directory">Szülőkönyvtár</string>
-    <string name="last_edit">Utoljára szerkesztve: </string>
-    <string name="error_dir_access">A könyvtár nem érhető el</string>
     <string name="lang" translatable="false">Nyelv</string>
     <string name="update">Frissítés érhető el</string>
     <string name="new_ver">Új AntiSplit M verzió érhető el</string>

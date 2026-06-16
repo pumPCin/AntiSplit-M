@@ -10,8 +10,6 @@
     <string name="output">"Output directory: "</string>
     <string name="show_dialog">Show dialog allowing selection of which splits to include</string>
     <string name="nothing">Nothing selected</string>
-    <string name="change_text_color">Change text color</string>
-    <string name="change_background_color">Change background color</string>
     <string name="all">Select All</string>
     <string name="for_device">Select all splits for your device specifications</string>
     <string name="lang_for_device">Select language for your device</string>
@@ -31,9 +29,6 @@
     <string name="searching">Searching APK files…</string>
     <string name="cancel">Cancel</string>
     <string name="select">Select</string>
-    <string name="label_parent_directory">Parent Directory</string>
-    <string name="last_edit">Last edited: </string>
-    <string name="error_dir_access">Directory cannot be accessed</string>
     <string name="lang">Language</string>
     <string name="update">Update available</string>
     <string name="new_ver">New version of AntiSplit M is available</string>

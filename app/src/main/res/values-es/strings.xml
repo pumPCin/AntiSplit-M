@@ -10,8 +10,6 @@
     <string name="output">"Directorio de salida: "</string>
     <string name="show_dialog">"Mostrar diálogo que permite seleccionar qué divisiones incluir"</string>
     <string name="nothing">"Nada seleccionado"</string>
-    <string name="change_text_color">"Cambiar color del texto"</string>
-    <string name="change_background_color">"Cambiar color de fondo"</string>
     <string name="all">"Seleccionar todo"</string>
     <string name="for_device">"Seleccionar divisiones que coincidan con las especificaciones de tu dispositivo"</string>
     <string name="lang_for_device">"Seleccionar idioma para tu dispositivo"</string>
@@ -31,9 +29,6 @@
     <string name="searching">"Buscando archivos APK…"</string>
     <string name="cancel">"Cancelar"</string>
     <string name="select">"Seleccionar"</string>
-    <string name="label_parent_directory">"Directorio padre"</string>
-    <string name="last_edit">"Última edición: "</string>
-    <string name="error_dir_access">"No se puede acceder al directorio"</string>
     <string name="lang" translatable="false">"Language"</string>
     <string name="update">"Actualización disponible"</string>
     <string name="new_ver">"Nueva versión de AntiSplit M disponible"</string>

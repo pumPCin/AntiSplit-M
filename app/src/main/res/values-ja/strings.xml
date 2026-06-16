@@ -10,8 +10,6 @@
     <string name="output">"出力先ディレクトリ: "</string>
     <string name="show_dialog">分割に含めるファイルを選択するダイアログを表示する</string>
     <string name="nothing">選択されていません</string>
-    <string name="change_text_color">テキスト色を変更する</string>
-    <string name="change_background_color">背景色を変更する</string>
     <string name="all">すべて選択</string>
     <string name="for_device">デバイスの仕様に応じたすべての分割を選択</string>
     <string name="lang_for_device">デバイスの言語を選択</string>
@@ -31,9 +29,6 @@
     <string name="searching">APK ファイルを検索中…</string>
     <string name="cancel">キャンセル</string>
     <string name="select">選択</string>
-    <string name="label_parent_directory">親ディレクトリ</string>
-    <string name="last_edit">最終編集: </string>
-    <string name="error_dir_access">ディレクトリにアクセスできません</string>
     <string name="lang" translatable="false">言語</string>
     <string name="update">更新が利用可能です</string>
     <string name="new_ver">最新の AntiSplit M が利用可能です</string>

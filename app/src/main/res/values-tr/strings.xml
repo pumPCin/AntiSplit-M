@@ -9,8 +9,6 @@
     <string name="output">"Kayıt klasörü: "</string>
     <string name="show_dialog">Uygulanacak bölünmeleri seçme penceresini göster</string>
     <string name="nothing">Seçim yapılmadı</string>
-    <string name="change_text_color">Metin rengini değiştir</string>
-    <string name="change_background_color">Arka plan rengini değiştir</string>
     <string name="all">Hepsini seç</string>
     <string name="for_device">Cihazınız için özel olan tüm bölünmeleri seçin</string>
     <string name="lang_for_device">Cihazınız için dili seçin</string>
@@ -30,9 +28,6 @@
     <string name="searching">APK dosyaları aranıyor…</string>
     <string name="cancel">İptal</string>
     <string name="select">Seç</string>
-    <string name="label_parent_directory">Üst Klasör</string>
-    <string name="last_edit">Son düzenleme: </string>
-    <string name="error_dir_access">Klasöre erişilemiyor</string>
     <string name="lang" translatable="false">Dil</string>
     <string name="update">Güncelleme mevcut</string>
     <string name="new_ver">AntiSplit M\'nin yeni bir sürümü mevcut</string>

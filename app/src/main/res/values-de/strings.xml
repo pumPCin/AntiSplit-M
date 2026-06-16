@@ -10,8 +10,6 @@
     <string name="output">"Zielverzeichnis: "</string>
     <string name="show_dialog">Dialog zur Auswahl der einzubeziehenden Splits anzeigen</string>
     <string name="nothing">Nichts ausgewählt</string>
-    <string name="change_text_color">Textfarbe ändern</string>
-    <string name="change_background_color">Hintergrundfarbe ändern</string>
     <string name="all">Alle auswählen</string>
     <string name="for_device">Alle Splits für deine Gerätespezifikationen auswählen</string>
     <string name="lang_for_device">Wähle die Sprache für dein Gerät</string>
@@ -31,9 +29,6 @@
     <string name="searching">Suche nach APK-Dateien…</string>
     <string name="cancel">Abbrechen</string>
     <string name="select">Auswählen</string>
-    <string name="label_parent_directory">Übergeordnetes Verzeichnis</string>
-    <string name="last_edit">Zuletzt bearbeitet: </string>
-    <string name="error_dir_access">Auf das Verzeichnis kann nicht zugegriffen werden</string>
     <string name="lang" translatable="false">"Language"</string>
     <string name="update">Update verfügbar</string>
     <string name="new_ver">Eine neue Version von AntiSplit M ist verfügbar</string>

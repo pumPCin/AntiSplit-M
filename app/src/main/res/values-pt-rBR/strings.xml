@@ -15,8 +15,6 @@
     <string name="output">"Diretório de saída: "</string>
     <string name="show_dialog">Exibir caixa de diálogo permitindo a seleção de quais splits incluir</string>
     <string name="nothing">Nada selecionado</string>
-    <string name="change_text_color">Alterar cor do texto</string>
-    <string name="change_background_color">Alterar cor de fundo</string>
     <string name="all">Selecionar tudo</string>
     <string name="for_device">Selecione todas os splits para as especificações do seu dispositivo</string>
     <string name="lang_for_device">Selecione o idioma para o seu dispositivo</string>
@@ -36,9 +34,6 @@
     <string name="searching">Procurando arquivos apk…</string>
     <string name="cancel">Cancelar</string>
     <string name="select">Selecione</string>
-    <string name="label_parent_directory">Diretório pai</string>
-    <string name="last_edit">Última edição: </string>
-    <string name="error_dir_access">O diretório não pode ser acessado</string>
     <string name="lang" translatable="false">Idioma</string>
     <string name="update">Atualização disponível</string>
     <string name="new_ver">Nova versão do AntiSplit M está disponível</string>

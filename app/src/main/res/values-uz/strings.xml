@@ -8,8 +8,6 @@
     <string name="automatically_select">Qurilmangiz uchun hamma narsani avtomatik ravishda tanlang</string>
     <string name="black_theme">Qora</string>
     <string name="cancel">Bekor qilish</string>
-    <string name="change_background_color">Fon rangini o\'zgartirish</string>
-    <string name="change_text_color">Matn rangini o\'zgartirish</string>
     <string name="check_update_now">Yangilanishlarni tekshirish</string>
     <string name="close">Yopish</string>
     <string name="copied_log">Jurnal nusxalandi</string>
@@ -19,16 +17,13 @@
     <string name="dl">Yuklab olish</string>
     <string name="dpi_for_device">Qurilmangiz uchun ekran kengligini tanlang</string>
     <string name="enable_logs">Jurnalni yoqish</string>
-    <string name="error_dir_access">Katalogga kirish taqiqlandi</string>
     <string name="file_save_method">Faylni saqlash usuli</string>
     <string name="for_device">Qurilmangiz uchun barchasini tanlang</string>
     <string name="force">Split-apk\'ning mos kelmaydigan qismlarini birlashtirish (turli versiyalar yoki paket nomlari)</string>
     <string name="grant_storage">Ushbu katalogga yozish ruxsatini berishingiz kerak</string>
     <string name="install">O\'rnatish</string>
-    <string name="label_parent_directory">Ota-ona katalogi</string>
     <string name="lang">Til</string>
     <string name="lang_for_device">Qurilmangiz uchun tilni tanlang</string>
-    <string name="last_edit">Oxirgi marta tahrirlangan:</string>
     <string name="light_theme">Light</string>
     <string name="merge">Birlashtirish/ajralishga qarshi dastur uchun splits-apk ni tanlang</string>
     <string name="mismatch">Splits-apk (%1$s) qismlari boshqa versiya. Ilova til qismlarisiz ishlaydi va ular ilovada mavjud bo\'lmaydi. Birlashtirishda davom etyapsizmi?</string>

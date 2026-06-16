@@ -11,8 +11,6 @@
     <string name="output">"Cartella di salvataggio: "</string>
     <string name="show_dialog">Mostra finestra di scelta delle suddivisioni da implementare</string>
     <string name="nothing">Non è stata effettuata alcuna selezione</string>
-    <string name="change_text_color">Modifica colore del testo</string>
-    <string name="change_background_color">Modifica colore di sfondo</string>
     <string name="all">Seleziona Tutto</string>
     <string name="for_device">Seleziona tutte le suddivisioni specifiche per il tuo dispositivo</string>
     <string name="lang_for_device">Seleziona la lingua per il tuo dispositivo</string>
@@ -32,9 +30,6 @@
     <string name="searching">Ricerca file apk…</string>
     <string name="cancel">Annulla</string>
     <string name="select">Seleziona</string>
-    <string name="label_parent_directory">Cartella Superiore</string>
-    <string name="last_edit">Ultima modifica: </string>
-    <string name="error_dir_access">Impossibile accedere alla cartella</string>
     <string name="lang" translatable="false">Lingua</string>
     <string name="update">Aggiornamento disponibile</string>
     <string name="new_ver">È disponibile una nuova versione di AntiSplit M</string>

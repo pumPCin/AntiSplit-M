@@ -16,8 +16,6 @@
     <string name="output">"دليل الإخراج: "</string>
     <string name="show_dialog">عرض حوار يسمح باختيار المقاطع التي يجب تضمينها</string>
     <string name="nothing">لم يتم اختيار أي شيء</string>
-    <string name="change_text_color">تغيير لون النص</string>
-    <string name="change_background_color">تغيير لون الخلفية</string>
     <string name="all">تحديد الكل</string>
     <string name="for_device">تحديد جميع المقاطع لمواصفات جهازك</string>
     <string name="lang_for_device">تحديد اللغة لجهازك</string>
@@ -37,9 +35,6 @@
     <string name="searching">جارٍ البحث عن ملفات APK…</string>
     <string name="cancel">إلغاء</string>
     <string name="select">تحديد</string>
-    <string name="label_parent_directory">الدليل الرئيسي</string>
-    <string name="last_edit">آخر تعديل: </string>
-    <string name="error_dir_access">لا يمكن الوصول إلى الدليل</string>
     <string name="lang" translatable="false">"Language"</string>
     <string name="update">تحديث متاح</string>
     <string name="new_ver">إصدار جديد من AntiSplit M متاح</string>
