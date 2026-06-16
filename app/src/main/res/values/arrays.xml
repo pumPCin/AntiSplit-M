@@ -19,6 +19,7 @@
         <item>Українська</item>  <!-- uk -->
         <item>O\'zbek</item>  <!-- uz -->
         <item>Tiếng Việt</item>  <!-- vi -->
+        <item>فارسی</item>  <!-- fa -->
         <item>简体中文</item>  <!-- zh-CN -->
         <item>繁體中文(台灣)</item>  <!-- zh-tw -->
     </string-array>
@@ -41,6 +42,7 @@
         <item>uk</item>      <!-- Ukrainian -->
         <item>uz</item>      <!-- Uzbek -->
         <item>vi</item>      <!-- Vietnamese -->
+        <item>fa</item>      <!-- Persian -->
         <item>zh-rCN</item>   <!-- Chinese (Simplified) -->
         <item>zh-TW</item>   <!-- Chinese (Taiwan, Traditional) -->
     </string-array>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">AntiSplit M</string>
+    <string name="merge">انتخاب فایل APK تقسیم‌شده برای ادغام (APKS;APKM;XAPK)</string>
+    <string name="success_saved">فایل با موفقیت ذخیره شد</string>
+    <string name="enable_logs">فعال‌سازی گزارش‌ها</string>
+    <string name="ask">هر بار پرسیده شود</string>
+    <string name="same">همان پوشه فایل انتخاب‌شده</string>
+    <string name="grant_storage">برای ذخیره در همان پوشه فایل انتخاب‌شده به مجوز حافظه نیاز است</string>
+    <string name="no_filepath">"امکان نوشتن در مسیر فایل وجود ندارد "</string>
+    <string name="output">"پوشه خروجی: "</string>
+    <string name="show_dialog">نمایش گفتگو برای انتخاب بخش‌هایی که باید گنجانده شوند</string>
+    <string name="nothing">چیزی انتخاب نشده است</string>
+    <string name="change_text_color">تغییر رنگ متن</string>
+    <string name="change_background_color">تغییر رنگ پس‌زمینه</string>
+    <string name="all">انتخاب همه</string>
+    <string name="for_device">انتخاب همه بخش‌ها برای مشخصات دستگاه شما</string>
+    <string name="lang_for_device">انتخاب زبان برای دستگاه شما</string>
+    <string name="arch_for_device">انتخاب معماری برای دستگاه شما</string>
+    <string name="dpi_for_device">انتخاب عرض صفحه برای دستگاه شما</string>
+    <string name="select_splits">انتخاب بخش‌ها</string>
+    <string name="sign_apk">امضای APK پس از ادغام</string>
+    <string name="automatically_select">انتخاب خودکار بخش‌ها برای مشخصات دستگاه شما</string>
+    <string name="sign_failed">امضای APK ناموفق بود، بدون امضا ذخیره می‌شود</string>
+    <string name="signing">در حال امضای APK…</string>
+    <string name="saving">در حال ذخیره…</string>
+    <string name="removed_table_entry">"ورودی جدول حذف شد: "</string>
+    <string name="sanitizing_manifest">در حال پاک‌سازی مانیفست </string>
+    <string name="skipping">"رد شدن از "</string>
+    <string name="not_apk">: فایل APK نیست</string>
+    <string name="unselected">: انتخاب‌ نشده</string>
+    <string name="searching">در حال جستجوی فایل‌های APK…</string>
+    <string name="cancel">لغو</string>
+    <string name="select">انتخاب</string>
+    <string name="label_parent_directory">پوشه والد</string>
+    <string name="last_edit">آخرین ویرایش: </string>
+    <string name="error_dir_access">دسترسی به پوشه ممکن نیست</string>
+    <string name="lang" translatable="false">Language</string>
+    <string name="update">به‌روزرسانی موجود است</string>
+    <string name="new_ver">نسخه جدید AntiSplit M موجود است</string>
+    <string name="dl">دانلود</string>
+    <string name="auto_update">بررسی خودکار به‌روزرسانی‌ها</string>
+    <string name="check_update_now">بررسی به‌روزرسانی اکنون</string>
+    <string name="no_update_found">به‌روزرسانی‌ای یافت نشد</string>
+    <string name="settings">تنظیمات</string>
+    <string name="close">بستن</string>
+    <string name="mismatch">بخش‌های زیر (%1$s) دارای کد نسخه ناهماهنگ هستند. این‌ها فقط کدهای زبان هستند، بنابراین برنامه می‌تواند بدون آن‌ها اجرا شود، اما این زبان‌ها در برنامه کار نخواهند کرد. آیا می‌خواهید در هر صورت ادغام را ادامه دهید؟</string>
+    <string name="warning">هشدار</string>
+    <string name="mismatch_base">" کد نسخه با base.apk مطابقت ندارد"</string>
+    <string name="label_parent_dir" translatable="false">…</string>
+    <string name="create_issue">ایجاد Issue در GitHub</string>
+    <string name="copy_log">کپی گزارش</string>
+    <string name="pause">دکمه مکث</string>
+    <string name="copied_log">گزارش کپی شد</string>
+    <string name="select_from_installed_apps">انتخاب از برنامه‌های نصب‌شده</string>
+    <string name="app_icon_list_label">آیکون برنامه</string>
+    <string name="install">نصب</string>
+    <string name="black_theme">تم سیاه</string>
+    <string name="dark_theme">تم تیره</string>
+    <string name="light_theme">تم روشن</string>
+    <string name="system_theme">تم سیستم</string>
+    <string name="suffix">پسوند</string>
+    <string name="pairip_warning">برنامه‌ای که می‌خواهید ادغام کنید از Pairip/Google加固 Integrity برای محافظت در برابر تغییرات استفاده می‌کند. نسخه ادغام‌شده هنگام باز شدن از کار می‌افتد مگر اینکه بدانید چگونه APK را برای دور زدن آن تغییر دهید.</string>
+    <string name="force">ادغام اجباری بخش‌های ناهماهنگ (با versionCode یا نام بسته متفاوت)</string>
+    <string name="file_save_method">روش ذخیره فایل</string>
+    <string name="pick_folder">وارد کردن پوشه</string>
+    <string name="not_split">این به نظر یک APK تقسیم‌شده نیست (%1$s)</string>
+    <string name="merged">با موفقیت ادغام شد، محل ذخیره را انتخاب کنید</string>
+    <string name="save">ذخیره</string>
+    <string name="check_file_valid">"لطفاً بررسی کنید که فایل انتخاب‌شده یک ZIP/APK تقسیم‌شده معتبر است (سعی کنید آن را در مدیر فایل باز کنید یا نصب کنید). اگر نصب شده اما همچنان خطا می‌گیرید، لطفاً از این قابلیت استفاده کنید "</string>
+    <string name="select_compression_level">انتخاب سطح فشرده‌سازی</string>
+    <string name="default_c">پیش‌فرض</string>
+</resources>
