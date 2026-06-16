@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">AntiSplit M</string>
     <string name="merge">병합할 분할 APK 파일 선택(APKS/APKM/XAPK)</string>
     <string name="success_saved">파일을 저장했습니다</string>
     <string name="enable_logs">로그 사용</string>
@@ -46,7 +45,6 @@
     <string name="mismatch">다음 분할(%1$s)의 versionCode가 서로 다릅니다. 이 항목들은 언어 코드일 뿐이라 없어도 앱은 실행되지만, 앱에서 해당 언어는 작동하지 않습니다. 그래도 병합을 계속하시겠습니까?</string>
     <string name="warning">경고</string>
     <string name="mismatch_base">" versionCode가 base.apk와 일치하지 않습니다"</string>
-    <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">GitHub Issue 만들기</string>
     <string name="copy_log">로그 복사</string>
     <string name="pause">일시정지 버튼</string>

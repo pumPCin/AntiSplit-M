@@ -46,7 +46,6 @@
     <string name="mismatch">"Las siguientes divisiones (%1$s) tienen códigos de versión inconsistentes. Solo son códigos de idioma, así que la app puede funcionar sin ellos, pero estos idiomas no estarán disponibles. ¿Deseas continuar con la combinación?"</string>
     <string name="warning">"Advertencia"</string>
     <string name="mismatch_base">" versionCode no coincide con base.apk"</string>
-    <string name="label_parent_dir" translatable="false">"…"</string>
     <string name="create_issue">"Crear incidencia en GitHub"</string>
     <string name="copy_log">"Copiar registro"</string>
     <string name="pause">"Botón de pausa"</string>
@@ -64,4 +63,5 @@
     <string name="file_save_method">"Método de guardado de archivos"</string>
     <string name="pick_folder">"Seleccionar carpeta"</string>
     <string name="not_split">"Esto no parece ser un APK dividido (%1$s)"</string>
+    <string name="default_c">valor por defecto</string>
 </resources>

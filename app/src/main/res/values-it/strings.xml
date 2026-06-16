@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="not_split">"This does not seem to be a split APK (%1$s)"</string>
-<string name="app_name" translatable="false">"AntiSplit M"</string>
     <string name="merge">Seleziona l\'APK suddiviso da unire</string>
     <string name="success_saved">Esportazione file APK unito completata</string>
     <string name="enable_logs">Attiva registro eventi</string>
@@ -48,7 +47,6 @@
     <string name="mismatch">Le seguenti suddivisioni (%1$s) hanno un codice di versione non corrispondente. Queste contengono solo traduzioni per altre lingue, quindi l\'app potrà essere comunque eseguita, ma non risulterà tradotta. Intendi procedere ugualmente con l\'unione?</string>
     <string name="warning">Avviso</string>
     <string name="mismatch_base">" il codice di versione non corrisponde a quello del file apk base."</string>
-    <string name="label_parent_dir" translatable="false">"…"</string>
     <string name="create_issue">Segnala un problema su GitHub</string>
     <string name="copy_log">Copia registro eventi</string>
     <string name="pause">Pulsante pausa</string>
@@ -65,4 +63,5 @@
     <string name="force">Forza unificazione delle suddivisioni non corrispondenti (con differente versionCode o nome pacchetto)</string>
     <string name="file_save_method">Opzioni di salvataggio file</string>
     <string name="pick_folder">Inserisci percorso</string>
+    <string name="default_c">valore di default</string>
 </resources>

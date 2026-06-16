@@ -52,7 +52,6 @@
     <string name="mismatch">المقاطع التالية (%1$s) تحتوي على رموز إصدار غير متطابقة. هي فقط رموز لغات، لذا يمكن للتطبيق العمل بدونها، لكن هذه اللغات لن تعمل في التطبيق. هل ترغب في الاستمرار في الدمج على أي حال؟</string>
     <string name="warning">تحذير</string>
     <string name="mismatch_base">" رمز الإصدار لا يتطابق مع base.apk"</string>
-    <string name="label_parent_dir" translatable="false">"…"</string>
     <string name="create_issue">إنشاء مشكلة على GitHub</string>
     <string name="copy_log">نسخ السجل</string>
     <string name="pause">زر الإيقاف المؤقت</string>
@@ -65,4 +64,5 @@
     <string name="light_theme">"Light theme"</string>
     <string name="system_theme">"System theme"</string>
     <string name="suffix">اللاحقة</string>
+    <string name="default_c">تقصير</string>
 </resources>

@@ -4,7 +4,6 @@
 <string name="pick_folder">"Select folder"</string>
     <string name="file_save_method">"File saving method"</string>
     <string name="force">"Force merging mismatched splits (with different versionCode or package name)"</string>
-    <string name="app_name" translatable="false">"AntiSplit M"</string>
     <string name="change_text_color">"Change text color"</string>
     <string name="change_background_color">"Change background color"</string>
     <string name="all">Chọn hết</string>
@@ -31,7 +30,6 @@
     <string name="for_device">Chọn tất cả các phần tách cho thông số kỹ thuật thiết bị của bạn</string>
     <string name="grant_storage">Cần có quyền lưu trữ để lưu vào cùng thư mục với tệp đã chọn</string>
     <string name="install">Cài đặt</string>
-    <string name="label_parent_dir">…</string>
     <string name="label_parent_directory">Thư mục chính</string>
     <string name="lang">Ngôn ngữ</string>
     <string name="lang_for_device">Chọn ngôn ngữ cho thiết bị của bạn</string>
@@ -65,4 +63,5 @@
     <string name="unselected">: Không được chọn</string>
     <string name="update">Cập nhật có sẵn</string>
     <string name="warning">Cảnh báo</string>
+    <string name="default_c">giá trị mặc định</string>
 </resources>

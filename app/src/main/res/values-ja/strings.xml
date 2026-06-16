@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">AntiSplit M</string>
     <string name="merge">分割 APK を選択で統合/アンチスプリットする</string>
     <string name="success_saved">ファイルの保存に成功しました</string>
     <string name="enable_logs">ログを有効化</string>
@@ -47,7 +46,6 @@
     <string name="mismatch">以下の分割 (%1$s) のバージョンコードが一致しません。これらは言語コードのみのためファイルがなくても実行は可能ですが、その言語はアプリで動作しなくなります。それでも統合を続行しますか？</string>
     <string name="warning">警告</string>
     <string name="mismatch_base">" バージョンコードが base.apk のバージョンと一致しません"</string>
-    <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">GitHub で Issue を作成</string>
     <string name="copy_log">ログをコピー</string>
     <string name="pause">一時停止ボタン</string>
@@ -65,4 +63,5 @@
     <string name="file_save_method">ファイルの保存方法</string>
     <string name="pick_folder">保存先を入力</string>
     <string name="not_split">これは分割 APK ではないようです (%1$s)</string>
+    <string name="default_c">デフォルト値</string>
 </resources>

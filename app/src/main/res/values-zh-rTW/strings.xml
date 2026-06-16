@@ -1,6 +1,5 @@
 
 <resources>
-    <string name="app_name" translatable="false">AntiSplit M</string>
     <string name="merge">選擇split APK來合併/AntiSplit</string>
     <string name="success_saved">檔案已成功保存</string>
     <string name="enable_logs">啟用日誌</string>
@@ -47,7 +46,6 @@
     <string name="mismatch">以下splits（%1$s）的版本代碼不符。它們只是語言代碼，因此應用程式可以在沒有它們的情況下運行，但這些語言將無法在應用程式中運行。您是否仍想繼續合併？</string>
     <string name="warning">Warning</string>
     <string name="mismatch_base">" 版本代碼與 base.apk 不符"</string>
-    <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">在 GitHub 建立問題</string>
     <string name="copy_log">複製日誌</string>
     <string name="pause">暫停按鈕</string>
@@ -65,4 +63,5 @@
     <string name="file_save_method">檔案保存方法</string>
     <string name="pick_folder">輸入資料夾</string>
     <string name="not_split">這似乎不是 split APK (%1$s)</string>
+    <string name="default_c">預設值</string>
 </resources>

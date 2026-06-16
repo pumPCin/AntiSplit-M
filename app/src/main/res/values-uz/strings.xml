@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">AntiSplit M</string>
     <string name="all">Hammasini tanlang</string>
     <string name="app_icon_list_label">Ilova belgisi</string>
     <string name="arch_for_device">Qurilmangiz uchun arxitekturani tanlang</string>
@@ -26,7 +25,6 @@
     <string name="force">Split-apk\'ning mos kelmaydigan qismlarini birlashtirish (turli versiyalar yoki paket nomlari)</string>
     <string name="grant_storage">Ushbu katalogga yozish ruxsatini berishingiz kerak</string>
     <string name="install">O\'rnatish</string>
-    <string name="label_parent_dir">..</string>
     <string name="label_parent_directory">Ota-ona katalogi</string>
     <string name="lang">Til</string>
     <string name="lang_for_device">Qurilmangiz uchun tilni tanlang</string>
@@ -65,4 +63,5 @@
     <string name="unselected">: tanlanmagan</string>
     <string name="update">Yangilanish mavjud</string>
     <string name="warning">Ogohlantirish</string>
+    <string name="default_c">Standart</string>
 </resources>

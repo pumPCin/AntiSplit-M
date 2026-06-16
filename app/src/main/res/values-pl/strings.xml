@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">AntiSplit M</string>
     <string name="merge">Wybierz podzielone APK do scalenia</string>
     <string name="success_saved">Plik został zapisany pomyślnie</string>
     <string name="enable_logs">Włącz logi</string>
@@ -46,7 +45,6 @@
     <string name="mismatch">Następujące części APK (%1$s) mają niezgodne kody wersji. To pakiety językowe, aplikacja zadziała bez nich, ale te języki nie będa dostępne. Czy chcesz kontynuować scalanie?</string>
     <string name="warning">Uwaga</string>
     <string name="mismatch_base">" kod wersji nie pasuje do base.apk"</string>
-    <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">Zgłoś problem na GitHub\'ie</string>
     <string name="copy_log">Skopiuj log</string>
     <string name="pause">Przycisk pauzy</string>
@@ -64,4 +62,5 @@
     <string name="file_save_method">Lokalizacja zapisu pliku</string>
     <string name="pick_folder">Wybierz folder</string>
     <string name="not_split">To nie wydaje się być podzielonym plikiem APK (%1$s)</string>
+    <string name="default_c">ustawienia domyślne</string>
 </resources>

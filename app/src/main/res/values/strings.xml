@@ -34,7 +34,7 @@
     <string name="label_parent_directory">Parent Directory</string>
     <string name="last_edit">Last edited: </string>
     <string name="error_dir_access">Directory cannot be accessed</string>
-    <string name="lang" translatable="false">Language</string>
+    <string name="lang">Language</string>
     <string name="update">Update available</string>
     <string name="new_ver">New version of AntiSplit M is available</string>
     <string name="dl">Download</string>
@@ -46,7 +46,6 @@
     <string name="mismatch">The following splits (%1$s) have mismatched version codes. They are only language codes, so the app can run without them, but these languages will not work in the app. Do you want to continue with merging anyway?</string>
     <string name="warning">Warning</string>
     <string name="mismatch_base">" version code does not match that of base.apk"</string>
-    <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">Create GitHub Issue</string>
     <string name="copy_log">Copy log</string>
     <string name="pause">Pause button</string>

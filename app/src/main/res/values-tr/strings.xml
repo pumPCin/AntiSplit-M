@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">AntiSplit M</string>
     <string name="merge">Dosyadan bölünmüş APK seçin</string>
     <string name="success_saved">Dosya başarıyla kaydedildi</string>
     <string name="enable_logs">Etkinlik kaydını etkinleştir</string>
@@ -46,7 +45,6 @@
     <string name="mismatch">Aşağıdaki bölünmelerin (%1$s) sürüm kodu uyuşmuyor. Bunlar yalnızca diğer diller için çeviriler içeriyor, bu nedenle uygulama yine de çalışabilir.</string>
     <string name="warning">Uyarı</string>
     <string name="mismatch_base">" sürüm kodu temel APK dosyasıyla eşleşmiyor."</string>
-    <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">GitHub\'da sorun bildir</string>
     <string name="copy_log">Etkinlik kaydını kopyala</string>
     <string name="pause">Duraklatma düğmesi</string>
@@ -64,4 +62,5 @@
     <string name="file_save_method">Dosya kaydetme seçenekleri</string>
     <string name="pick_folder">Yolu girin</string>
     <string name="not_split">Bu bölünmüş APK gibi durmuyor (%1$s)</string>
+    <string name="default_c">Varsayılan değer</string>
 </resources>

@@ -30,7 +30,6 @@
     <string name="all">Выбрать все</string>
     <string name="androidx_startup">androidx.startup</string>
     <string name="app_icon_list_label">App icon</string>
-    <string name="app_name">AntiSplit M</string>
     <string name="appbar_scrolling_view_behavior">com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior</string>
     <string name="arch_for_device">Выберите архитектуру для вашего устройства</string>
     <string name="ask">Спрашивать каждый раз</string>
@@ -81,7 +80,6 @@
     <string name="icon_content_description">Dialog Icon</string>
     <string name="install">Установить</string>
     <string name="item_view_role_description">Tab</string>
-    <string name="label_parent_dir">…</string>
     <string name="label_parent_directory">Родительский каталог</string>
     <string name="lang">Язык</string>
     <string name="lang_for_device">Выберите язык для вашего устройства</string>
@@ -235,4 +233,5 @@
     <string name="unselected">: Не выбрано</string>
     <string name="update">Доступно обновление</string>
     <string name="warning">Предупреждение</string>
+    <string name="default_c">По умолчанию</string>
 </resources>

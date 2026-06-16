@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">AntiSplit M</string>
     <string name="merge">Osztott APK kiválasztása az egyesítéshez/szétválasztáshoz</string>
     <string name="success_saved">Fájl sikeresen mentve</string>
     <string name="enable_logs">Naplók engedélyezése</string>
@@ -46,7 +45,6 @@
     <string name="mismatch">A következő osztott részek (%1$s) verziókódjai nem egyeznek. Ezek csak nyelvi kódok, így az alkalmazás ezek nélkül is futtatható, de ezek a nyelvek nem fognak működni az alkalmazásban. Folytatja az egyesítést?</string>
     <string name="warning">Figyelem</string>
     <string name="mismatch_base">" verziókódja nem egyezik a base.apk kódjával"</string>
-    <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">GitHub téma létrehozása</string>
     <string name="copy_log">Napló másolása</string>
     <string name="pause">Szünet gomb</string>
@@ -64,4 +62,5 @@
     <string name="file_save_method">Fájl mentési módszer</string>
     <string name="pick_folder">Mappa megadása</string>
     <string name="not_split">Ez nem tűnik split APK-nak (%1$s)</string>
+    <string name="default_c">alapértelmezés</string>
 </resources>

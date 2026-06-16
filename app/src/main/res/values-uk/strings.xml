@@ -30,7 +30,6 @@
     <string name="all">Вибрати все</string>
     <string name="androidx_startup">androidx.startup</string>
     <string name="app_icon_list_label">App icon</string>
-    <string name="app_name">AntiSplit M</string>
     <string name="appbar_scrolling_view_behavior">com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior</string>
     <string name="arch_for_device">Виберіть архітектуру для Вашого пристрою</string>
     <string name="ask">Запитувати кожного разу</string>
@@ -81,7 +80,6 @@
 	<string name="icon_content_description">Dialog Icon</string>
     <string name="install">Встановити</string>
     <string name="item_view_role_description">Tab</string>
-    <string name="label_parent_dir">…</string>
     <string name="label_parent_directory">Батьківський каталог</string>
     <string name="lang">Мова</string>
     <string name="lang_for_device">Виберіть мову для Вашого пристрою</string>
@@ -235,4 +233,5 @@
     <string name="unselected">: Не вибрано</string>
     <string name="update">Доступне оновлення</string>
     <string name="warning">Попередження</string>
+    <string name="default_c">усталене значення</string>
 </resources>

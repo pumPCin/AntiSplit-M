@@ -30,7 +30,6 @@
     <string name="all">全选</string>
     <string name="androidx_startup">androidx.startup</string>
     <string name="app_icon_list_label">应用图标</string>
-    <string name="app_name">AntiSplit M</string>
     <string name="appbar_scrolling_view_behavior">com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior</string>
     <string name="arch_for_device">选择您设备的架构</string>
     <string name="ask">每次都要问</string>
@@ -81,7 +80,6 @@
     <string name="icon_content_description">对话框图标</string>
     <string name="install">安装</string>
     <string name="item_view_role_description">标签页</string>
-    <string name="label_parent_dir">…</string>
     <string name="label_parent_directory">父目录</string>
     <string name="lang">语言</string>
     <string name="lang_for_device">选择您设备的语言</string>
@@ -234,5 +232,6 @@
     <string name="unselected">：未选择</string>
     <string name="update">更新可用</string>
     <string name="warning">警告</string>
+    <string name="default_c">默认</string>
 </resources>
 

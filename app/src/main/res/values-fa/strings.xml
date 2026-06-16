@@ -47,7 +47,6 @@
     <string name="mismatch">بخش‌های زیر (%1$s) دارای کد نسخه ناهماهنگ هستند. این‌ها فقط کدهای زبان هستند، بنابراین برنامه می‌تواند بدون آن‌ها اجرا شود، اما این زبان‌ها در برنامه کار نخواهند کرد. آیا می‌خواهید در هر صورت ادغام را ادامه دهید؟</string>
     <string name="warning">هشدار</string>
     <string name="mismatch_base">" کد نسخه با base.apk مطابقت ندارد"</string>
-    <string name="label_parent_dir" translatable="false">…</string>
     <string name="create_issue">ایجاد Issue در GitHub</string>
     <string name="copy_log">کپی گزارش</string>
     <string name="pause">دکمه مکث</string>
