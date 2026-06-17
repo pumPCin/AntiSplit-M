@@ -151,17 +151,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences("set", Context.MODE_PRIVATE);
 
         String deviceLang = Locale.getDefault().getLanguage();
-        boolean zh = deviceLang.equals("zh");
-        boolean supportedLang = zh || deviceLang.equals("ar") || deviceLang.equals("es")
-                || deviceLang.equals("fr") || deviceLang.equals("in") || deviceLang.equals("it")
-                || deviceLang.equals("pt-BR") || deviceLang.equals("ru") || deviceLang.equals("tr")
-                || deviceLang.equals("uk") || deviceLang.equals("vi") || deviceLang.equals("hu")
-                || deviceLang.equals("pl") || deviceLang.equals("sk") || deviceLang.equals("ko")
-                || deviceLang.equals("uz") || deviceLang.equals("ja") || deviceLang.equals("de")
-                || deviceLang.equals("fa");
-        if(zh) {
-            deviceLang = Locale.getDefault().getCountry().equals("TW") ? "zh-TW" : "zh-rCN";
-        }
+        boolean supportedLang = deviceLang.equals("ru");
         lang = settings.getString("lang", supportedLang ? deviceLang : "en");
         boolean useDeviceRss = lang.equals(deviceLang);
         rss = useDeviceRss ? getResources() : LocaleHelper.setLocale(this, lang).getResources();
@@ -832,7 +822,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 currentVer = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             } catch (Exception ex) {
-                currentVer = "2.3.0";
+                currentVer = "2.3.3";
             }
             fullLog.append(currentVer).append('\n')
                     .append("Storage permission granted: ")
