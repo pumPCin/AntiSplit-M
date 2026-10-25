@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AntiSplit M"
+rootProject.name = "AntiSplit-M"
 include(":app")
