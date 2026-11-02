@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.abdurazaaqmohammed.AntiSplit"
-    compileSdk = 36
+    compileSdk = 37
 
     lint {
         lintConfig = rootProject.file("lint.xml")
@@ -12,10 +12,10 @@ android {
 
     defaultConfig {
         applicationId = "com.abdurazaaqmohammed.AntiSplit"
-        minSdk = 19
+        minSdk = 24
         targetSdk = 37
         versionCode = 61
-        versionName = "2.3.3"
+        versionName = "2.3.5"
         multiDexEnabled = true
     }
 
@@ -31,15 +31,15 @@ android {
     }
     compileOptions {
         isCoreLibraryDesugaringEnabled = false
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     buildFeatures {
         viewBinding = false
     }
     dependencies {
-        implementation("com.google.android.material:material:1.12.0")
-        //implementation(files("libs/ARSCLib-1.3.9.jar"))
+        implementation("com.google.android.material:material:1.14.0")
+        //implementation(files("libs/ARSCLib.jar"))
     }
     dependenciesInfo {
         // Disables dependency metadata when building APKs.
